@@ -6,6 +6,7 @@ import (
 
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
+	totp "github.com/ACaiCat/tiktok-go/pkg/ totp"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/jwt"
@@ -32,6 +33,15 @@ func (s *UserService) UserLogin(req *user.LoginReq) (*model.User, string, string
 		}
 		log.Println("Error comparing password hash:", err)
 		return nil, "", "", errno.ServiceErr
+	}
+
+	if usr.TotpSecret != "" {
+		if req.Code == "" {
+			return nil, "", "", errno.MFAMissingErr
+		}
+		if !totp.ValidateCode(req.Code, usr.TotpSecret) {
+			return nil, "", "", errno.MFACodeInvalidErr
+		}
 	}
 
 	accessToken, err := jwt.CreateToken(constants.TypeAccessToken, usr.ID)

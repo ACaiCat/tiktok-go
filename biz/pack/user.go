@@ -29,3 +29,18 @@ func RespRegister(c *app.RequestContext) {
 		Base: SuccessBase,
 	})
 }
+
+func RespMFA(c *app.RequestContext, secret string) {
+	c.JSON(consts.StatusOK, user.MFAQRCodeResp{
+		Base: SuccessBase,
+		Data: &user.MFAQRCodeData{
+			Secret: secret,
+		},
+	})
+}
+
+func RespBindMFA(c *app.RequestContext) {
+	c.JSON(consts.StatusOK, user.BindMFAResp{
+		Base: SuccessBase,
+	})
+}

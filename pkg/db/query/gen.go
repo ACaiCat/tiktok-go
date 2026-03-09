@@ -15,22 +15,6 @@ import (
 	"gorm.io/plugin/dbresolver"
 )
 
-var (
-	Q       = new(Query)
-	Comment *comment
-	Like    *like
-	User    *user
-	Video   *video
-)
-
-func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
-	*Q = *Use(db, opts...)
-	Comment = &Q.Comment
-	Like = &Q.Like
-	User = &Q.User
-	Video = &Q.Video
-}
-
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:      db,

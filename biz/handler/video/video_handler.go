@@ -20,7 +20,6 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -37,7 +36,6 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -54,7 +52,6 @@ func List(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -71,7 +68,6 @@ func Popular(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -88,7 +84,6 @@ func Search(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 

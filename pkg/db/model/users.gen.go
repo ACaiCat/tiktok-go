@@ -14,13 +14,14 @@ const TableNameUser = "users"
 
 // User mapped from table <users>
 type User struct {
-	ID        int64          `gorm:"column:id;primaryKey;autoIncrement:true;comment:用户ID" json:"id"`                      // 用户ID
-	Username  string         `gorm:"column:username;not null;comment:用户名" json:"username"`                                // 用户名
-	Password  string         `gorm:"column:password;not null;comment:密码" json:"password"`                                 // 密码
-	AvatarURL string         `gorm:"column:avatar_url;comment:头像URL" json:"avatar_url"`                                   // 头像URL
-	CreatedAt time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"created_at"` // 创建时间
-	UpdatedAt time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP;comment:更新时间" json:"updated_at"` // 更新时间
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;comment:删除时间" json:"deleted_at"`                                    // 删除时间
+	ID         int64          `gorm:"column:id;primaryKey;autoIncrement:true;comment:用户ID" json:"id"`                      // 用户ID
+	Username   string         `gorm:"column:username;not null;comment:用户名" json:"username"`                                // 用户名
+	Password   string         `gorm:"column:password;not null;comment:密码" json:"password"`                                 // 密码
+	AvatarURL  string         `gorm:"column:avatar_url;comment:头像URL" json:"avatar_url"`                                   // 头像URL
+	TotpSecret string         `gorm:"column:totp_secret;comment:TOTP密钥" json:"totp_secret"`                                // TOTP密钥
+	CreatedAt  time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"created_at"` // 创建时间
+	UpdatedAt  time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP;comment:更新时间" json:"updated_at"` // 更新时间
+	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;comment:删除时间" json:"deleted_at"`                                    // 删除时间
 }
 
 // TableName User's table name

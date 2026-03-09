@@ -12,4 +12,6 @@ const (
 	UserIsNotExistErrCode        = 11001
 	PasswordIsNotVerifiedErrCode = 11002
 	PasswordTooShortErrCode      = 11003
+	MFACodeInvalidErrCode        = 11004
+	MFAMissingErrCode            = 11005
 )

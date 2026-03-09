@@ -6,11 +6,11 @@ import (
 	"context"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
+	mw "github.com/ACaiCat/tiktok-go/biz/mw/auth"
 	"github.com/ACaiCat/tiktok-go/biz/pack"
 	service "github.com/ACaiCat/tiktok-go/biz/service/user"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"github.com/ACaiCat/tiktok-go/pkg/jwt"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -23,7 +23,6 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -43,7 +42,6 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -67,25 +65,10 @@ func Refresh(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	userID, err := jwt.VerifyToken(req.RefreshToken, constants.TypeRefreshToken)
-	if err != nil {
-		pack.RespError(c, err)
-		return
-	}
-
-	accessToken, err := jwt.CreateToken(constants.TypeAccessToken, userID)
-
-	if err != nil {
-		pack.RespError(c, err)
-		return
-	}
-
-	refreshToken, err := jwt.CreateToken(constants.TypeRefreshToken, userID)
-
+	accessToken, refreshToken, err := service.NewUserService().RefreshToken(&req)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -102,7 +85,6 @@ func Info(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -119,7 +101,6 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -136,18 +117,17 @@ func MFAQRCode(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	userID := mw.GetUserID(c)
+
+	secret, err := service.NewUserService().GetMFA(&req, userID)
+	if err != nil {
+		pack.RespError(c, err)
 		return
 	}
 
-	resp := new(user.MFAQRCodeResp)
-
-	resp.Data = &user.MFAQRCodeData{
-		Secret: "",
-		Qrcode: "",
-	}
-
-	c.JSON(consts.StatusOK, resp)
+	pack.RespMFA(c, secret)
 }
 
 // BindMFA .
@@ -158,13 +138,18 @@ func BindMFA(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	resp := new(user.MFAQRCodeResp)
+	userID := mw.GetUserID(c)
 
-	c.JSON(consts.StatusOK, resp)
+	err = service.NewUserService().BindMFA(&req, userID)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespBindMFA(c)
 }
 
 // SearchImage .
@@ -175,7 +160,6 @@ func SearchImage(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 

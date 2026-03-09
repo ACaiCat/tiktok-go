@@ -106,8 +106,6 @@ message MFAQRCodeResp {
 message MFAQRCodeData {
   // 密钥
   string secret = 1;
-  // Base64图片
-  string qrcode = 2;
 }
 
 // 绑定MFA请求
@@ -122,8 +120,6 @@ message BindMFAReq {
 message BindMFAResp {
   // 响应状态
   common.Base base = 1;
-  // 用户数据
-  model.User data = 2;
 }
 
 // 以图搜图请求

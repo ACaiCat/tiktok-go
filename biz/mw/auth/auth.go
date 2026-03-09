@@ -1,4 +1,4 @@
-﻿package auth
+﻿package mw
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 func Auth() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		token := string(c.GetHeader(constants.AccessTokenHeader))
-		userID, err := jwt.VerifyToken(token, constants.TypeAccessToken)
+		userID, err := jwt.ValidateToken(token, constants.TypeAccessToken)
 		if err != nil {
 			pack.RespError(c, err)
 		}

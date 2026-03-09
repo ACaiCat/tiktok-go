@@ -11,7 +11,7 @@ func main() {
 
 	g := gen.NewGenerator(gen.Config{
 		OutPath: "pkg/db/query",
-		Mode:    gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface,
+		Mode:    gen.WithoutContext | gen.WithQueryInterface,
 	})
 
 	db.InitPostgres()

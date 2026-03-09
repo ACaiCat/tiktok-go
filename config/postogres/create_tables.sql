@@ -4,6 +4,7 @@
     username   TEXT        NOT NULL UNIQUE,
     password   TEXT        NOT NULL,
     avatar_url TEXT,
+    totp_secret TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMPTZ
@@ -14,6 +15,7 @@ COMMENT ON COLUMN users.id IS '用户ID';
 COMMENT ON COLUMN users.username IS '用户名';
 COMMENT ON COLUMN users.password IS '密码';
 COMMENT ON COLUMN users.avatar_url IS '头像URL';
+COMMENT ON COLUMN users.totp_secret IS 'TOTP密钥';
 COMMENT ON COLUMN users.created_at IS '创建时间';
 COMMENT ON COLUMN users.updated_at IS '更新时间';
 COMMENT ON COLUMN users.deleted_at IS '删除时间';

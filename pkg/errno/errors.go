@@ -17,4 +17,6 @@ var (
 	UserIsNotExistErr     = NewErrNo(UserIsNotExistErrCode, "用户不存在")
 	PasswordIsNotVerified = NewErrNo(PasswordIsNotVerifiedErrCode, "用户名或密码错误")
 	PasswordTooShortErr   = NewErrNo(PasswordTooShortErrCode, "密码长度太短")
+	MFACodeInvalidErr     = NewErrNo(MFACodeInvalidErrCode, "多因素认证码无效")
+	MFAMissingErr         = NewErrNo(MFAMissingErrCode, "缺少多因素认证码")
 )

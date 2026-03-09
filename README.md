@@ -34,8 +34,8 @@
 - [x] `POST /auth/refresh` — 刷新 Token
 - [ ] `GET  /user/info` — 获取用户信息
 - [ ] `PUT  /user/avatar/upload` — 上传头像
-- [ ] `GET  /auth/mfa/qrcode` — 获取 MFA 二维码
-- [ ] `POST /auth/mfa/bind` — 绑定 MFA
+- [x] `GET  /auth/mfa/qrcode` — 获取 MFA 二维码
+- [x] `POST /auth/mfa/bind` — 绑定 MFA
 - [ ] `POST /user/image/search` — 以图搜图
 
 ### 视频模块(Video)

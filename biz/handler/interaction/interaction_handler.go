@@ -20,7 +20,6 @@ func Like(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -37,7 +36,6 @@ func ListLike(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -54,7 +52,6 @@ func Comment(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -71,7 +68,6 @@ func ListComment(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -88,7 +84,6 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.RespError(c, errno.ParamErr.WithError(err))
-		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 

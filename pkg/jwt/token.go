@@ -53,7 +53,7 @@ func CreateToken(tokenType int8, userID int64) (string, error) {
 
 }
 
-func VerifyToken(token string, tokenType int8) (int64, error) {
+func ValidateToken(token string, tokenType int8) (int64, error) {
 	if token == "" {
 		return 0, errno.AuthMissingErr
 	}
