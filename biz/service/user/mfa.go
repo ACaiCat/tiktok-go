@@ -1,38 +1,53 @@
 package service
 
 import (
+	"encoding/base64"
 	"log"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	totp "github.com/ACaiCat/tiktok-go/pkg/totp"
+	"github.com/skip2/go-qrcode"
 )
 
-func (s *UserService) GetMFA(req *user.MFAQRCodeReq, userID int64) (string, error) {
+func (s *UserService) GetMFA(req *user.MFAQRCodeReq, userID int64) (string, string, error) {
 	var err error
 
 	usr, err := s.dao.GetByID(userID)
 	if err != nil {
-		return "", errno.ServiceErr
+		return "", "", errno.ServiceErr
 	}
 
 	if usr == nil {
-		return "", errno.UserIsNotExistErr
+		return "", "", errno.UserIsNotExistErr
 	}
 
-	secret, err := totp.CreateSecret(usr.Username)
+	key, err := totp.CreateKey(usr.Username)
 	if err != nil {
-		log.Println("failed to create secret for user", usr.Username, ":", err)
-		return "", errno.ServiceErr
+		return "", "", errno.ServiceErr
 	}
 
-	return secret, nil
+	rawQrcode, err := qrcode.Encode(key.String(), qrcode.Low, 256)
+	if err != nil {
+		log.Println("failed to generate QR code for user", usr.Username, ":", err)
+		return "", "", errno.ServiceErr
+	}
+
+	base64Qrcode := "data:image/png;base64," + base64.StdEncoding.EncodeToString(rawQrcode)
+
+	return key.Secret(), base64Qrcode, nil
 }
 
 func (s *UserService) BindMFA(req *user.BindMFAReq, userID int64) error {
 	var err error
 
-	if !totp.ValidateCode(req.Secret, req.Code) {
+	ok, err := totp.ValidateCode(req.Secret, req.Code)
+
+	if err != nil {
+		return errno.ServiceErr
+	}
+
+	if !ok {
 		return errno.MFACodeInvalidErr
 	}
 

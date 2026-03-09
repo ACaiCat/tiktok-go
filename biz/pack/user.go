@@ -30,11 +30,12 @@ func RespRegister(c *app.RequestContext) {
 	})
 }
 
-func RespMFA(c *app.RequestContext, secret string) {
+func RespMFA(c *app.RequestContext, secret string, base64Qrcode string) {
 	c.JSON(consts.StatusOK, user.MFAQRCodeResp{
 		Base: SuccessBase,
 		Data: &user.MFAQRCodeData{
 			Secret: secret,
+			Qrcode: base64Qrcode,
 		},
 	})
 }

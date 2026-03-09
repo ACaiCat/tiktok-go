@@ -106,6 +106,8 @@ message MFAQRCodeResp {
 message MFAQRCodeData {
   // 密钥
   string secret = 1;
+  // 二维码Base64
+  string qrcode = 2;
 }
 
 // 绑定MFA请求

@@ -1,14 +1,15 @@
-﻿package totp
+package totp
 
 import (
 	"log"
+	"time"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 )
 
-func CreateSecret(accountName string) (string, error) {
+func CreateKey(accountName string) (*otp.Key, error) {
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      constants.TotpIssuer,
 		AccountName: accountName,
@@ -18,12 +19,20 @@ func CreateSecret(accountName string) (string, error) {
 
 	if err != nil {
 		log.Println("failed to generate totp secret:", err)
-		return "", errno.ServiceErr
+		return nil, err
 	}
 
-	return key.String(), err
+	return key, err
 }
 
-func ValidateCode(secret string, code string) bool {
-	return totp.Validate(code, secret)
+func ValidateCode(secret string, code string) (bool, error) {
+	ok, err := totp.ValidateCustom(code, secret, time.Now(), totp.ValidateOpts{
+		Period: constants.TotpPeriod,
+		Digits: constants.TotpDigitLength,
+	})
+	if err != nil {
+		log.Println("failed to validate totp code:", err)
+		return false, err
+	}
+	return ok, nil
 }

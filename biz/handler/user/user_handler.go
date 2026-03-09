@@ -121,13 +121,13 @@ func MFAQRCode(ctx context.Context, c *app.RequestContext) {
 	}
 	userID := mw.GetUserID(c)
 
-	secret, err := service.NewUserService().GetMFA(&req, userID)
+	secret, base64Qrcode, err := service.NewUserService().GetMFA(&req, userID)
 	if err != nil {
 		pack.RespError(c, err)
 		return
 	}
 
-	pack.RespMFA(c, secret)
+	pack.RespMFA(c, secret, base64Qrcode)
 }
 
 // BindMFA .
