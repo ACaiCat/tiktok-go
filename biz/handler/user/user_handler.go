@@ -121,7 +121,7 @@ func MFAQRCode(ctx context.Context, c *app.RequestContext) {
 	}
 	userID := mw.GetUserID(c)
 
-	secret, base64Qrcode, err := service.NewUserService().GetMFA(&req, userID)
+	secret, base64Qrcode, err := service.NewUserService().GetMFA(userID)
 	if err != nil {
 		pack.RespError(c, err)
 		return

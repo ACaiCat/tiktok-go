@@ -10,7 +10,7 @@ import (
 	"github.com/skip2/go-qrcode"
 )
 
-func (s *UserService) GetMFA(req *user.MFAQRCodeReq, userID int64) (string, string, error) {
+func (s *UserService) GetMFA(userID int64) (string, string, error) {
 	var err error
 
 	usr, err := s.dao.GetByID(userID)
