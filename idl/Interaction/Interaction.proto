@@ -23,7 +23,7 @@ message LikeReq {
 // 点赞响应
 message LikeResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
 }
 
 // 点赞列表请求
@@ -39,7 +39,7 @@ message ListLikeReq {
 // 点赞列表响应
 message ListLikeResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
   // 响应数据
   VideoData data = 2;
   // 视频数据
@@ -59,7 +59,7 @@ message CommentReq {
 // 评论响应
 message CommentResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
 }
 
 // 评论列表请求
@@ -77,7 +77,7 @@ message ListCommentReq {
 // 评论列表响应
 message ListCommentResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
   // 响应数据
   CommentData data = 2;
   // 评论数据
@@ -95,7 +95,7 @@ message DeleteCommentReq {
 // 删除评论响应
 message DeleteCommentResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
 }
 
 

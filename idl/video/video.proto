@@ -17,7 +17,7 @@ message FeedReq {
 // 视频流响应
 message FeedResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
   // 响应数据
   VideoData data = 2;
   // 视频数据
@@ -40,7 +40,7 @@ message PublishReq {
 // 投稿视频响应
 message PublishResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
 }
 
 // 发布列表请求
@@ -56,7 +56,7 @@ message ListReq {
 // 发布列表响应
 message ListResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
   // 响应数据
   VideoData data = 2;
   // 视频数据
@@ -77,7 +77,7 @@ message PopularReq {
 // 热门排行榜响应
 message PopularResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
   // 响应数据
   VideoData data = 2;
   // 视频流数据
@@ -106,7 +106,7 @@ message SearchReq {
 // 搜索视频响应
 message SearchResp {
   // 响应状态
-  common.Base Base = 1;
+  common.Base base = 1;
   // 响应数据
   VideoData data = 2;
   // 视频数据
