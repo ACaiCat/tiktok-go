@@ -13,6 +13,10 @@ func (s *UserService) GetMFA(req *user.MFAQRCodeReq, userID int64) (string, erro
 
 	usr, err := s.dao.GetByID(userID)
 	if err != nil {
+		return "", errno.ServiceErr
+	}
+
+	if usr == nil {
 		return "", errno.UserIsNotExistErr
 	}
 
