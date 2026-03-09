@@ -15,3 +15,6 @@ jwt:
   refresh_secret: "your_refresh_secret"
   access_secret: "your_access_secret"
 
+server:
+  host: "127.0.0.1"
+  port: 13215
