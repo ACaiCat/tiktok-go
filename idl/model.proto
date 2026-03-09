@@ -1,0 +1,51 @@
+﻿syntax = "proto3";
+
+package model;
+
+message TimeStamp {
+  string created_at = 1;
+  string updated_at = 2;
+  string deleted_at = 3;
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string avatar_url = 3;
+  string created_at = 4;
+  string updated_at = 5;
+  string deleted_at = 6;
+}
+
+message Video {
+  string id = 1;
+  string user_id = 2;
+  string video_url = 3;
+  string cover_url = 4;
+  string title = 5;
+  string description = 6;
+  int64 visit_count = 7;
+  int64 comment_count = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  string deleted_at = 11;
+}
+
+message Comment {
+  string id = 1;
+  string user_id = 2;
+  string video_url = 3;
+  string parent_id = 4;
+  int64 like_count = 5;
+  int64 child_count = 6;
+  string content = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  string deleted_at = 10;
+}
+
+message SocialUser {
+  string id = 1;
+  string username = 2;
+  string avatar_url = 3;
+}

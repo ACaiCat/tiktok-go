@@ -1,0 +1,178 @@
+﻿syntax = "proto3";
+
+package user;
+
+option go_package = "tiktok-go/user";
+
+import "api.proto";
+import "common.proto";
+import "model.proto";
+
+// 用户注册请求
+message RegisterReq {
+  // 用户名
+  string username = 1[(api.form) = 'username,required'];
+  // 密码
+  string password = 2[(api.form) = 'password,required'];
+}
+
+// 用户注册响应
+message RegisterResp {
+  // 响应状态
+  common.Base Base = 1;
+}
+
+// 用户登录请求
+message LoginReq {
+  // 用户名
+  string username = 1[(api.form) = 'username,required'];
+  // 密码
+  string password = 2[(api.form) = 'password,required'];
+  // 验证码
+  string code = 3[(api.form) = 'code'];
+}
+
+// 用户登录响应
+message LoginResp {
+  // 响应状态
+  common.Base base = 1;
+  // 用户数据
+  model.User data = 2;
+}
+
+// 刷新Token请求
+message RefreshReq {
+  // 刷新Token
+  string refreshToken = 1[(api.body) = 'refresh_token,required'];
+}
+
+// 刷新Token响应
+message RefreshResp {
+  // 响应状态
+  common.Base base = 1;
+  // Token数据
+  TokenData data = 2;
+}
+
+// Token数据
+message TokenData {
+  // 访问Token
+  string accessToken = 1;
+  // 刷新Token
+  string refreshToken = 2;
+}
+
+// 用户信息请求
+message InfoReq {
+  // 用户ID
+  string UserID = 1[(api.query) = 'user_id'];
+}
+
+// 用户信息响应
+message InfoResp {
+  // 响应状态
+  common.Base base = 1;
+  // 用户数据
+  model.User data = 2;
+}
+
+// 上传头像请求
+message UploadAvatarReq {
+  // 图片文件
+  bytes data = 1[(api.form) = 'data,required'];
+}
+
+// 上传头像响应
+message UploadAvatarResp {
+  // 响应状态
+  common.Base base = 1;
+  // 用户数据
+  model.User data = 2;
+}
+
+// MFA二维码请求
+message MFAQRCodeReq {
+}
+
+// MFA二维码请求响应
+message MFAQRCodeResp {
+  // 响应状态
+  common.Base base = 1;
+  // 数据
+  MFAQRCodeData data = 2;
+}
+
+// MFA二维码数据
+message MFAQRCodeData {
+  // 密钥
+  string secret = 1;
+  // Base64图片
+  string qrcode = 2;
+}
+
+// 绑定MFA请求
+message BindMFAReq {
+  // 校验码
+  string code = 1[(api.body) = 'code,required'];
+  // 密钥
+  string secret = 2[(api.body) = 'secret,required'];
+}
+
+// 绑定MFA响应
+message BindMFAResp {
+  // 响应状态
+  common.Base base = 1;
+  // 用户数据
+  model.User data = 2;
+}
+
+// 以图搜图请求
+message SearchImageReq {
+  // 图片原始数据
+  bytes data = 1[(api.form) = 'data,required'];
+}
+
+// 以图搜图响应
+message SearchImageResp {
+  // 响应状态
+  common.Base base = 1;
+  // 图片URL
+  string data = 2;
+}
+
+service UserHandler {
+  // 用户注册
+  rpc Register(RegisterReq) returns(RegisterResp) {
+    option (api.post) = "/user/register";
+  }
+  // 用户登录
+  rpc Login(LoginReq) returns(LoginResp) {
+    option (api.post) = "/user/login";
+  }
+  // 刷新Token
+  rpc Refresh(RefreshReq) returns(RegisterResp) {
+    option (api.post) = "/auth/refresh";
+  }
+  // 用户信息
+  rpc Info(InfoReq) returns(LoginResp) {
+    option (api.get) = "/user/info";
+  }
+  // 上传头像
+  rpc UploadAvatar(UploadAvatarReq) returns(UploadAvatarResp) {
+    option (api.put) = "/user/avatar/upload";
+  }
+  // MFA二维码
+  rpc MFAQRCode(MFAQRCodeReq) returns(MFAQRCodeResp) {
+    option (api.get) = "/auth/mfa/qrcode";
+  }
+  // 绑定MFA
+  rpc BindMFA(BindMFAReq) returns(MFAQRCodeResp) {
+    option (api.post) = "/auth/mfa/bind";
+  }
+  // 以图搜图
+  rpc SearchImage(SearchImageReq) returns(SearchImageResp) {
+    option (api.post) = "/user/image/search";
+  }
+}
+
+

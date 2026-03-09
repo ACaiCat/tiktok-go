@@ -1,0 +1,17 @@
+﻿postgres:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "your_password"
+  dbname: "tiktok"
+
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  db: 0
+
+jwt:
+  refresh_secret: "your_refresh_secret"
+  access_secret: "your_access_secret"
+

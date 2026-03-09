@@ -1,0 +1,134 @@
+﻿syntax = "proto3";
+
+package social;
+
+option go_package = "tiktok-go/social";
+
+import "api.proto";
+import "common.proto";
+import "model.proto";
+
+// 聊天请求
+message ChatReq {
+}
+
+// 聊天响应
+message ChatResp {
+  // 响应状态
+  common.Base Base = 1;
+}
+
+// 关注请求
+message FollowReq {
+  // 操作对象ID
+  string ToUserID = 1[(api.form) = 'to_user_id,required'];
+  //
+  FollowAction actionType = 2[(api.form) = 'action_type,required'];
+  enum FollowAction {
+    Follow = 0;
+    Unfollow = 1;
+  }
+}
+
+// 关注响应
+message FollowResp {
+  // 响应状态
+  common.Base Base = 1;
+}
+
+// 关注列表请求
+message ListFollowingReq {
+  // 用户ID
+  string userID = 1[(api.query) = 'user_id,required'];
+  // 页码
+  string pageNum = 2[(api.query) = 'page_num,required'];
+  // 单页尺寸
+  string pageSize = 3[(api.query) = 'page_size,required'];
+}
+
+// 关注列表响应
+message ListFollowingResp {
+  // 响应状态
+  common.Base Base = 1;
+  // 响应数据
+  SocialUserData data = 2;
+  // 社交用户数据
+  message SocialUserData {
+    // 社交用户
+    repeated model.SocialUser items = 1;
+    // 总数
+    int64 total = 2;
+  }
+}
+
+// 粉丝列表请求
+message ListFollowerReq {
+  // 用户ID
+  string userID = 1[(api.query) = 'user_id,required'];
+  // 页码
+  string pageNum = 2[(api.query) = 'page_num,required'];
+  // 单页尺寸
+  string pageSize = 3[(api.query) = 'page_size,required'];
+}
+
+// 粉丝列表响应
+message ListFollowerResp {
+  // 响应状态
+  common.Base Base = 1;
+  // 响应数据
+  SocialUserData data = 2;
+  // 社交用户数据
+  message SocialUserData {
+    // 社交用户
+    repeated model.SocialUser items = 1;
+    // 总数
+    int64 total = 2;
+  }
+}
+
+// 好友列表请求
+message ListFriendReq {
+  // 页码
+  string pageNum = 1[(api.query) = 'page_num,required'];
+  // 单页尺寸
+  string pageSize = 2[(api.query) = 'page_size,required'];
+}
+
+// 好友列表响应
+message ListFriendResp {
+  // 响应状态
+  common.Base Base = 1;
+  // 响应数据
+  SocialUserData data = 2;
+  // 社交用户数据
+  message SocialUserData {
+    // 社交用户
+    repeated model.SocialUser items = 1;
+    // 总数
+    int64 total = 2;
+  }
+}
+
+service VideoHandler {
+  // 聊天
+  rpc Chat(ChatReq) returns(ChatResp) {
+    option (api.get) = "/ws";
+  }
+  // 关注
+  rpc Follow(FollowReq) returns(FollowResp) {
+    option (api.post) = "/relation/action";
+  }
+  // 关注列表
+  rpc ListFollowing(ListFollowingReq) returns(ListFollowingResp) {
+    option (api.get) = "/following/list";
+  }
+  // 粉丝列表
+  rpc ListFollower(ListFollowerReq) returns(ListFollowerResp) {
+    option (api.get) = "/follower/list";
+  }
+  // 好友列表
+  rpc ListFriend(ListFriendReq) returns(ListFriendResp) {
+    option (api.get) = "/friends/list";
+  }
+}
+

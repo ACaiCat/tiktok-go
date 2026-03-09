@@ -1,0 +1,142 @@
+﻿syntax = "proto3";
+
+package video;
+
+option go_package = "tiktok-go/video";
+
+import "api.proto";
+import "common.proto";
+import "model.proto";
+
+// 视频流请求
+message FeedReq {
+  // 时间戳游标
+  string latestTime = 1[(api.query) = 'latest_time'];
+}
+
+// 视频流响应
+message FeedResp {
+  // 响应状态
+  common.Base Base = 1;
+  // 响应数据
+  VideoData data = 2;
+  // 视频数据
+  message VideoData {
+    // 视频
+    repeated model.Video items = 1;
+  }
+}
+
+// 投稿视频请求
+message PublishReq {
+  // 视频文件
+  bytes data = 1[(api.form) = 'data,required'];
+  // 视频标题
+  string title = 2[(api.form) = 'title,required'];
+  // 视频描述
+  string description = 3[(api.form) = 'description,required'];
+}
+
+// 投稿视频响应
+message PublishResp {
+  // 响应状态
+  common.Base Base = 1;
+}
+
+// 发布列表请求
+message ListReq {
+  // 用户ID
+  string userID = 1[(api.query) = 'user_id,required'];
+  // 页码
+  string pageNum = 2[(api.query) = 'page_num,required'];
+  // 单页尺寸
+  string pageSize = 3[(api.query) = 'page_size,required'];
+}
+
+// 发布列表响应
+message ListResp {
+  // 响应状态
+  common.Base Base = 1;
+  // 响应数据
+  VideoData data = 2;
+  // 视频数据
+  message VideoData {
+    // 视频
+    repeated model.Video items = 1;
+  }
+}
+
+// 热门排行榜请求
+message PopularReq {
+  // 页码
+  string pageNum = 1[(api.query) = 'page_num,required'];
+  // 单页尺寸
+  string pageSize = 2[(api.query) = 'page_size,required'];
+}
+
+// 热门排行榜响应
+message PopularResp {
+  // 响应状态
+  common.Base Base = 1;
+  // 响应数据
+  VideoData data = 2;
+  // 视频流数据
+  message VideoData {
+    // 视频
+    repeated model.Video items = 1;
+  }
+}
+
+// 搜索视频请求
+message SearchReq {
+  // 关键词
+  string keywords = 1[(api.form) = 'keywords,required'];
+  // 页码
+  string pageNum = 2[(api.form) = 'page_num,required'];
+  // 单页尺寸
+  string pageSize = 3[(api.form) = 'page_size,required'];
+  // 起始时间
+  string from_date = 4[(api.form) = 'from_date'];
+  // 结束时间
+  string to_date = 5[(api.form) = 'to_date'];
+  // 用户名关键词
+  string username = 6[(api.form) = 'username'];
+}
+
+// 搜索视频响应
+message SearchResp {
+  // 响应状态
+  common.Base Base = 1;
+  // 响应数据
+  VideoData data = 2;
+  // 视频数据
+  message VideoData {
+    // 视频
+    repeated model.Video items = 1;
+  }
+}
+
+service VideoHandler {
+  // 视频流
+  rpc Feed(FeedReq) returns(FeedResp) {
+    option (api.get) = "/video/feed";
+  }
+  // 投稿
+  rpc Publish(PublishReq) returns(PublishResp) {
+    option (api.post) = "/video/publish";
+  }
+  // 发布列表
+  rpc List(ListReq) returns(ListResp) {
+    option (api.get) = "/video/list";
+  }
+  // 热门排行榜
+  rpc Popular(PopularReq) returns(PublishResp) {
+    option (api.get) = "/video/popular";
+  }
+  // 搜索
+  rpc Search(SearchReq) returns(SearchResp) {
+    option (api.post) = "/video/search";
+  }
+
+}
+
