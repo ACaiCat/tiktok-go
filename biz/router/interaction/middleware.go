@@ -3,12 +3,14 @@
 package interaction
 
 import (
+	mw "github.com/ACaiCat/tiktok-go/biz/mw/auth"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
 func rootMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _commentMw() []app.HandlerFunc {

@@ -3,6 +3,7 @@
 package user
 
 import (
+	mw "github.com/ACaiCat/tiktok-go/biz/mw/auth"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -17,8 +18,9 @@ func _authMw() []app.HandlerFunc {
 }
 
 func _mfaMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _bindmfaMw() []app.HandlerFunc {
@@ -37,8 +39,9 @@ func _userMw() []app.HandlerFunc {
 }
 
 func _infoMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _loginMw() []app.HandlerFunc {
@@ -53,17 +56,23 @@ func _registerMw() []app.HandlerFunc {
 
 func _avatarMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _uploadavatarMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _imageMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _searchimageMw() []app.HandlerFunc {
