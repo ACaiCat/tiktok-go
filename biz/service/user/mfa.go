@@ -1,11 +1,11 @@
-﻿package service
+package service
 
 import (
 	"log"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
-	totp "github.com/ACaiCat/tiktok-go/pkg/ totp"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	totp "github.com/ACaiCat/tiktok-go/pkg/totp"
 )
 
 func (s *UserService) GetMFA(req *user.MFAQRCodeReq, userID int64) (string, error) {

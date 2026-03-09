@@ -1,4 +1,4 @@
-﻿package service
+package service
 
 import (
 	"errors"
@@ -6,10 +6,10 @@ import (
 
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
-	totp "github.com/ACaiCat/tiktok-go/pkg/ totp"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/jwt"
+	totp "github.com/ACaiCat/tiktok-go/pkg/totp"
 	"golang.org/x/crypto/bcrypt"
 )
 

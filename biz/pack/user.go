@@ -1,4 +1,4 @@
-﻿package pack
+package pack
 
 import (
 	"github.com/ACaiCat/tiktok-go/biz/model/model"

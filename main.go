@@ -14,7 +14,6 @@ func main() {
 	config.Init()
 
 	db.InitPostgres()
-	db.SetDB(db.DB)
 
 	h := server.Default(
 		server.WithHostPorts(config.AppConfig.Server.Host + ":" + strconv.Itoa(config.AppConfig.Server.Port)),
