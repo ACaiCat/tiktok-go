@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
-	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
+	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/jwt"
@@ -36,11 +36,11 @@ func (s *UserService) UserLogin(req *user.LoginReq) (*model.User, string, string
 	}
 
 	if usr.TotpSecret != "" {
-		if req.Code == "" {
+		if *req.Code == "" {
 			return nil, "", "", errno.MFAMissingErr
 		}
 
-		ok, err := totp.ValidateCode(usr.TotpSecret, req.Code)
+		ok, err := totp.ValidateCode(usr.TotpSecret, *req.Code)
 
 		if err != nil {
 			return nil, "", "", errno.ServiceErr

@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"log"
 
-	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
+	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	totp "github.com/ACaiCat/tiktok-go/pkg/totp"
 	"github.com/skip2/go-qrcode"

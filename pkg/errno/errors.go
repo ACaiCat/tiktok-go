@@ -1,4 +1,4 @@
-﻿package errno
+package errno
 
 var (
 	SuccessMessage = "OK"
@@ -19,4 +19,11 @@ var (
 	PasswordTooShortErr   = NewErrNo(PasswordTooShortErrCode, "密码长度太短")
 	MFACodeInvalidErr     = NewErrNo(MFACodeInvalidErrCode, "多因素认证码无效")
 	MFAMissingErr         = NewErrNo(MFAMissingErrCode, "缺少多因素认证码")
+	AvatarTooLargeErr     = NewErrNo(AvatarTooLargeErrCode, "头像文件过大")
+	AvatarFormatErr       = NewErrNo(AvatarFormatErrCode, "头像文件格式错误")
+
+	UsernameTooShortErr = NewErrNo(UsernameTooShortErrCode, "用户名长度太短")
+
+	UsernameTooLongErr = NewErrNo(UsernameTooLongErrCode, "用户名长度太长")
+	PasswordTooLongErr = NewErrNo(PasswordTooLongErrCode, "密码长度太长")
 )

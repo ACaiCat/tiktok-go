@@ -32,8 +32,8 @@
 - [x] `POST /user/register` — 用户注册
 - [x] `POST /user/login` — 用户登录
 - [x] `POST /auth/refresh` — 刷新 Token
-- [ ] `GET  /user/info` — 获取用户信息
-- [ ] `PUT  /user/avatar/upload` — 上传头像
+- [X] `GET  /user/info` — 获取用户信息
+- [X] `PUT  /user/avatar/upload` — 上传头像
 - [x] `GET  /auth/mfa/qrcode` — 获取 MFA 二维码
 - [x] `POST /auth/mfa/bind` — 绑定 MFA
 - [ ] `POST /user/image/search` — 以图搜图

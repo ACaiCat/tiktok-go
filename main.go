@@ -6,14 +6,15 @@ import (
 	"strconv"
 
 	"github.com/ACaiCat/tiktok-go/config"
+	"github.com/ACaiCat/tiktok-go/pkg/bucket"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
 func main() {
 	config.Init()
-
 	db.InitPostgres()
+	bucket.InitMinIO()
 
 	h := server.Default(
 		server.WithHostPorts(config.AppConfig.Server.Host + ":" + strconv.Itoa(config.AppConfig.Server.Port)),

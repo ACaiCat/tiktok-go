@@ -1,4 +1,4 @@
-﻿package errno
+package errno
 
 import "errors"
 
@@ -29,9 +29,9 @@ func ConvertErr(err error) ErrNo {
 	if err == nil {
 		return Success
 	}
-	errno := &ErrNo{}
+	errno := ErrNo{}
 	if errors.As(err, &errno) {
-		return *errno
+		return errno
 	}
 
 	serviceErr := ServiceErr

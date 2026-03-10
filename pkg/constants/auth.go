@@ -14,4 +14,8 @@ const (
 	UserIdKey                   = "user_id"
 
 	MinPasswordLength = 6
+	MaxPasswordLength = 64
+
+	MinUsernameLength = 3
+	MaxUsernameLength = 32
 )

@@ -2,7 +2,7 @@ package pack
 
 import (
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
-	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
+	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -43,5 +43,19 @@ func RespMFA(c *app.RequestContext, secret string, base64Qrcode string) {
 func RespBindMFA(c *app.RequestContext) {
 	c.JSON(consts.StatusOK, user.BindMFAResp{
 		Base: SuccessBase,
+	})
+}
+
+func RespUploadAvatar(c *app.RequestContext, usr *model.User) {
+	c.JSON(consts.StatusOK, user.UploadAvatarResp{
+		Base: SuccessBase,
+		Data: usr,
+	})
+}
+
+func RespUserInfo(c *app.RequestContext, usr *model.User) {
+	c.JSON(consts.StatusOK, user.InfoResp{
+		Base: SuccessBase,
+		Data: usr,
 	})
 }

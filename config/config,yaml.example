@@ -15,6 +15,12 @@ jwt:
   refresh_secret: "your_refresh_secret"
   access_secret: "your_access_secret"
 
+minio:
+  endpoint: "127.0.0.1:9000"
+  access_key: "cai"
+  secret_key: "1145141919810"
+  use_ssl: false
+
 server:
   host: "127.0.0.1"
   port: 13215

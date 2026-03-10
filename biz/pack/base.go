@@ -1,9 +1,10 @@
-﻿package pack
+package pack
 
 import (
 	"github.com/ACaiCat/tiktok-go/biz/model/common"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
@@ -17,8 +18,10 @@ var (
 func RespError(c *app.RequestContext, err error) {
 	_errno := errno.ConvertErr(err)
 
-	c.JSON(consts.StatusOK, common.Base{
-		Msg:  _errno.ErrMsg,
-		Code: _errno.ErrCode,
+	c.JSON(consts.StatusOK, utils.H{
+		"base": common.Base{
+			Msg:  _errno.ErrMsg,
+			Code: _errno.ErrCode,
+		},
 	})
 }

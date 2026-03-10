@@ -4,8 +4,9 @@ package user
 
 import (
 	"context"
+	"strconv"
 
-	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
+	user "github.com/ACaiCat/tiktok-go/biz/model/user"
 	mw "github.com/ACaiCat/tiktok-go/biz/mw/auth"
 	"github.com/ACaiCat/tiktok-go/biz/pack"
 	service "github.com/ACaiCat/tiktok-go/biz/service/user"
@@ -88,9 +89,28 @@ func Info(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(user.LoginResp)
+	var userID int64 = 0
 
-	c.JSON(consts.StatusOK, resp)
+	if req.UserID == nil {
+		userID = mw.GetUserID(c)
+	} else {
+		userID, err = strconv.ParseInt(*req.UserID, 10, 64)
+
+		if err != nil {
+			pack.RespError(c, errno.ParamErr.WithError(err))
+			return
+		}
+	}
+
+	usr, err := service.NewUserService().GetUserInfo(userID)
+
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespUserInfo(c, usr)
+
 }
 
 // UploadAvatar .
@@ -104,9 +124,29 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(user.UploadAvatarResp)
+	fileHeader, err := c.FormFile("data")
+	if err != nil {
+		pack.RespError(c, errno.ParamErr.WithError(err))
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	userID := mw.GetUserID(c)
+	userService := service.NewUserService()
+
+	err = userService.UploadAvatar(fileHeader, userID)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	usr, err := userService.GetUserInfo(userID)
+
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespUploadAvatar(c, usr)
 }
 
 // MFAQRCode .

@@ -1,7 +1,7 @@
-﻿package service
+package service
 
 import (
-	"github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/user"
+	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/jwt"
 )

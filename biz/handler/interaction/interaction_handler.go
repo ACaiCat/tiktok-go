@@ -5,9 +5,7 @@ package interaction
 import (
 	"context"
 
-	interaction "github.com/ACaiCat/tiktok-go/biz/model/tiktok-go/interaction"
-	"github.com/ACaiCat/tiktok-go/biz/pack"
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	interaction "github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -19,7 +17,7 @@ func Like(ctx context.Context, c *app.RequestContext) {
 	var req interaction.LikeReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -35,7 +33,7 @@ func ListLike(ctx context.Context, c *app.RequestContext) {
 	var req interaction.ListLikeReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -51,7 +49,7 @@ func Comment(ctx context.Context, c *app.RequestContext) {
 	var req interaction.CommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -67,7 +65,7 @@ func ListComment(ctx context.Context, c *app.RequestContext) {
 	var req interaction.ListCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -83,7 +81,7 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 	var req interaction.DeleteCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 

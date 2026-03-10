@@ -1,4 +1,4 @@
-﻿package errno
+package errno
 
 const (
 	SuccessCode                  = 10000
@@ -14,4 +14,9 @@ const (
 	PasswordTooShortErrCode      = 11003
 	MFACodeInvalidErrCode        = 11004
 	MFAMissingErrCode            = 11005
+	AvatarTooLargeErrCode        = 12000
+	AvatarFormatErrCode          = 12001
+	UsernameTooShortErrCode      = 12002
+	UsernameTooLongErrCode       = 12003
+	PasswordTooLongErrCode       = 12004
 )

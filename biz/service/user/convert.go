@@ -1,4 +1,4 @@
-﻿package service
+package service
 
 import (
 	"strconv"
@@ -9,11 +9,9 @@ import dto "github.com/ACaiCat/tiktok-go/biz/model/model"
 
 func UserDaoToDTO(user *model.User) *dto.User {
 	return &dto.User{
-		Id:        strconv.FormatInt(user.ID, 10),
+		ID:        strconv.FormatInt(user.ID, 10),
 		Username:  user.Username,
-		AvatarUrl: user.AvatarURL,
-		CreatedAt: user.CreatedAt.String(),
-		UpdatedAt: user.UpdatedAt.String(),
-		DeletedAt: user.DeletedAt.Time.String(),
+		AvatarURL: user.AvatarURL,
+		CreatedAt: strconv.FormatInt(user.CreatedAt.UnixMilli(), 10),
 	}
 }
