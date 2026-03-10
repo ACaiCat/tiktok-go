@@ -13,3 +13,17 @@ func RespFeedList(c *app.RequestContext, videoList []*model.Video) {
 		Items: videoList,
 	})
 }
+
+func RespPopularList(c *app.RequestContext, videoList []*model.Video) {
+	c.JSON(consts.StatusOK, video.PopularResp{
+		Base:  SuccessBase,
+		Items: videoList,
+	})
+}
+
+func RespAuthorList(c *app.RequestContext, videoList []*model.Video) {
+	c.JSON(consts.StatusOK, video.ListResp{
+		Base:  SuccessBase,
+		Items: videoList,
+	})
+}

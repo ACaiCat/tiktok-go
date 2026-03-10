@@ -1,4 +1,4 @@
-﻿package service
+package service
 
 import (
 	"github.com/ACaiCat/tiktok-go/pkg/cache"
@@ -6,7 +6,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	commentDao "github.com/ACaiCat/tiktok-go/pkg/db/comment"
 	likeDao "github.com/ACaiCat/tiktok-go/pkg/db/like"
-	videoDao "github.com/ACaiCat/tiktok-go/pkg/db/vedio"
+	videoDao "github.com/ACaiCat/tiktok-go/pkg/db/video"
 )
 
 type VideoService struct {

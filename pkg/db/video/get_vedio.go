@@ -42,3 +42,24 @@ func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*mode
 
 	return videos[:limit], nil
 }
+
+func (v *VideoDao) GetVideosByUserID(userID int64, pageSize int, pageNum int) ([]*model.Video, error) {
+	var err error
+	videos, err := v.q.Video.Where(v.q.Video.UserID.Eq(userID)).Offset(pageSize * pageNum).Limit(pageSize).Find()
+	if err != nil {
+		log.Printf("failed to get videos by user id: %v", err)
+		return nil, err
+	}
+	return videos, nil
+
+}
+
+func (v *VideoDao) GetPopularVideos(pageSize int, pageNum int) ([]*model.Video, error) {
+	var err error
+	videos, err := v.q.Video.Order(v.q.Video.VisitCount.Desc()).Offset(pageSize * pageNum).Limit(pageSize).Find()
+	if err != nil {
+		log.Printf("failed to get popular videos: %v", err)
+		return nil, err
+	}
+	return videos, nil
+}

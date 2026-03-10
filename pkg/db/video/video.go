@@ -1,4 +1,4 @@
-﻿package videoDao
+package videoDao
 
 import (
 	"github.com/ACaiCat/tiktok-go/pkg/db/query"

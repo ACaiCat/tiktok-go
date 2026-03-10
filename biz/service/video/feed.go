@@ -1,4 +1,4 @@
-﻿package service
+package service
 
 import (
 	"strconv"
@@ -28,22 +28,10 @@ func (s *VideoService) GetFeed(req *video.FeedReq) ([]*model.Video, error) {
 		return nil, errno.ServiceErr
 	}
 
-	videoIDs := make([]int64, len(videosDao))
-	for i, v := range videosDao {
-		videoIDs[i] = v.ID
-	}
-
-	idWithCommentCount, err := s.commentDao.GetCommentCounts(videoIDs)
+	videos, err := s.GetLikeAndCommentCount(videosDao)
 	if err != nil {
-		return nil, errno.ServiceErr
+		return nil, err
 	}
-
-	idWithLikeCount, err := s.likeDao.GetLikeCounts(videoIDs)
-	if err != nil {
-		return nil, errno.ServiceErr
-	}
-
-	videos := VideosDaoToDto(videosDao, idWithLikeCount, idWithCommentCount)
 
 	return videos, nil
 

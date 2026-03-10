@@ -60,9 +60,13 @@ func List(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(video.ListResp)
+	videos, err := service.NewVideoService().GetVideoList(&req)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespAuthorList(c, videos)
 }
 
 // Popular .
@@ -76,9 +80,14 @@ func Popular(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(video.PopularResp)
+	videos, err := service.NewVideoService().GetPopularVideos(&req)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.RespPopularList(c, videos)
+
 }
 
 // Search .
