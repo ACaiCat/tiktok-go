@@ -6,11 +6,11 @@ include "common.thrift"
 // 点赞请求
 struct LikeReq {
   // 视频ID
-  1: optional string videoID (api.form = 'video_id');
+  1: optional string video_id (api.form = 'video_id');
   // 评论ID
-  2: optional string commentID (api.form = 'comment_id');
+  2: optional string comment_id (api.form = 'comment_id');
   // 操作类型
-  3: required i32 actionType (api.form = 'action_type');
+  3: required i32 action_type (api.form = 'action_type');
 }
 
 // 点赞响应
@@ -28,11 +28,11 @@ struct VideoData {
 // 点赞列表请求
 struct ListLikeReq {
   // 用户ID
-  1: required string userID (api.query = 'user_id');
+  1: required string user_id (api.query = 'user_id');
   // 页码
-  2: required string pageNum (api.query = 'page_num');
+  2: required string page_num (api.query = 'page_num');
   // 单页尺寸
-  3: required string pageSize (api.query = 'page_size');
+  3: required string page_size (api.query = 'page_size');
 }
 
 // 点赞列表响应
@@ -46,9 +46,9 @@ struct ListLikeResp {
 // 评论请求
 struct CommentReq {
   // 视频ID
-  1: optional string videoID (api.form = 'video_id');
+  1: optional string video_id (api.form = 'video_id');
   // 评论ID
-  2: optional string commentID (api.form = 'comment_id');
+  2: optional string comment_id (api.form = 'comment_id');
   // 评论内容
   3: required string content (api.form = 'content');
 }
@@ -68,13 +68,13 @@ struct CommentData {
 // 评论列表请求
 struct ListCommentReq {
   // 视频ID
-  1: optional string videoID (api.query = 'video_id');
+  1: optional string video_id (api.query = 'video_id');
   // 评论ID
-  2: optional string commentID (api.query = 'comment_id');
+  2: optional string comment_id (api.query = 'comment_id');
   // 页码
-  3: required string pageNum (api.query = 'page_num');
+  3: required string page_num (api.query = 'page_num');
   // 单页尺寸
-  4: required string pageSize (api.query = 'page_size');
+  4: required string page_size (api.query = 'page_size');
 }
 
 // 评论列表响应
@@ -88,7 +88,7 @@ struct ListCommentResp {
 // 删除评论请求
 struct DeleteCommentReq {
   // 评论ID
-  1: required string commentID (api.form = 'comment_id');
+  1: required string comment_id (api.form = 'comment_id');
 }
 
 // 删除评论响应

@@ -846,7 +846,7 @@ func (p *LoginResp) String() string {
 // 刷新Token请求
 type RefreshReq struct {
 	// 刷新Token
-	RefreshToken string `thrift:"refreshToken,1,required" form:"refresh_token,required" json:"refresh_token,required"`
+	RefreshToken string `thrift:"refresh_token,1,required" form:"refresh_token,required" json:"refresh_token,required"`
 }
 
 func NewRefreshReq() *RefreshReq {
@@ -861,7 +861,7 @@ func (p *RefreshReq) GetRefreshToken() (v string) {
 }
 
 var fieldIDToName_RefreshReq = map[int16]string{
-	1: "refreshToken",
+	1: "refresh_token",
 }
 
 func (p *RefreshReq) Read(iprot thrift.TProtocol) (err error) {
@@ -969,7 +969,7 @@ WriteStructEndError:
 }
 
 func (p *RefreshReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("refreshToken", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("refresh_token", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.RefreshToken); err != nil {
@@ -1207,9 +1207,9 @@ func (p *RefreshResp) String() string {
 // Token数据
 type TokenData struct {
 	// 访问Token
-	AccessToken string `thrift:"accessToken,1,required" form:"accessToken,required" json:"accessToken,required" query:"accessToken,required"`
+	AccessToken string `thrift:"access_token,1,required" form:"access_token,required" json:"access_token,required" query:"access_token,required"`
 	// 刷新Token
-	RefreshToken string `thrift:"refreshToken,2,required" form:"refreshToken,required" json:"refreshToken,required" query:"refreshToken,required"`
+	RefreshToken string `thrift:"refresh_token,2,required" form:"refresh_token,required" json:"refresh_token,required" query:"refresh_token,required"`
 }
 
 func NewTokenData() *TokenData {
@@ -1228,8 +1228,8 @@ func (p *TokenData) GetRefreshToken() (v string) {
 }
 
 var fieldIDToName_TokenData = map[int16]string{
-	1: "accessToken",
-	2: "refreshToken",
+	1: "access_token",
+	2: "refresh_token",
 }
 
 func (p *TokenData) Read(iprot thrift.TProtocol) (err error) {
@@ -1367,7 +1367,7 @@ WriteStructEndError:
 }
 
 func (p *TokenData) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("accessToken", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("access_token", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.AccessToken); err != nil {
@@ -1384,7 +1384,7 @@ WriteFieldEndError:
 }
 
 func (p *TokenData) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("refreshToken", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("refresh_token", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.RefreshToken); err != nil {

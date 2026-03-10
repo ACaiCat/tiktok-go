@@ -13,11 +13,11 @@ import (
 // 点赞请求
 type LikeReq struct {
 	// 视频ID
-	VideoID *string `thrift:"videoID,1,optional" form:"video_id" json:"videoID,omitempty"`
+	VideoID *string `thrift:"video_id,1,optional" form:"video_id" json:"video_id,omitempty"`
 	// 评论ID
-	CommentID *string `thrift:"commentID,2,optional" form:"comment_id" json:"commentID,omitempty"`
+	CommentID *string `thrift:"comment_id,2,optional" form:"comment_id" json:"comment_id,omitempty"`
 	// 操作类型
-	ActionType int32 `thrift:"actionType,3,required" form:"action_type,required" json:"actionType,required"`
+	ActionType int32 `thrift:"action_type,3,required" form:"action_type,required" json:"action_type,required"`
 }
 
 func NewLikeReq() *LikeReq {
@@ -50,9 +50,9 @@ func (p *LikeReq) GetActionType() (v int32) {
 }
 
 var fieldIDToName_LikeReq = map[int16]string{
-	1: "videoID",
-	2: "commentID",
-	3: "actionType",
+	1: "video_id",
+	2: "comment_id",
+	3: "action_type",
 }
 
 func (p *LikeReq) IsSetVideoID() bool {
@@ -215,7 +215,7 @@ WriteStructEndError:
 
 func (p *LikeReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if p.IsSetVideoID() {
-		if err = oprot.WriteFieldBegin("videoID", thrift.STRING, 1); err != nil {
+		if err = oprot.WriteFieldBegin("video_id", thrift.STRING, 1); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.VideoID); err != nil {
@@ -234,7 +234,7 @@ WriteFieldEndError:
 
 func (p *LikeReq) writeField2(oprot thrift.TProtocol) (err error) {
 	if p.IsSetCommentID() {
-		if err = oprot.WriteFieldBegin("commentID", thrift.STRING, 2); err != nil {
+		if err = oprot.WriteFieldBegin("comment_id", thrift.STRING, 2); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.CommentID); err != nil {
@@ -252,7 +252,7 @@ WriteFieldEndError:
 }
 
 func (p *LikeReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("actionType", thrift.I32, 3); err != nil {
+	if err = oprot.WriteFieldBegin("action_type", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.ActionType); err != nil {
@@ -605,11 +605,11 @@ func (p *VideoData) String() string {
 // 点赞列表请求
 type ListLikeReq struct {
 	// 用户ID
-	UserID string `thrift:"userID,1,required" json:"userID,required" query:"user_id,required"`
+	UserID string `thrift:"user_id,1,required" json:"user_id,required" query:"user_id,required"`
 	// 页码
-	PageNum string `thrift:"pageNum,2,required" json:"pageNum,required" query:"page_num,required"`
+	PageNum string `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required"`
 	// 单页尺寸
-	PageSize string `thrift:"pageSize,3,required" json:"pageSize,required" query:"page_size,required"`
+	PageSize string `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required"`
 }
 
 func NewListLikeReq() *ListLikeReq {
@@ -632,9 +632,9 @@ func (p *ListLikeReq) GetPageSize() (v string) {
 }
 
 var fieldIDToName_ListLikeReq = map[int16]string{
-	1: "userID",
-	2: "pageNum",
-	3: "pageSize",
+	1: "user_id",
+	2: "page_num",
+	3: "page_size",
 }
 
 func (p *ListLikeReq) Read(iprot thrift.TProtocol) (err error) {
@@ -802,7 +802,7 @@ WriteStructEndError:
 }
 
 func (p *ListLikeReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("userID", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("user_id", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.UserID); err != nil {
@@ -819,7 +819,7 @@ WriteFieldEndError:
 }
 
 func (p *ListLikeReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageNum", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("page_num", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.PageNum); err != nil {
@@ -836,7 +836,7 @@ WriteFieldEndError:
 }
 
 func (p *ListLikeReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageSize", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.PageSize); err != nil {
@@ -1074,9 +1074,9 @@ func (p *ListLikeResp) String() string {
 // 评论请求
 type CommentReq struct {
 	// 视频ID
-	VideoID *string `thrift:"videoID,1,optional" form:"video_id" json:"videoID,omitempty"`
+	VideoID *string `thrift:"video_id,1,optional" form:"video_id" json:"video_id,omitempty"`
 	// 评论ID
-	CommentID *string `thrift:"commentID,2,optional" form:"comment_id" json:"commentID,omitempty"`
+	CommentID *string `thrift:"comment_id,2,optional" form:"comment_id" json:"comment_id,omitempty"`
 	// 评论内容
 	Content string `thrift:"content,3,required" form:"content,required" json:"content,required"`
 }
@@ -1111,8 +1111,8 @@ func (p *CommentReq) GetContent() (v string) {
 }
 
 var fieldIDToName_CommentReq = map[int16]string{
-	1: "videoID",
-	2: "commentID",
+	1: "video_id",
+	2: "comment_id",
 	3: "content",
 }
 
@@ -1276,7 +1276,7 @@ WriteStructEndError:
 
 func (p *CommentReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if p.IsSetVideoID() {
-		if err = oprot.WriteFieldBegin("videoID", thrift.STRING, 1); err != nil {
+		if err = oprot.WriteFieldBegin("video_id", thrift.STRING, 1); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.VideoID); err != nil {
@@ -1295,7 +1295,7 @@ WriteFieldEndError:
 
 func (p *CommentReq) writeField2(oprot thrift.TProtocol) (err error) {
 	if p.IsSetCommentID() {
-		if err = oprot.WriteFieldBegin("commentID", thrift.STRING, 2); err != nil {
+		if err = oprot.WriteFieldBegin("comment_id", thrift.STRING, 2); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.CommentID); err != nil {
@@ -1666,13 +1666,13 @@ func (p *CommentData) String() string {
 // 评论列表请求
 type ListCommentReq struct {
 	// 视频ID
-	VideoID *string `thrift:"videoID,1,optional" json:"videoID,omitempty" query:"video_id"`
+	VideoID *string `thrift:"video_id,1,optional" json:"video_id,omitempty" query:"video_id"`
 	// 评论ID
-	CommentID *string `thrift:"commentID,2,optional" json:"commentID,omitempty" query:"comment_id"`
+	CommentID *string `thrift:"comment_id,2,optional" json:"comment_id,omitempty" query:"comment_id"`
 	// 页码
-	PageNum string `thrift:"pageNum,3,required" json:"pageNum,required" query:"page_num,required"`
+	PageNum string `thrift:"page_num,3,required" json:"page_num,required" query:"page_num,required"`
 	// 单页尺寸
-	PageSize string `thrift:"pageSize,4,required" json:"pageSize,required" query:"page_size,required"`
+	PageSize string `thrift:"page_size,4,required" json:"page_size,required" query:"page_size,required"`
 }
 
 func NewListCommentReq() *ListCommentReq {
@@ -1709,10 +1709,10 @@ func (p *ListCommentReq) GetPageSize() (v string) {
 }
 
 var fieldIDToName_ListCommentReq = map[int16]string{
-	1: "videoID",
-	2: "commentID",
-	3: "pageNum",
-	4: "pageSize",
+	1: "video_id",
+	2: "comment_id",
+	3: "page_num",
+	4: "page_size",
 }
 
 func (p *ListCommentReq) IsSetVideoID() bool {
@@ -1905,7 +1905,7 @@ WriteStructEndError:
 
 func (p *ListCommentReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if p.IsSetVideoID() {
-		if err = oprot.WriteFieldBegin("videoID", thrift.STRING, 1); err != nil {
+		if err = oprot.WriteFieldBegin("video_id", thrift.STRING, 1); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.VideoID); err != nil {
@@ -1924,7 +1924,7 @@ WriteFieldEndError:
 
 func (p *ListCommentReq) writeField2(oprot thrift.TProtocol) (err error) {
 	if p.IsSetCommentID() {
-		if err = oprot.WriteFieldBegin("commentID", thrift.STRING, 2); err != nil {
+		if err = oprot.WriteFieldBegin("comment_id", thrift.STRING, 2); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.CommentID); err != nil {
@@ -1942,7 +1942,7 @@ WriteFieldEndError:
 }
 
 func (p *ListCommentReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageNum", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("page_num", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.PageNum); err != nil {
@@ -1959,7 +1959,7 @@ WriteFieldEndError:
 }
 
 func (p *ListCommentReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageSize", thrift.STRING, 4); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.STRING, 4); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.PageSize); err != nil {
@@ -2197,7 +2197,7 @@ func (p *ListCommentResp) String() string {
 // 删除评论请求
 type DeleteCommentReq struct {
 	// 评论ID
-	CommentID string `thrift:"commentID,1,required" form:"comment_id,required" json:"commentID,required"`
+	CommentID string `thrift:"comment_id,1,required" form:"comment_id,required" json:"comment_id,required"`
 }
 
 func NewDeleteCommentReq() *DeleteCommentReq {
@@ -2212,7 +2212,7 @@ func (p *DeleteCommentReq) GetCommentID() (v string) {
 }
 
 var fieldIDToName_DeleteCommentReq = map[int16]string{
-	1: "commentID",
+	1: "comment_id",
 }
 
 func (p *DeleteCommentReq) Read(iprot thrift.TProtocol) (err error) {
@@ -2320,7 +2320,7 @@ WriteStructEndError:
 }
 
 func (p *DeleteCommentReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("commentID", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("comment_id", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.CommentID); err != nil {

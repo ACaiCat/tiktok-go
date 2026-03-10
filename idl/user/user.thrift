@@ -38,7 +38,7 @@ struct LoginResp {
 // 刷新Token请求
 struct RefreshReq {
   // 刷新Token
-  1: required string refreshToken (api.body = 'refresh_token');
+  1: required string refresh_token (api.body = 'refresh_token');
 }
 
 // 刷新Token响应
@@ -52,9 +52,9 @@ struct RefreshResp {
 // Token数据
 struct TokenData {
   // 访问Token
-  1: required string accessToken;
+  1: required string access_token;
   // 刷新Token
-  2: required string refreshToken;
+  2: required string refresh_token;
 }
 
 // 用户信息请求

@@ -16,9 +16,9 @@ struct ChatResp {
 // 关注请求
 struct FollowReq {
   // 操作对象ID
-  1: required string toUserID (api.form = 'to_user_id');
+  1: required string to_user_id (api.form = 'to_user_id');
   // 操作类型
-  2: required i32 actionType (api.form = 'action_type');
+  2: required i32 action_type (api.form = 'action_type');
 }
 
 // 关注响应
@@ -38,11 +38,11 @@ struct SocialUserData {
 // 关注列表请求
 struct ListFollowingReq {
   // 用户ID
-  1: required string userID (api.query = 'user_id');
+  1: required string user_id (api.query = 'user_id');
   // 页码
-  2: required string pageNum (api.query = 'page_num');
+  2: required string page_num (api.query = 'page_num');
   // 单页尺寸
-  3: required string pageSize (api.query = 'page_size');
+  3: required string page_size (api.query = 'page_size');
 }
 
 // 关注列表响应
@@ -56,11 +56,11 @@ struct ListFollowingResp {
 // 粉丝列表请求
 struct ListFollowerReq {
   // 用户ID
-  1: required string userID (api.query = 'user_id');
+  1: required string user_id (api.query = 'user_id');
   // 页码
-  2: required string pageNum (api.query = 'page_num');
+  2: required string page_num (api.query = 'page_num');
   // 单页尺寸
-  3: required string pageSize (api.query = 'page_size');
+  3: required string page_size (api.query = 'page_size');
 }
 
 // 粉丝列表响应
@@ -74,9 +74,9 @@ struct ListFollowerResp {
 // 好友列表请求
 struct ListFriendReq {
   // 页码
-  1: required string pageNum (api.query = 'page_num');
+  1: required string page_num (api.query = 'page_num');
   // 单页尺寸
-  2: required string pageSize (api.query = 'page_size');
+  2: required string page_size (api.query = 'page_size');
 }
 
 // 好友列表响应

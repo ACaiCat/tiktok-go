@@ -13,7 +13,7 @@ import (
 // 视频流请求
 type FeedReq struct {
 	// 时间戳游标
-	LatestTime *string `thrift:"latestTime,1,optional" json:"latestTime,omitempty" query:"latest_time"`
+	LatestTime *string `thrift:"latest_time,1,optional" json:"latest_time,omitempty" query:"latest_time"`
 }
 
 func NewFeedReq() *FeedReq {
@@ -33,7 +33,7 @@ func (p *FeedReq) GetLatestTime() (v string) {
 }
 
 var fieldIDToName_FeedReq = map[int16]string{
-	1: "latestTime",
+	1: "latest_time",
 }
 
 func (p *FeedReq) IsSetLatestTime() bool {
@@ -138,7 +138,7 @@ WriteStructEndError:
 
 func (p *FeedReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if p.IsSetLatestTime() {
-		if err = oprot.WriteFieldBegin("latestTime", thrift.STRING, 1); err != nil {
+		if err = oprot.WriteFieldBegin("latest_time", thrift.STRING, 1); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.LatestTime); err != nil {
@@ -810,11 +810,11 @@ func (p *PublishResp) String() string {
 // 发布列表请求
 type ListReq struct {
 	// 用户ID
-	UserID string `thrift:"userID,1,required" json:"userID,required" query:"user_id,required"`
+	UserID string `thrift:"user_id,1,required" json:"user_id,required" query:"user_id,required"`
 	// 页码
-	PageNum int32 `thrift:"pageNum,2,required" json:"pageNum,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required"`
 	// 单页尺寸
-	PageSize int32 `thrift:"pageSize,3,required" json:"pageSize,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required"`
 }
 
 func NewListReq() *ListReq {
@@ -837,9 +837,9 @@ func (p *ListReq) GetPageSize() (v int32) {
 }
 
 var fieldIDToName_ListReq = map[int16]string{
-	1: "userID",
-	2: "pageNum",
-	3: "pageSize",
+	1: "user_id",
+	2: "page_num",
+	3: "page_size",
 }
 
 func (p *ListReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1007,7 +1007,7 @@ WriteStructEndError:
 }
 
 func (p *ListReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("userID", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("user_id", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.UserID); err != nil {
@@ -1024,7 +1024,7 @@ WriteFieldEndError:
 }
 
 func (p *ListReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageNum", thrift.I32, 2); err != nil {
+	if err = oprot.WriteFieldBegin("page_num", thrift.I32, 2); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageNum); err != nil {
@@ -1041,7 +1041,7 @@ WriteFieldEndError:
 }
 
 func (p *ListReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageSize", thrift.I32, 3); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageSize); err != nil {
@@ -1298,9 +1298,9 @@ func (p *ListResp) String() string {
 // 热门排行榜请求
 type PopularReq struct {
 	// 页码
-	PageNum int32 `thrift:"pageNum,1,required" json:"pageNum,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,1,required" json:"page_num,required" query:"page_num,required"`
 	// 单页尺寸
-	PageSize int32 `thrift:"pageSize,2,required" json:"pageSize,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,2,required" json:"page_size,required" query:"page_size,required"`
 }
 
 func NewPopularReq() *PopularReq {
@@ -1319,8 +1319,8 @@ func (p *PopularReq) GetPageSize() (v int32) {
 }
 
 var fieldIDToName_PopularReq = map[int16]string{
-	1: "pageNum",
-	2: "pageSize",
+	1: "page_num",
+	2: "page_size",
 }
 
 func (p *PopularReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1458,7 +1458,7 @@ WriteStructEndError:
 }
 
 func (p *PopularReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageNum", thrift.I32, 1); err != nil {
+	if err = oprot.WriteFieldBegin("page_num", thrift.I32, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageNum); err != nil {
@@ -1475,7 +1475,7 @@ WriteFieldEndError:
 }
 
 func (p *PopularReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageSize", thrift.I32, 2); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 2); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageSize); err != nil {
@@ -1734,13 +1734,13 @@ type SearchReq struct {
 	// 关键词
 	Keywords string `thrift:"keywords,1,required" form:"keywords,required" json:"keywords,required"`
 	// 页码
-	PageNum int32 `thrift:"pageNum,2,required" form:"page_num,required" json:"pageNum,required"`
+	PageNum int32 `thrift:"page_num,2,required" form:"page_num,required" json:"page_num,required"`
 	// 单页尺寸
-	PageSize int32 `thrift:"pageSize,3,required" form:"page_size,required" json:"pageSize,required"`
+	PageSize int32 `thrift:"page_size,3,required" form:"page_size,required" json:"page_size,required"`
 	// 起始时间
-	FromDate *string `thrift:"fromDate,4,optional" form:"from_date" json:"fromDate,omitempty"`
+	FromDate *string `thrift:"from_date,4,optional" form:"from_date" json:"from_date,omitempty"`
 	// 结束时间
-	ToDate *string `thrift:"toDate,5,optional" form:"to_date" json:"toDate,omitempty"`
+	ToDate *string `thrift:"to_date,5,optional" form:"to_date" json:"to_date,omitempty"`
 	// 用户名关键词
 	Username *string `thrift:"username,6,optional" form:"username" json:"username,omitempty"`
 }
@@ -1793,10 +1793,10 @@ func (p *SearchReq) GetUsername() (v string) {
 
 var fieldIDToName_SearchReq = map[int16]string{
 	1: "keywords",
-	2: "pageNum",
-	3: "pageSize",
-	4: "fromDate",
-	5: "toDate",
+	2: "page_num",
+	3: "page_size",
+	4: "from_date",
+	5: "to_date",
 	6: "username",
 }
 
@@ -2063,7 +2063,7 @@ WriteFieldEndError:
 }
 
 func (p *SearchReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageNum", thrift.I32, 2); err != nil {
+	if err = oprot.WriteFieldBegin("page_num", thrift.I32, 2); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageNum); err != nil {
@@ -2080,7 +2080,7 @@ WriteFieldEndError:
 }
 
 func (p *SearchReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageSize", thrift.I32, 3); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageSize); err != nil {
@@ -2098,7 +2098,7 @@ WriteFieldEndError:
 
 func (p *SearchReq) writeField4(oprot thrift.TProtocol) (err error) {
 	if p.IsSetFromDate() {
-		if err = oprot.WriteFieldBegin("fromDate", thrift.STRING, 4); err != nil {
+		if err = oprot.WriteFieldBegin("from_date", thrift.STRING, 4); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.FromDate); err != nil {
@@ -2117,7 +2117,7 @@ WriteFieldEndError:
 
 func (p *SearchReq) writeField5(oprot thrift.TProtocol) (err error) {
 	if p.IsSetToDate() {
-		if err = oprot.WriteFieldBegin("toDate", thrift.STRING, 5); err != nil {
+		if err = oprot.WriteFieldBegin("to_date", thrift.STRING, 5); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.ToDate); err != nil {
