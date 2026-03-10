@@ -15,5 +15,5 @@ func (s *UserService) GetUserInfo(userID int64) (*model.User, error) {
 		return nil, errno.UserIsNotExistErr
 	}
 
-	return UserDaoToDTO(usr), nil
+	return UserDaoToDto(usr), nil
 }

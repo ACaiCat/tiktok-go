@@ -29,8 +29,6 @@ CREATE TABLE IF NOT EXISTS videos
     title         TEXT        NOT NULL,
     description   TEXT        NOT NULL,
     visit_count   BIGINT      NOT NULL DEFAULT 0,
-    like_count    BIGINT      NOT NULL DEFAULT 0,
-    comment_count BIGINT      NOT NULL DEFAULT 0,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at    TIMESTAMPTZ
@@ -89,3 +87,21 @@ COMMENT ON COLUMN likes.comment_id IS '评论ID';
 COMMENT ON COLUMN likes.created_at IS '创建时间';
 COMMENT ON COLUMN likes.updated_at IS '更新时间';
 COMMENT ON COLUMN likes.deleted_at IS '删除时间';
+
+CREATE TABLE IF NOT EXISTS followers
+(
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id     BIGINT      NOT NULL,
+    follower_id BIGINT      NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at  TIMESTAMPTZ
+);
+
+COMMENT ON TABLE followers IS '关注表';
+COMMENT ON COLUMN followers.id IS '关注ID';
+COMMENT ON COLUMN followers.user_id IS '用户ID';
+COMMENT ON COLUMN followers.follower_id IS '粉丝ID';
+COMMENT ON COLUMN followers.created_at IS '创建时间';
+COMMENT ON COLUMN followers.updated_at IS '更新时间';
+COMMENT ON COLUMN followers.deleted_at IS '删除时间';

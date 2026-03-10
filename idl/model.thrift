@@ -15,8 +15,9 @@ struct Video {
   5: required string title;
   6: required string description;
   7: required i64 visit_count;
-  8: required i64 comment_count;
-  9: required string created_at;
+  8: required i64 like_count;
+  9: required i64 comment_count;
+  10: required string created_at;
 }
 
 struct Comment {

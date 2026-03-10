@@ -6,6 +6,8 @@ import (
 	"context"
 
 	video "github.com/ACaiCat/tiktok-go/biz/model/video"
+	"github.com/ACaiCat/tiktok-go/biz/pack"
+	service "github.com/ACaiCat/tiktok-go/biz/service/video"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -21,9 +23,14 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(video.FeedResp)
+	videos, err := service.NewVideoService().GetFeed(&req)
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespFeedList(c, videos)
 }
 
 // Publish .

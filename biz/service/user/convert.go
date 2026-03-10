@@ -7,7 +7,7 @@ import (
 )
 import dto "github.com/ACaiCat/tiktok-go/biz/model/model"
 
-func UserDaoToDTO(user *model.User) *dto.User {
+func UserDaoToDto(user *model.User) *dto.User {
 	return &dto.User{
 		ID:        strconv.FormatInt(user.ID, 10),
 		Username:  user.Username,

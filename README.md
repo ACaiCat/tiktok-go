@@ -40,7 +40,7 @@
 
 ### 视频模块(Video)
 
-- [ ] `GET  /video/feed` — 视频流
+- [X] `GET  /video/feed` — 视频流
 - [ ] `POST /video/publish` — 发布视频
 - [ ] `GET  /video/list` — 用户视频列表
 - [ ] `GET  /video/popular` — 热门视频

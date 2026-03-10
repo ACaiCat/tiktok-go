@@ -14,7 +14,7 @@ struct FeedResp {
   // 响应状态
   1: required common.Base base;
   // 视频列表
-  2: optional list<model.Video> items;
+  2: required list<model.Video> items;
 }
 
 // 投稿视频请求
@@ -48,7 +48,7 @@ struct ListResp {
   // 响应状态
   1: required common.Base base;
   // 视频列表
-  2: optional list<model.Video> items;
+  2: required list<model.Video> items;
 }
 
 // 热门排行榜请求
@@ -64,7 +64,7 @@ struct PopularResp {
   // 响应状态
   1: required common.Base base;
   // 视频列表
-  2: optional list<model.Video> items;
+  2: required list<model.Video> items;
 }
 
 // 搜索视频请求
@@ -88,7 +88,7 @@ struct SearchResp {
   // 响应状态
   1: required common.Base base;
   // 视频列表
-  2: optional list<model.Video> items;
+  2: required list<model.Video> items;
 }
 
 service VideoHandler {

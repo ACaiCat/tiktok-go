@@ -63,6 +63,6 @@ func (s *UserService) UserLogin(req *user.LoginReq) (*model.User, string, string
 		return nil, "", "", errno.ServiceErr
 	}
 
-	return UserDaoToDTO(usr), accessToken, refreshToken, nil
+	return UserDaoToDto(usr), accessToken, refreshToken, nil
 
 }

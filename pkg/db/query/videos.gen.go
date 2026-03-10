@@ -35,8 +35,6 @@ func newVideo(db *gorm.DB, opts ...gen.DOOption) video {
 	_video.Title = field.NewString(tableName, "title")
 	_video.Description = field.NewString(tableName, "description")
 	_video.VisitCount = field.NewInt64(tableName, "visit_count")
-	_video.LikeCount = field.NewInt64(tableName, "like_count")
-	_video.CommentCount = field.NewInt64(tableName, "comment_count")
 	_video.CreatedAt = field.NewTime(tableName, "created_at")
 	_video.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_video.DeletedAt = field.NewField(tableName, "deleted_at")
@@ -49,19 +47,17 @@ func newVideo(db *gorm.DB, opts ...gen.DOOption) video {
 type video struct {
 	videoDo
 
-	ALL          field.Asterisk
-	ID           field.Int64  // 视频ID
-	UserID       field.Int64  // 用户ID
-	VideoURL     field.String // 视频URL
-	CoverURL     field.String // 封面URL
-	Title        field.String // 视频标题
-	Description  field.String // 视频描述
-	VisitCount   field.Int64  // 访问量
-	LikeCount    field.Int64
-	CommentCount field.Int64
-	CreatedAt    field.Time  // 创建时间
-	UpdatedAt    field.Time  // 更新时间
-	DeletedAt    field.Field // 删除时间
+	ALL         field.Asterisk
+	ID          field.Int64  // 视频ID
+	UserID      field.Int64  // 用户ID
+	VideoURL    field.String // 视频URL
+	CoverURL    field.String // 封面URL
+	Title       field.String // 视频标题
+	Description field.String // 视频描述
+	VisitCount  field.Int64  // 访问量
+	CreatedAt   field.Time   // 创建时间
+	UpdatedAt   field.Time   // 更新时间
+	DeletedAt   field.Field  // 删除时间
 
 	fieldMap map[string]field.Expr
 }
@@ -85,8 +81,6 @@ func (v *video) updateTableName(table string) *video {
 	v.Title = field.NewString(table, "title")
 	v.Description = field.NewString(table, "description")
 	v.VisitCount = field.NewInt64(table, "visit_count")
-	v.LikeCount = field.NewInt64(table, "like_count")
-	v.CommentCount = field.NewInt64(table, "comment_count")
 	v.CreatedAt = field.NewTime(table, "created_at")
 	v.UpdatedAt = field.NewTime(table, "updated_at")
 	v.DeletedAt = field.NewField(table, "deleted_at")
@@ -106,7 +100,7 @@ func (v *video) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (v *video) fillFieldMap() {
-	v.fieldMap = make(map[string]field.Expr, 12)
+	v.fieldMap = make(map[string]field.Expr, 10)
 	v.fieldMap["id"] = v.ID
 	v.fieldMap["user_id"] = v.UserID
 	v.fieldMap["video_url"] = v.VideoURL
@@ -114,8 +108,6 @@ func (v *video) fillFieldMap() {
 	v.fieldMap["title"] = v.Title
 	v.fieldMap["description"] = v.Description
 	v.fieldMap["visit_count"] = v.VisitCount
-	v.fieldMap["like_count"] = v.LikeCount
-	v.fieldMap["comment_count"] = v.CommentCount
 	v.fieldMap["created_at"] = v.CreatedAt
 	v.fieldMap["updated_at"] = v.UpdatedAt
 	v.fieldMap["deleted_at"] = v.DeletedAt

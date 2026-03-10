@@ -1,0 +1,44 @@
+package videoDao
+
+import (
+	"errors"
+	"log"
+	"math/rand/v2"
+	"time"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+	"gorm.io/gorm"
+)
+
+func (v *VideoDao) GetVideoByID(videoID int64) (*model.Video, error) {
+	var err error
+	video, err := v.q.Video.Where(v.q.Video.ID.Eq(videoID)).First()
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return video, nil
+}
+
+func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*model.Video, error) {
+	var err error
+	videos, err := v.q.Video.Where(v.q.Video.CreatedAt.Lt(latestTime)).Limit(limit * 3).Order(v.q.Video.CreatedAt.Desc()).Find()
+
+	if err != nil {
+		log.Printf("failed to get feed by latest time: %v", err)
+		return nil, err
+	}
+
+	rand.Shuffle(len(videos), func(i, j int) {
+		videos[i], videos[j] = videos[j], videos[i]
+	})
+
+	if len(videos) <= limit {
+		return videos, nil
+	}
+
+	return videos[:limit], nil
+}

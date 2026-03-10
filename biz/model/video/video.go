@@ -168,7 +168,7 @@ type FeedResp struct {
 	// 响应状态
 	Base *common.Base `thrift:"base,1,required" form:"base,required" json:"base,required" query:"base,required"`
 	// 视频列表
-	Items []*model.Video `thrift:"items,2,optional,list<model.Video>" form:"items" json:"items,omitempty" query:"items"`
+	Items []*model.Video `thrift:"items,2,required,list<model.Video>" form:"items,required" json:"items,required" query:"items,required"`
 }
 
 func NewFeedResp() *FeedResp {
@@ -187,12 +187,7 @@ func (p *FeedResp) GetBase() (v *common.Base) {
 	return p.Base
 }
 
-var FeedResp_Items_DEFAULT []*model.Video
-
 func (p *FeedResp) GetItems() (v []*model.Video) {
-	if !p.IsSetItems() {
-		return FeedResp_Items_DEFAULT
-	}
 	return p.Items
 }
 
@@ -205,15 +200,12 @@ func (p *FeedResp) IsSetBase() bool {
 	return p.Base != nil
 }
 
-func (p *FeedResp) IsSetItems() bool {
-	return p.Items != nil
-}
-
 func (p *FeedResp) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetBase bool = false
+	var issetItems bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -243,6 +235,7 @@ func (p *FeedResp) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetItems = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -261,6 +254,11 @@ func (p *FeedResp) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetBase {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetItems {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -363,24 +361,22 @@ WriteFieldEndError:
 }
 
 func (p *FeedResp) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetItems() {
-		if err = oprot.WriteFieldBegin("items", thrift.LIST, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Items)); err != nil {
+	if err = oprot.WriteFieldBegin("items", thrift.LIST, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Items)); err != nil {
+		return err
+	}
+	for _, v := range p.Items {
+		if err := v.Write(oprot); err != nil {
 			return err
 		}
-		for _, v := range p.Items {
-			if err := v.Write(oprot); err != nil {
-				return err
-			}
-		}
-		if err := oprot.WriteListEnd(); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:
@@ -1074,7 +1070,7 @@ type ListResp struct {
 	// 响应状态
 	Base *common.Base `thrift:"base,1,required" form:"base,required" json:"base,required" query:"base,required"`
 	// 视频列表
-	Items []*model.Video `thrift:"items,2,optional,list<model.Video>" form:"items" json:"items,omitempty" query:"items"`
+	Items []*model.Video `thrift:"items,2,required,list<model.Video>" form:"items,required" json:"items,required" query:"items,required"`
 }
 
 func NewListResp() *ListResp {
@@ -1093,12 +1089,7 @@ func (p *ListResp) GetBase() (v *common.Base) {
 	return p.Base
 }
 
-var ListResp_Items_DEFAULT []*model.Video
-
 func (p *ListResp) GetItems() (v []*model.Video) {
-	if !p.IsSetItems() {
-		return ListResp_Items_DEFAULT
-	}
 	return p.Items
 }
 
@@ -1111,15 +1102,12 @@ func (p *ListResp) IsSetBase() bool {
 	return p.Base != nil
 }
 
-func (p *ListResp) IsSetItems() bool {
-	return p.Items != nil
-}
-
 func (p *ListResp) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetBase bool = false
+	var issetItems bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -1149,6 +1137,7 @@ func (p *ListResp) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetItems = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -1167,6 +1156,11 @@ func (p *ListResp) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetBase {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetItems {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -1269,24 +1263,22 @@ WriteFieldEndError:
 }
 
 func (p *ListResp) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetItems() {
-		if err = oprot.WriteFieldBegin("items", thrift.LIST, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Items)); err != nil {
+	if err = oprot.WriteFieldBegin("items", thrift.LIST, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Items)); err != nil {
+		return err
+	}
+	for _, v := range p.Items {
+		if err := v.Write(oprot); err != nil {
 			return err
 		}
-		for _, v := range p.Items {
-			if err := v.Write(oprot); err != nil {
-				return err
-			}
-		}
-		if err := oprot.WriteListEnd(); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:
@@ -1512,7 +1504,7 @@ type PopularResp struct {
 	// 响应状态
 	Base *common.Base `thrift:"base,1,required" form:"base,required" json:"base,required" query:"base,required"`
 	// 视频列表
-	Items []*model.Video `thrift:"items,2,optional,list<model.Video>" form:"items" json:"items,omitempty" query:"items"`
+	Items []*model.Video `thrift:"items,2,required,list<model.Video>" form:"items,required" json:"items,required" query:"items,required"`
 }
 
 func NewPopularResp() *PopularResp {
@@ -1531,12 +1523,7 @@ func (p *PopularResp) GetBase() (v *common.Base) {
 	return p.Base
 }
 
-var PopularResp_Items_DEFAULT []*model.Video
-
 func (p *PopularResp) GetItems() (v []*model.Video) {
-	if !p.IsSetItems() {
-		return PopularResp_Items_DEFAULT
-	}
 	return p.Items
 }
 
@@ -1549,15 +1536,12 @@ func (p *PopularResp) IsSetBase() bool {
 	return p.Base != nil
 }
 
-func (p *PopularResp) IsSetItems() bool {
-	return p.Items != nil
-}
-
 func (p *PopularResp) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetBase bool = false
+	var issetItems bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -1587,6 +1571,7 @@ func (p *PopularResp) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetItems = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -1605,6 +1590,11 @@ func (p *PopularResp) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetBase {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetItems {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -1707,24 +1697,22 @@ WriteFieldEndError:
 }
 
 func (p *PopularResp) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetItems() {
-		if err = oprot.WriteFieldBegin("items", thrift.LIST, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Items)); err != nil {
+	if err = oprot.WriteFieldBegin("items", thrift.LIST, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Items)); err != nil {
+		return err
+	}
+	for _, v := range p.Items {
+		if err := v.Write(oprot); err != nil {
 			return err
 		}
-		for _, v := range p.Items {
-			if err := v.Write(oprot); err != nil {
-				return err
-			}
-		}
-		if err := oprot.WriteListEnd(); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:
@@ -2178,7 +2166,7 @@ type SearchResp struct {
 	// 响应状态
 	Base *common.Base `thrift:"base,1,required" form:"base,required" json:"base,required" query:"base,required"`
 	// 视频列表
-	Items []*model.Video `thrift:"items,2,optional,list<model.Video>" form:"items" json:"items,omitempty" query:"items"`
+	Items []*model.Video `thrift:"items,2,required,list<model.Video>" form:"items,required" json:"items,required" query:"items,required"`
 }
 
 func NewSearchResp() *SearchResp {
@@ -2197,12 +2185,7 @@ func (p *SearchResp) GetBase() (v *common.Base) {
 	return p.Base
 }
 
-var SearchResp_Items_DEFAULT []*model.Video
-
 func (p *SearchResp) GetItems() (v []*model.Video) {
-	if !p.IsSetItems() {
-		return SearchResp_Items_DEFAULT
-	}
 	return p.Items
 }
 
@@ -2215,15 +2198,12 @@ func (p *SearchResp) IsSetBase() bool {
 	return p.Base != nil
 }
 
-func (p *SearchResp) IsSetItems() bool {
-	return p.Items != nil
-}
-
 func (p *SearchResp) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetBase bool = false
+	var issetItems bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2253,6 +2233,7 @@ func (p *SearchResp) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetItems = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2271,6 +2252,11 @@ func (p *SearchResp) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetBase {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetItems {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -2373,24 +2359,22 @@ WriteFieldEndError:
 }
 
 func (p *SearchResp) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetItems() {
-		if err = oprot.WriteFieldBegin("items", thrift.LIST, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Items)); err != nil {
+	if err = oprot.WriteFieldBegin("items", thrift.LIST, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Items)); err != nil {
+		return err
+	}
+	for _, v := range p.Items {
+		if err := v.Write(oprot); err != nil {
 			return err
 		}
-		for _, v := range p.Items {
-			if err := v.Write(oprot); err != nil {
-				return err
-			}
-		}
-		if err := oprot.WriteListEnd(); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:

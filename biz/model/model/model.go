@@ -322,8 +322,9 @@ type Video struct {
 	Title        string `thrift:"title,5,required" form:"title,required" json:"title,required" query:"title,required"`
 	Description  string `thrift:"description,6,required" form:"description,required" json:"description,required" query:"description,required"`
 	VisitCount   int64  `thrift:"visit_count,7,required" form:"visit_count,required" json:"visit_count,required" query:"visit_count,required"`
-	CommentCount int64  `thrift:"comment_count,8,required" form:"comment_count,required" json:"comment_count,required" query:"comment_count,required"`
-	CreatedAt    string `thrift:"created_at,9,required" form:"created_at,required" json:"created_at,required" query:"created_at,required"`
+	LikeCount    int64  `thrift:"like_count,8,required" form:"like_count,required" json:"like_count,required" query:"like_count,required"`
+	CommentCount int64  `thrift:"comment_count,9,required" form:"comment_count,required" json:"comment_count,required" query:"comment_count,required"`
+	CreatedAt    string `thrift:"created_at,10,required" form:"created_at,required" json:"created_at,required" query:"created_at,required"`
 }
 
 func NewVideo() *Video {
@@ -361,6 +362,10 @@ func (p *Video) GetVisitCount() (v int64) {
 	return p.VisitCount
 }
 
+func (p *Video) GetLikeCount() (v int64) {
+	return p.LikeCount
+}
+
 func (p *Video) GetCommentCount() (v int64) {
 	return p.CommentCount
 }
@@ -370,15 +375,16 @@ func (p *Video) GetCreatedAt() (v string) {
 }
 
 var fieldIDToName_Video = map[int16]string{
-	1: "id",
-	2: "user_id",
-	3: "video_url",
-	4: "cover_url",
-	5: "title",
-	6: "description",
-	7: "visit_count",
-	8: "comment_count",
-	9: "created_at",
+	1:  "id",
+	2:  "user_id",
+	3:  "video_url",
+	4:  "cover_url",
+	5:  "title",
+	6:  "description",
+	7:  "visit_count",
+	8:  "like_count",
+	9:  "comment_count",
+	10: "created_at",
 }
 
 func (p *Video) Read(iprot thrift.TProtocol) (err error) {
@@ -392,6 +398,7 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 	var issetTitle bool = false
 	var issetDescription bool = false
 	var issetVisitCount bool = false
+	var issetLikeCount bool = false
 	var issetCommentCount bool = false
 	var issetCreatedAt bool = false
 
@@ -477,13 +484,22 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField8(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetCommentCount = true
+				issetLikeCount = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
 		case 9:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField9(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetCommentCount = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 10:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField10(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetCreatedAt = true
@@ -538,13 +554,18 @@ func (p *Video) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetCommentCount {
+	if !issetLikeCount {
 		fieldId = 8
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetCreatedAt {
+	if !issetCommentCount {
 		fieldId = 9
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetCreatedAt {
+		fieldId = 10
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -650,10 +671,21 @@ func (p *Video) ReadField8(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.CommentCount = _field
+	p.LikeCount = _field
 	return nil
 }
 func (p *Video) ReadField9(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.CommentCount = _field
+	return nil
+}
+func (p *Video) ReadField10(iprot thrift.TProtocol) error {
 
 	var _field string
 	if v, err := iprot.ReadString(); err != nil {
@@ -705,6 +737,10 @@ func (p *Video) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField9(oprot); err != nil {
 			fieldId = 9
+			goto WriteFieldError
+		}
+		if err = p.writeField10(oprot); err != nil {
+			fieldId = 10
 			goto WriteFieldError
 		}
 	}
@@ -845,10 +881,10 @@ WriteFieldEndError:
 }
 
 func (p *Video) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("comment_count", thrift.I64, 8); err != nil {
+	if err = oprot.WriteFieldBegin("like_count", thrift.I64, 8); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.CommentCount); err != nil {
+	if err := oprot.WriteI64(p.LikeCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -862,10 +898,10 @@ WriteFieldEndError:
 }
 
 func (p *Video) writeField9(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("created_at", thrift.STRING, 9); err != nil {
+	if err = oprot.WriteFieldBegin("comment_count", thrift.I64, 9); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.CreatedAt); err != nil {
+	if err := oprot.WriteI64(p.CommentCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -876,6 +912,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 9 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 9 end error: ", p), err)
+}
+
+func (p *Video) writeField10(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("created_at", thrift.STRING, 10); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.CreatedAt); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 10 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 10 end error: ", p), err)
 }
 
 func (p *Video) String() string {
