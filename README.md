@@ -15,7 +15,7 @@
 
 1. 复制配置文件并填写配置：
    ```bash
-   cp config/config,yaml.example config/config.yaml
+   cp config/config.yaml.example config/config.yaml
    ```
 
 2. 启动服务：
