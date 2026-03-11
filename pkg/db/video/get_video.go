@@ -83,3 +83,15 @@ func (v *VideoDao) GetPopularVideos(pageSize int, pageNum int) ([]*model.Video, 
 	}
 	return videos, nil
 }
+
+func (v *VideoDao) GetVideoCountByUserID(userID int64) (int64, error) {
+	var err error
+	count, err := v.q.Video.
+		Where(v.q.Video.UserID.Eq(userID)).
+		Count()
+	if err != nil {
+		log.Printf("failed to get video count by user id: %v", err)
+		return 0, err
+	}
+	return count, nil
+}

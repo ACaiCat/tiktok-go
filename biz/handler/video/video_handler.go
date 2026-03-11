@@ -74,13 +74,13 @@ func List(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	videos, err := service.NewVideoService().GetVideoList(&req)
+	videos, total, err := service.NewVideoService().GetVideoList(&req)
 	if err != nil {
 		pack.RespError(c, err)
 		return
 	}
 
-	pack.RespVideoList(c, videos)
+	pack.RespVideoList(c, videos, total)
 }
 
 // Popular .
