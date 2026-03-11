@@ -124,3 +124,24 @@ func Search(ctx context.Context, c *app.RequestContext) {
 
 	pack.RespSearch(c, videos)
 }
+
+// VisitVideo .
+// @router /video/visit [GET]
+func VisitVideo(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req video.VisitVideoReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = service.NewVideoService().VisitVideo(&req)
+
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespVisitVideo(c)
+}

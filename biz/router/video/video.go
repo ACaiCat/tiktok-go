@@ -24,5 +24,6 @@ func Register(r *server.Hertz) {
 		_video.GET("/popular", append(_popularMw(), video.Popular)...)
 		_video.POST("/publish", append(_publishMw(), video.Publish)...)
 		_video.POST("/search", append(_searchMw(), video.Search)...)
+		_video.GET("/visit", append(_visitvideoMw(), video.VisitVideo)...)
 	}
 }

@@ -49,3 +49,9 @@ func RespSearch(c *app.RequestContext, videoList []*model.Video) {
 		},
 	})
 }
+
+func RespVisitVideo(c *app.RequestContext) {
+	c.JSON(consts.StatusOK, video.VisitVideoResp{
+		Base: SuccessBase,
+	})
+}

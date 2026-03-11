@@ -42,3 +42,8 @@ func _searchMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _visitvideoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -45,6 +45,7 @@
 - [X] `GET  /video/list` — 用户视频列表
 - [X] `GET  /video/popular` — 热门视频
 - [X] `POST /video/search` — 搜索视频
+- [X] `GET  /video/visit` — 访问视频
 
 ### 互动模块(Interaction)
 

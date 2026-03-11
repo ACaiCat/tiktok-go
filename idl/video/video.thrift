@@ -103,6 +103,16 @@ struct SearchResp {
   2: required VideoList data;
 }
 
+struct VisitVideoReq {
+  // 视频ID
+  1: required string video_id (api.query = 'video_id');
+}
+
+struct VisitVideoResp {
+  // 响应状态
+  1: required common.Base base;
+}
+
 service VideoHandler {
   // 视频流
   FeedResp Feed(1: FeedReq req) (api.get = "/video/feed")
@@ -118,5 +128,9 @@ service VideoHandler {
 
   // 搜索
   SearchResp Search(1: SearchReq req) (api.post = "/video/search")
+
+  // 访问视频
+  VisitVideoResp VisitVideo(1: VisitVideoReq req) (api.get = "/video/visit")
+
 }
 
