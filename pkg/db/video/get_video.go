@@ -12,7 +12,9 @@ import (
 
 func (v *VideoDao) GetVideoByID(videoID int64) (*model.Video, error) {
 	var err error
-	video, err := v.q.Video.Where(v.q.Video.ID.Eq(videoID)).First()
+	video, err := v.q.Video.
+		Where(v.q.Video.ID.Eq(videoID)).
+		First()
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -25,7 +27,11 @@ func (v *VideoDao) GetVideoByID(videoID int64) (*model.Video, error) {
 
 func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*model.Video, error) {
 	var err error
-	videos, err := v.q.Video.Where(v.q.Video.CreatedAt.Gt(latestTime)).Limit(limit * 3).Order(v.q.Video.CreatedAt.Desc()).Find()
+	videos, err := v.q.Video.
+		Where(v.q.Video.CreatedAt.Gt(latestTime)).
+		Limit(limit * 3).
+		Order(v.q.Video.CreatedAt.Desc()).
+		Find()
 
 	if err != nil {
 		log.Printf("failed to get feed by latest time: %v", err)
@@ -45,7 +51,11 @@ func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*mode
 
 func (v *VideoDao) GetVideosByUserID(userID int64, pageSize int, pageNum int) ([]*model.Video, error) {
 	var err error
-	videos, err := v.q.Video.Where(v.q.Video.UserID.Eq(userID)).Offset(pageSize * pageNum).Limit(pageSize).Find()
+	videos, err := v.q.Video.
+		Where(v.q.Video.UserID.Eq(userID)).
+		Offset(pageSize * pageNum).
+		Limit(pageSize).
+		Find()
 	if err != nil {
 		log.Printf("failed to get videos by user id: %v", err)
 		return nil, err
@@ -56,7 +66,11 @@ func (v *VideoDao) GetVideosByUserID(userID int64, pageSize int, pageNum int) ([
 
 func (v *VideoDao) GetPopularVideos(pageSize int, pageNum int) ([]*model.Video, error) {
 	var err error
-	videos, err := v.q.Video.Order(v.q.Video.VisitCount.Desc()).Offset(pageSize * pageNum).Limit(pageSize).Find()
+	videos, err := v.q.Video.
+		Order(v.q.Video.VisitCount.Desc()).
+		Offset(pageSize * pageNum).
+		Limit(pageSize).
+		Find()
 	if err != nil {
 		log.Printf("failed to get popular videos: %v", err)
 		return nil, err

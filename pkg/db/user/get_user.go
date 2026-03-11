@@ -9,7 +9,9 @@ import (
 )
 
 func (u *UserDao) GetByID(id int64) (*model.User, error) {
-	user, err := u.q.User.Where(u.q.User.ID.Eq(id)).First()
+	user, err := u.q.User.
+		Where(u.q.User.ID.Eq(id)).
+		First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -22,7 +24,9 @@ func (u *UserDao) GetByID(id int64) (*model.User, error) {
 }
 
 func (u *UserDao) GetByUsername(username string) (*model.User, error) {
-	user, err := u.q.User.Where(u.q.User.Username.Eq(username)).First()
+	user, err := u.q.User.
+		Where(u.q.User.Username.Eq(username)).
+		First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
