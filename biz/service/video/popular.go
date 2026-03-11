@@ -23,7 +23,7 @@ func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, 
 		pageSize = constants.MaxVideoPageSize
 	}
 
-	videosDao, err := s.videoDao.GetPopularVideos(int(req.PageSize), int(req.PageNum))
+	videosDao, err := s.videoDao.GetPopularVideos(int(pageSize), int(pageNum))
 	if err != nil {
 		return nil, err
 	}
