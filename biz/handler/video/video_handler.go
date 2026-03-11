@@ -80,7 +80,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	pack.RespAuthorList(c, videos)
+	pack.RespVideoList(c, videos)
 }
 
 // Popular .
@@ -115,7 +115,12 @@ func Search(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(video.SearchResp)
+	videos, err := service.NewVideoService().SearchVideo(&req)
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespPopularList(c, videos)
 }

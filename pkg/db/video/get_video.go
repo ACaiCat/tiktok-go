@@ -27,8 +27,14 @@ func (v *VideoDao) GetVideoByID(videoID int64) (*model.Video, error) {
 
 func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*model.Video, error) {
 	var err error
-	videos, err := v.q.Video.
-		Where(v.q.Video.CreatedAt.Gt(latestTime)).
+
+	statement := v.q.Video.Where()
+
+	if !latestTime.IsZero() {
+		statement = statement.Where(v.q.Video.CreatedAt.Gt(latestTime))
+	}
+
+	videos, err := statement.
 		Limit(limit * 3).
 		Order(v.q.Video.CreatedAt.Desc()).
 		Find()

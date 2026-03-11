@@ -21,7 +21,7 @@ func RespPopularList(c *app.RequestContext, videoList []*model.Video) {
 	})
 }
 
-func RespAuthorList(c *app.RequestContext, videoList []*model.Video) {
+func RespVideoList(c *app.RequestContext, videoList []*model.Video) {
 	c.JSON(consts.StatusOK, video.ListResp{
 		Base:  SuccessBase,
 		Items: videoList,
@@ -31,5 +31,12 @@ func RespAuthorList(c *app.RequestContext, videoList []*model.Video) {
 func RespPublish(c *app.RequestContext) {
 	c.JSON(consts.StatusOK, video.PublishResp{
 		Base: SuccessBase,
+	})
+}
+
+func RespSearch(c *app.RequestContext, videoList []*model.Video) {
+	c.JSON(consts.StatusOK, video.SearchResp{
+		Base:  SuccessBase,
+		Items: videoList,
 	})
 }

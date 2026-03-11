@@ -13,7 +13,8 @@ import (
 func (s *VideoService) GetFeed(req *video.FeedReq) ([]*model.Video, error) {
 	var err error
 
-	latestTime := time.UnixMilli(0)
+	var latestTime time.Time
+
 	if req.LatestTime != nil && *req.LatestTime != "" {
 		unixMilliStamp, err := strconv.ParseInt(*req.LatestTime, 10, 64)
 		if err != nil {

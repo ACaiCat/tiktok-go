@@ -44,7 +44,7 @@
 - [X] `POST /video/publish` — 发布视频
 - [X] `GET  /video/list` — 用户视频列表
 - [X] `GET  /video/popular` — 热门视频
-- [ ] `POST /video/search` — 搜索视频
+- [X] `POST /video/search` — 搜索视频
 
 ### 互动模块(Interaction)
 
