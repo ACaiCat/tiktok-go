@@ -122,5 +122,5 @@ func Search(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	pack.RespPopularList(c, videos)
+	pack.RespSearch(c, videos)
 }
