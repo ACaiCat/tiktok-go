@@ -29,10 +29,12 @@ type server struct {
 }
 
 type minio struct {
-	Endpoint  string `mapstructure:"endpoint"`
-	AccessKey string `mapstructure:"access_key"`
-	SecretKey string `mapstructure:"secret_key"`
-	UseSSL    bool   `mapstructure:"use_ssl"`
+	Endpoint         string `mapstructure:"endpoint"`
+	AccessKey        string `mapstructure:"access_key"`
+	SecretKey        string `mapstructure:"secret_key"`
+	UseSSL           bool   `mapstructure:"use_ssl"`
+	ExternalEndpoint string `mapstructure:"external_endpoint"`
+	ExternalUseSSL   bool   `mapstructure:"external_use_ssl"`
 }
 
 type config struct {

@@ -396,7 +396,7 @@ func (p *FeedResp) String() string {
 // 投稿视频请求
 type PublishReq struct {
 	// 视频文件
-	Data []byte `thrift:"data,1,required" form:"data,required" json:"data,required"`
+	Data []byte `thrift:"data,1,optional" form:"data" json:"data,omitempty"`
 	// 视频标题
 	Title string `thrift:"title,2,required" form:"title,required" json:"title,required"`
 	// 视频描述
@@ -410,7 +410,12 @@ func NewPublishReq() *PublishReq {
 func (p *PublishReq) InitDefault() {
 }
 
+var PublishReq_Data_DEFAULT []byte
+
 func (p *PublishReq) GetData() (v []byte) {
+	if !p.IsSetData() {
+		return PublishReq_Data_DEFAULT
+	}
 	return p.Data
 }
 
@@ -428,11 +433,14 @@ var fieldIDToName_PublishReq = map[int16]string{
 	3: "description",
 }
 
+func (p *PublishReq) IsSetData() bool {
+	return p.Data != nil
+}
+
 func (p *PublishReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetData bool = false
 	var issetTitle bool = false
 	var issetDescription bool = false
 
@@ -455,7 +463,6 @@ func (p *PublishReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetData = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -488,11 +495,6 @@ func (p *PublishReq) Read(iprot thrift.TProtocol) (err error) {
 	}
 	if err = iprot.ReadStructEnd(); err != nil {
 		goto ReadStructEndError
-	}
-
-	if !issetData {
-		fieldId = 1
-		goto RequiredFieldNotSetError
 	}
 
 	if !issetTitle {
@@ -593,14 +595,16 @@ WriteStructEndError:
 }
 
 func (p *PublishReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("data", thrift.STRING, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteBinary([]byte(p.Data)); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
+	if p.IsSetData() {
+		if err = oprot.WriteFieldBegin("data", thrift.STRING, 1); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteBinary([]byte(p.Data)); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
 	}
 	return nil
 WriteFieldBeginError:

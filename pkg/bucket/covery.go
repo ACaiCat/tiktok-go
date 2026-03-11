@@ -1,0 +1,27 @@
+package bucket
+
+import (
+	"bytes"
+	"context"
+	"fmt"
+
+	"github.com/ACaiCat/tiktok-go/pkg/constants"
+	"github.com/minio/minio-go/v7"
+)
+
+func coverObject(videoID int64) string {
+	return fmt.Sprintf("cover_%d", videoID)
+}
+
+func UploadCover(videoID int64, data []byte) error {
+	ctx := context.Background()
+	_, err := Bucket.PutObject(ctx, constants.CoverBucketName, coverObject(videoID),
+		bytes.NewReader(data), int64(len(data)),
+		minio.PutObjectOptions{ContentType: "image/jpeg"},
+	)
+	return err
+}
+
+func GetCoverURL(videoID int64) string {
+	return objectURL(constants.CoverBucketName, coverObject(videoID))
+}

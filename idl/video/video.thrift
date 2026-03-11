@@ -20,7 +20,7 @@ struct FeedResp {
 // 投稿视频请求
 struct PublishReq {
   // 视频文件
-  1: required binary data (api.form = 'data');
+  1: optional binary data (api.form = 'data');
   // 视频标题
   2: required string title (api.form = 'title');
   // 视频描述

@@ -27,3 +27,9 @@ func RespAuthorList(c *app.RequestContext, videoList []*model.Video) {
 		Items: videoList,
 	})
 }
+
+func RespPublish(c *app.RequestContext) {
+	c.JSON(consts.StatusOK, video.PublishResp{
+		Base: SuccessBase,
+	})
+}

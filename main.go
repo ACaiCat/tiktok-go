@@ -17,7 +17,8 @@ func main() {
 	bucket.InitMinIO()
 
 	h := server.Default(
-		server.WithHostPorts(config.AppConfig.Server.Host + ":" + strconv.Itoa(config.AppConfig.Server.Port)),
+		server.WithHostPorts(config.AppConfig.Server.Host+":"+strconv.Itoa(config.AppConfig.Server.Port)),
+		server.WithMaxRequestBodySize(10*1024*1024*1024), // 10GB
 	)
 
 	register(h)

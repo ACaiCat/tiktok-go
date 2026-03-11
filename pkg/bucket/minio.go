@@ -32,6 +32,7 @@ func InitMinIO() {
 
 	initBucket(constants.AvatarBucketName, constants.AvatarBucketPolicy)
 	initBucket(constants.VideoBucketName, constants.VideoBucketPolicy)
+	initBucket(constants.CoverBucketName, constants.CoverBucketPolicy)
 }
 
 func initBucket(name, policy string) {
@@ -53,12 +54,12 @@ func initBucket(name, policy string) {
 
 func objectURL(bucketName, objectName string) string {
 	scheme := "http"
-	if config.AppConfig.Minio.UseSSL {
+	if config.AppConfig.Minio.ExternalUseSSL {
 		scheme = "https"
 	}
 	u := url.URL{
 		Scheme: scheme,
-		Host:   config.AppConfig.Minio.Endpoint,
+		Host:   config.AppConfig.Minio.ExternalEndpoint,
 		Path:   bucketName + "/" + objectName,
 	}
 	return u.String()

@@ -6,8 +6,10 @@ import (
 	"context"
 
 	video "github.com/ACaiCat/tiktok-go/biz/model/video"
+	mw "github.com/ACaiCat/tiktok-go/biz/mw/auth"
 	"github.com/ACaiCat/tiktok-go/biz/pack"
 	service "github.com/ACaiCat/tiktok-go/biz/service/video"
+	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -44,9 +46,21 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(video.PublishResp)
+	userID := mw.GetUserID(c)
+	fileHeader, err := c.FormFile("data")
+	if err != nil {
+		pack.RespError(c, errno.ParamErr.WithError(err))
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	err = service.NewVideoService().PublishVideo(userID, req.Title, req.Description, fileHeader)
+
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespPublish(c)
 }
 
 // List .
