@@ -1,13 +1,13 @@
 ﻿CREATE TABLE IF NOT EXISTS users
 (
-    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    username   TEXT        NOT NULL UNIQUE,
-    password   TEXT        NOT NULL,
-    avatar_url TEXT,
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    username    TEXT        NOT NULL UNIQUE,
+    password    TEXT        NOT NULL,
+    avatar_url  TEXT,
     totp_secret TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at  TIMESTAMPTZ
 );
 
 COMMENT ON TABLE users IS '用户表';
@@ -22,16 +22,16 @@ COMMENT ON COLUMN users.deleted_at IS '删除时间';
 
 CREATE TABLE IF NOT EXISTS videos
 (
-    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id       BIGINT      NOT NULL,
-    video_url     TEXT        NOT NULL,
-    cover_url     TEXT        NOT NULL,
-    title         TEXT        NOT NULL,
-    description   TEXT        NOT NULL,
-    visit_count   BIGINT      NOT NULL DEFAULT 0,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at    TIMESTAMPTZ
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id     BIGINT      NOT NULL,
+    video_url   TEXT        NOT NULL,
+    cover_url   TEXT        NOT NULL,
+    title       TEXT        NOT NULL,
+    description TEXT        NOT NULL,
+    visit_count BIGINT      NOT NULL DEFAULT 0,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at  TIMESTAMPTZ
 );
 
 COMMENT ON TABLE videos IS '视频表';
@@ -93,3 +93,21 @@ COMMENT ON COLUMN followers.id IS '关注ID';
 COMMENT ON COLUMN followers.user_id IS '用户ID';
 COMMENT ON COLUMN followers.follower_id IS '粉丝ID';
 COMMENT ON COLUMN followers.created_at IS '创建时间';
+
+CREATE TABLE IF NOT EXISTS chat_messages
+(
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sender_id   BIGINT      NOT NULL,
+    receiver_id BIGINT      NOT NULL,
+    content     TEXT        NOT NULL,
+    read        BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+COMMENT ON TABLE chat_messages IS '聊天消息表';
+COMMENT ON COLUMN chat_messages.id IS '消息ID';
+COMMENT ON COLUMN chat_messages.sender_id IS '发送者ID';
+COMMENT ON COLUMN chat_messages.receiver_id IS '接收者ID';
+COMMENT ON COLUMN chat_messages.content IS '消息内容';
+COMMENT ON COLUMN chat_messages.read IS '是否已读';
+COMMENT ON COLUMN chat_messages.created_at IS '创建时间';

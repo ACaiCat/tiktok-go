@@ -23,6 +23,5 @@ func Auth() app.HandlerFunc {
 
 		c.Set(constants.UserIdKey, userID)
 		c.Next(ctx)
-
 	}
 }

@@ -3,16 +3,6 @@ namespace go social
 include "model.thrift"
 include "common.thrift"
 
-// 聊天请求
-struct ChatReq {
-}
-
-// 聊天响应
-struct ChatResp {
-  // 响应状态
-  1: required common.Base base;
-}
-
 // 关注操作类型
 enum FollowActionType {
   // 关注
@@ -96,9 +86,6 @@ struct ListFriendResp {
 }
 
 service SocialHandler {
-  // 聊天
-  ChatResp Chat(1: ChatReq req) (api.get = "/ws")
-
   // 关注
   FollowResp Follow(1: FollowReq req) (api.post = "/relation/action")
 

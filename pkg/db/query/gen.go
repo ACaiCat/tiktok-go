@@ -17,35 +17,38 @@ import (
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:       db,
-		Comment:  newComment(db, opts...),
-		Follower: newFollower(db, opts...),
-		Like:     newLike(db, opts...),
-		User:     newUser(db, opts...),
-		Video:    newVideo(db, opts...),
+		db:          db,
+		ChatMessage: newChatMessage(db, opts...),
+		Comment:     newComment(db, opts...),
+		Follower:    newFollower(db, opts...),
+		Like:        newLike(db, opts...),
+		User:        newUser(db, opts...),
+		Video:       newVideo(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Comment  comment
-	Follower follower
-	Like     like
-	User     user
-	Video    video
+	ChatMessage chatMessage
+	Comment     comment
+	Follower    follower
+	Like        like
+	User        user
+	Video       video
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:       db,
-		Comment:  q.Comment.clone(db),
-		Follower: q.Follower.clone(db),
-		Like:     q.Like.clone(db),
-		User:     q.User.clone(db),
-		Video:    q.Video.clone(db),
+		db:          db,
+		ChatMessage: q.ChatMessage.clone(db),
+		Comment:     q.Comment.clone(db),
+		Follower:    q.Follower.clone(db),
+		Like:        q.Like.clone(db),
+		User:        q.User.clone(db),
+		Video:       q.Video.clone(db),
 	}
 }
 
@@ -59,30 +62,33 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:       db,
-		Comment:  q.Comment.replaceDB(db),
-		Follower: q.Follower.replaceDB(db),
-		Like:     q.Like.replaceDB(db),
-		User:     q.User.replaceDB(db),
-		Video:    q.Video.replaceDB(db),
+		db:          db,
+		ChatMessage: q.ChatMessage.replaceDB(db),
+		Comment:     q.Comment.replaceDB(db),
+		Follower:    q.Follower.replaceDB(db),
+		Like:        q.Like.replaceDB(db),
+		User:        q.User.replaceDB(db),
+		Video:       q.Video.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Comment  ICommentDo
-	Follower IFollowerDo
-	Like     ILikeDo
-	User     IUserDo
-	Video    IVideoDo
+	ChatMessage IChatMessageDo
+	Comment     ICommentDo
+	Follower    IFollowerDo
+	Like        ILikeDo
+	User        IUserDo
+	Video       IVideoDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Comment:  q.Comment.WithContext(ctx),
-		Follower: q.Follower.WithContext(ctx),
-		Like:     q.Like.WithContext(ctx),
-		User:     q.User.WithContext(ctx),
-		Video:    q.Video.WithContext(ctx),
+		ChatMessage: q.ChatMessage.WithContext(ctx),
+		Comment:     q.Comment.WithContext(ctx),
+		Follower:    q.Follower.WithContext(ctx),
+		Like:        q.Like.WithContext(ctx),
+		User:        q.User.WithContext(ctx),
+		Video:       q.Video.WithContext(ctx),
 	}
 }
 

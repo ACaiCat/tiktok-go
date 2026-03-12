@@ -41,10 +41,10 @@ func main() {
 	)
 	userModel := g.GenerateModel("users")
 	likeModel := g.GenerateModel("likes")
-
 	followerModel := g.GenerateModel("followers")
+	messageModel := g.GenerateModel("chat_messages")
 
-	g.ApplyBasic(videoModel, userModel, likeModel, commentModel, followerModel)
+	g.ApplyBasic(videoModel, userModel, likeModel, commentModel, followerModel, messageModel)
 
 	g.Execute()
 }

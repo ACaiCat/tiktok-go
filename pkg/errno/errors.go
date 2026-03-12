@@ -36,4 +36,8 @@ var (
 	FollowAlreadyExistErr = NewErrNo(FollowAlreadyExistErrCode, "已经关注过了")
 	FollowNotExistErr     = NewErrNo(FollowNotExistErrCode, "没有关注过")
 	FollowSelfErr         = NewErrNo(FollowSelfErrCode, "不能关注自己")
+
+	ChatMsgParseErr  = NewErrNo(ChatMsgParseErrCode, "消息格式错误")
+	ChatMsgTypeErr   = NewErrNo(ChatMsgTypeErrCode, "未知的消息类型")
+	ChatNotFriendErr = NewErrNo(ChatNotFriendErrCode, "你们还不是好友")
 )

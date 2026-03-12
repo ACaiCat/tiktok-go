@@ -3,12 +3,15 @@
 package main
 
 import (
+	"net/http"
 	"strconv"
 
+	"github.com/ACaiCat/tiktok-go/biz/chat"
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/bucket"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/adaptor"
 )
 
 func main() {
@@ -21,6 +24,8 @@ func main() {
 		server.WithMaxRequestBodySize(10*1024*1024*1024), // 10GB
 	)
 
+	h.GET("/ws", adaptor.HertzHandler(http.HandlerFunc(chat.Chat)))
 	register(h)
+
 	h.Spin()
 }

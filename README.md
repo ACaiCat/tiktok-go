@@ -37,7 +37,7 @@
 - [X] `PUT  /user/avatar/upload` — 上传头像
 - [x] `GET  /auth/mfa/qrcode` — 获取 MFA 二维码
 - [x] `POST /auth/mfa/bind` — 绑定 MFA
-- [ ] `POST /user/image/search` — 以图搜图
+- [ ] `POST /user/image/search` — 以图搜图 (没看懂，何意味)
 
 ### 视频模块(Video)
 
@@ -62,5 +62,5 @@
 - [X] `GET  /following/list` — 关注列表
 - [X] `GET  /follower/list` — 粉丝列表
 - [x] `GET  /friends/list` — 好友列表
-- [ ] `GET  /ws` — WebSocket 聊天
+- [X] `GET  /ws` — WebSocket 聊天
 

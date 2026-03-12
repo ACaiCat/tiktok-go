@@ -11,24 +11,7 @@ import (
 	service "github.com/ACaiCat/tiktok-go/biz/service/social"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
-
-// Chat .
-// @router /ws [GET]
-func Chat(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req social.ChatReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
-		return
-	}
-
-	resp := new(social.ChatResp)
-
-	c.JSON(consts.StatusOK, resp)
-}
 
 // Follow .
 // @router /relation/action [POST]

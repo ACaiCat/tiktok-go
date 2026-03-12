@@ -28,4 +28,7 @@ const (
 	FollowAlreadyExistErrCode     = 16000
 	FollowNotExistErrCode         = 16001
 	FollowSelfErrCode             = 16002
+	ChatMsgParseErrCode           = 17000
+	ChatMsgTypeErrCode            = 17001
+	ChatNotFriendErrCode          = 17002
 )

@@ -17,7 +17,6 @@ import (
 func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
-	root.GET("/ws", append(_chatMw(), social.Chat)...)
 	{
 		_follower := root.Group("/follower", _followerMw()...)
 		_follower.GET("/list", append(_listfollowerMw(), social.ListFollower)...)
