@@ -1,14 +1,15 @@
 ﻿# tiktok-go
 
 @west2-online go组work4
-一个基于[Hertz](https://github.com/cloudwego/hertz)框架构建的乞丐版TikTok
+一个基于[Hertz](https://github.com/cloudwego/hertz)框架构建的乞丐版石山TikTok
 
 ## 技术栈
 
-- 框架：Cloudwego Hertz
-- 数据库：PostgreSQL(GORM Gen)
+- 框架：Hertz
+- 数据库：PostgreSQL (GORM Gen)  
+  "构式Gen，下辈子不用了，子查询都写不了，何意味？"
 - 缓存：Redis
-- 认证：JWT(Access Token + Refresh Token)
+- 认证：JWT (Access Token + Refresh Token)
 - 配置：Viper
 
 ## 快速开始
@@ -51,9 +52,9 @@
 
 - [X] `POST   /like/action` — 点赞 / 取消点赞
 - [X] `GET    /like/list` — 点赞列表
-- [ ] `POST   /comment/publish` — 发布评论
-- [ ] `GET    /comment/list` — 评论列表
-- [ ] `DELETE /comment/delete` — 删除评论
+- [X] `POST   /comment/publish` — 发布评论
+- [X] `GET    /comment/list` — 评论列表
+- [X] `DELETE /comment/delete` — 删除评论
 
 ### 社交模块(Social)
 

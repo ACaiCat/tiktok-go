@@ -11,7 +11,6 @@ import (
 	service "github.com/ACaiCat/tiktok-go/biz/service/video"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // Feed .
@@ -21,7 +20,7 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 	var req video.FeedReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -42,7 +41,7 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 	var req video.PublishReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -70,7 +69,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 	var req video.ListReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -90,7 +89,7 @@ func Popular(ctx context.Context, c *app.RequestContext) {
 	var req video.PopularReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -111,7 +110,7 @@ func Search(ctx context.Context, c *app.RequestContext) {
 	var req video.SearchReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -132,7 +131,7 @@ func VisitVideo(ctx context.Context, c *app.RequestContext) {
 	var req video.VisitVideoReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 

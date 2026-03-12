@@ -6,6 +6,8 @@ import (
 	"context"
 
 	social "github.com/ACaiCat/tiktok-go/biz/model/social"
+	"github.com/ACaiCat/tiktok-go/biz/pack"
+	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -17,7 +19,7 @@ func Chat(ctx context.Context, c *app.RequestContext) {
 	var req social.ChatReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -33,7 +35,7 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 	var req social.FollowReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -49,7 +51,7 @@ func ListFollowing(ctx context.Context, c *app.RequestContext) {
 	var req social.ListFollowingReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -65,7 +67,7 @@ func ListFollower(ctx context.Context, c *app.RequestContext) {
 	var req social.ListFollowerReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -81,7 +83,7 @@ func ListFriend(ctx context.Context, c *app.RequestContext) {
 	var req social.ListFriendReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.RespError(c, errno.ParamErr.WithError(err))
 		return
 	}
 
