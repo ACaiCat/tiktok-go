@@ -6,20 +6,16 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 const TableNameFollower = "followers"
 
 // Follower mapped from table <followers>
 type Follower struct {
-	ID         int64          `gorm:"column:id;primaryKey;autoIncrement:true;comment:关注ID" json:"id"`                      // 关注ID
-	UserID     int64          `gorm:"column:user_id;not null;comment:用户ID" json:"user_id"`                                 // 用户ID
-	FollowerID int64          `gorm:"column:follower_id;not null;comment:粉丝ID" json:"follower_id"`                         // 粉丝ID
-	CreatedAt  time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"created_at"` // 创建时间
-	UpdatedAt  time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP;comment:更新时间" json:"updated_at"` // 更新时间
-	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;comment:删除时间" json:"deleted_at"`                                    // 删除时间
+	ID         int64     `gorm:"column:id;primaryKey;autoIncrement:true;comment:关注ID" json:"id"`                      // 关注ID
+	UserID     int64     `gorm:"column:user_id;not null;comment:用户ID" json:"user_id"`                                 // 用户ID
+	FollowerID int64     `gorm:"column:follower_id;not null;comment:粉丝ID" json:"follower_id"`                         // 粉丝ID
+	CreatedAt  time.Time `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"created_at"` // 创建时间
 }
 
 // TableName Follower's table name

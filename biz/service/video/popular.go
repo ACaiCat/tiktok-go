@@ -28,10 +28,7 @@ func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, 
 		return nil, err
 	}
 
-	videos, err := s.GetLikeAndCommentCount(videosDao)
-	if err != nil {
-		return nil, err
-	}
+	videos := VideosDaoToDto(videosDao)
 
 	return videos, nil
 

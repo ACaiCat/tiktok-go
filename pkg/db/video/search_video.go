@@ -40,7 +40,12 @@ func (v *VideoDao) SearchVideo(
 			Where(v.q.User.Username.Like(username))
 	}
 
-	videos, err := statement.Offset(pageSize * pageNum).Limit(pageSize).Find()
+	videos, err := statement.
+		Select(v.q.Video.ALL, v.q.Like.ID.Count().As("like_count")).
+		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
+		Group(v.q.Video.ID).
+		Offset(pageSize * pageNum).Limit(pageSize).Find()
+
 	if err != nil {
 		log.Println("failed to search videos:", err)
 		return nil, err

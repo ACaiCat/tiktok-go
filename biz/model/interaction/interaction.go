@@ -4,11 +4,55 @@ package interaction
 
 import (
 	"context"
+	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"github.com/ACaiCat/tiktok-go/biz/model/common"
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/apache/thrift/lib/go/thrift"
 )
+
+type LikeActionType int64
+
+const (
+	LikeActionType_ADD    LikeActionType = 1
+	LikeActionType_DELETE LikeActionType = 2
+)
+
+func (p LikeActionType) String() string {
+	switch p {
+	case LikeActionType_ADD:
+		return "ADD"
+	case LikeActionType_DELETE:
+		return "DELETE"
+	}
+	return "<UNSET>"
+}
+
+func LikeActionTypeFromString(s string) (LikeActionType, error) {
+	switch s {
+	case "ADD":
+		return LikeActionType_ADD, nil
+	case "DELETE":
+		return LikeActionType_DELETE, nil
+	}
+	return LikeActionType(0), fmt.Errorf("not a valid LikeActionType string")
+}
+
+func LikeActionTypePtr(v LikeActionType) *LikeActionType { return &v }
+func (p *LikeActionType) Scan(value interface{}) (err error) {
+	var result sql.NullInt64
+	err = result.Scan(value)
+	*p = LikeActionType(result.Int64)
+	return
+}
+
+func (p *LikeActionType) Value() (driver.Value, error) {
+	if p == nil {
+		return nil, nil
+	}
+	return int64(*p), nil
+}
 
 // 点赞请求
 type LikeReq struct {
@@ -17,7 +61,7 @@ type LikeReq struct {
 	// 评论ID
 	CommentID *string `thrift:"comment_id,2,optional" form:"comment_id" json:"comment_id,omitempty"`
 	// 操作类型
-	ActionType int32 `thrift:"action_type,3,required" form:"action_type,required" json:"action_type,required"`
+	ActionType LikeActionType `thrift:"action_type,3,required,LikeActionType" form:"action_type,required" json:"action_type,required"`
 }
 
 func NewLikeReq() *LikeReq {
@@ -45,7 +89,7 @@ func (p *LikeReq) GetCommentID() (v string) {
 	return *p.CommentID
 }
 
-func (p *LikeReq) GetActionType() (v int32) {
+func (p *LikeReq) GetActionType() (v LikeActionType) {
 	return p.ActionType
 }
 
@@ -167,11 +211,11 @@ func (p *LikeReq) ReadField2(iprot thrift.TProtocol) error {
 }
 func (p *LikeReq) ReadField3(iprot thrift.TProtocol) error {
 
-	var _field int32
+	var _field LikeActionType
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
-		_field = v
+		_field = LikeActionType(v)
 	}
 	p.ActionType = _field
 	return nil
@@ -255,7 +299,7 @@ func (p *LikeReq) writeField3(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("action_type", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.ActionType); err != nil {
+	if err := oprot.WriteI32(int32(p.ActionType)); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -607,9 +651,9 @@ type ListLikeReq struct {
 	// 用户ID
 	UserID string `thrift:"user_id,1,required" json:"user_id,required" query:"user_id,required"`
 	// 页码
-	PageNum string `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required"`
 	// 单页尺寸
-	PageSize string `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required"`
 }
 
 func NewListLikeReq() *ListLikeReq {
@@ -623,11 +667,11 @@ func (p *ListLikeReq) GetUserID() (v string) {
 	return p.UserID
 }
 
-func (p *ListLikeReq) GetPageNum() (v string) {
+func (p *ListLikeReq) GetPageNum() (v int32) {
 	return p.PageNum
 }
 
-func (p *ListLikeReq) GetPageSize() (v string) {
+func (p *ListLikeReq) GetPageSize() (v int32) {
 	return p.PageSize
 }
 
@@ -669,7 +713,7 @@ func (p *ListLikeReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -678,7 +722,7 @@ func (p *ListLikeReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 3:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -744,8 +788,8 @@ func (p *ListLikeReq) ReadField1(iprot thrift.TProtocol) error {
 }
 func (p *ListLikeReq) ReadField2(iprot thrift.TProtocol) error {
 
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -755,8 +799,8 @@ func (p *ListLikeReq) ReadField2(iprot thrift.TProtocol) error {
 }
 func (p *ListLikeReq) ReadField3(iprot thrift.TProtocol) error {
 
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -819,10 +863,10 @@ WriteFieldEndError:
 }
 
 func (p *ListLikeReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page_num", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("page_num", thrift.I32, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.PageNum); err != nil {
+	if err := oprot.WriteI32(p.PageNum); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -836,10 +880,10 @@ WriteFieldEndError:
 }
 
 func (p *ListLikeReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page_size", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.PageSize); err != nil {
+	if err := oprot.WriteI32(p.PageSize); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1670,9 +1714,9 @@ type ListCommentReq struct {
 	// 评论ID
 	CommentID *string `thrift:"comment_id,2,optional" json:"comment_id,omitempty" query:"comment_id"`
 	// 页码
-	PageNum string `thrift:"page_num,3,required" json:"page_num,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,3,required" json:"page_num,required" query:"page_num,required"`
 	// 单页尺寸
-	PageSize string `thrift:"page_size,4,required" json:"page_size,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,4,required" json:"page_size,required" query:"page_size,required"`
 }
 
 func NewListCommentReq() *ListCommentReq {
@@ -1700,11 +1744,11 @@ func (p *ListCommentReq) GetCommentID() (v string) {
 	return *p.CommentID
 }
 
-func (p *ListCommentReq) GetPageNum() (v string) {
+func (p *ListCommentReq) GetPageNum() (v int32) {
 	return p.PageNum
 }
 
-func (p *ListCommentReq) GetPageSize() (v string) {
+func (p *ListCommentReq) GetPageSize() (v int32) {
 	return p.PageSize
 }
 
@@ -1761,7 +1805,7 @@ func (p *ListCommentReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 3:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1770,7 +1814,7 @@ func (p *ListCommentReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 4:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1842,8 +1886,8 @@ func (p *ListCommentReq) ReadField2(iprot thrift.TProtocol) error {
 }
 func (p *ListCommentReq) ReadField3(iprot thrift.TProtocol) error {
 
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -1853,8 +1897,8 @@ func (p *ListCommentReq) ReadField3(iprot thrift.TProtocol) error {
 }
 func (p *ListCommentReq) ReadField4(iprot thrift.TProtocol) error {
 
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -1942,10 +1986,10 @@ WriteFieldEndError:
 }
 
 func (p *ListCommentReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page_num", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("page_num", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.PageNum); err != nil {
+	if err := oprot.WriteI32(p.PageNum); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1959,10 +2003,10 @@ WriteFieldEndError:
 }
 
 func (p *ListCommentReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page_size", thrift.STRING, 4); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.PageSize); err != nil {
+	if err := oprot.WriteI32(p.PageSize); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

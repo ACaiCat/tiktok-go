@@ -2,11 +2,11 @@ package likeDao
 
 import "log"
 
-func (c *LikeDao) GetLikeCount(videoID int64) (int64, error) {
+func (l *LikeDao) GetLikeCount(videoID int64) (int64, error) {
 	var err error
 
-	count, err := c.q.Like.
-		Where(c.q.Like.VideoID.Eq(videoID)).
+	count, err := l.q.Like.
+		Where(l.q.Like.VideoID.Eq(videoID)).
 		Count()
 	if err != nil {
 		log.Printf("failed to get like count for videoID %d: %v", videoID, err)
@@ -16,21 +16,49 @@ func (c *LikeDao) GetLikeCount(videoID int64) (int64, error) {
 	return count, nil
 }
 
-func (c *LikeDao) GetLikeCounts(videoIDs []int64) (map[int64]int64, error) {
+func (l *LikeDao) GetLikeCounts(videoIDs []int64) (map[int64]int64, error) {
 	var err error
 
-	var result map[int64]int64
+	type Result struct {
+		VideoID int64 `gorm:"column:video_id"`
+		Count   int64 `gorm:"column:count"`
+	}
 
-	err = c.q.Like.
-		Select(c.q.Like.VideoID, c.q.Like.ID.Count().As("count")).
-		Where(c.q.Like.VideoID.In(videoIDs...)).
-		Group(c.q.Like.VideoID).
-		Scan(&result)
+	var results []Result
+
+	err = l.q.Like.
+		Select(l.q.Like.VideoID, l.q.Like.ID.Count().As("count")).
+		Where(l.q.Like.VideoID.In(videoIDs...)).
+		Group(l.q.Like.VideoID).
+		Scan(&results)
 
 	if err != nil {
 		log.Printf("failed to get like counts for videoIDs %v: %v", videoIDs, err)
 		return nil, err
 	}
 
-	return result, nil
+	likeMap := make(map[int64]int64)
+	for _, r := range results {
+		likeMap[r.VideoID] = r.Count
+	}
+
+	return likeMap, nil
+}
+
+func (l *LikeDao) GetUserLikes(userID int64) ([]int64, error) {
+	var err error
+
+	var videoIDs []int64
+
+	err = l.q.Like.
+		Select(l.q.Like.VideoID).
+		Where(l.q.Like.UserID.Eq(userID)).
+		Scan(&videoIDs)
+
+	if err != nil {
+		log.Printf("failed to get user likes for userID %d: %v", userID, err)
+		return nil, err
+	}
+
+	return videoIDs, nil
 }

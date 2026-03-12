@@ -23,7 +23,7 @@ struct Video {
 struct Comment {
   1: required string id;
   2: required string user_id;
-  3: required string video_url;
+  3: required string video_id;
   4: required string parent_id;
   5: required i64 like_count;
   6: required i64 child_count;

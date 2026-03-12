@@ -19,4 +19,8 @@ const (
 	UsernameTooShortErrCode      = 12002
 	UsernameTooLongErrCode       = 12003
 	PasswordTooLongErrCode       = 12004
+	NotSupportActionErrCode      = 13000
+	LikeAlreadyExistErrCode      = 14000
+	LikeNotExistErrCode          = 14001
+	VideoNotExistErrCode         = 15000
 )

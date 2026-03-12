@@ -19,18 +19,27 @@ func (c *CommentDao) GetCommentCount(videoID int64) (int64, error) {
 func (c *CommentDao) GetCommentCounts(videoIDs []int64) (map[int64]int64, error) {
 	var err error
 
-	var result map[int64]int64
+	type Result struct {
+		VideoID int64 `gorm:"column:video_id"`
+		Count   int64 `gorm:"column:count"`
+	}
+
+	var results []Result
 
 	err = c.q.Comment.
 		Select(c.q.Comment.VideoID, c.q.Comment.ID.Count().As("count")).
 		Where(c.q.Comment.VideoID.In(videoIDs...)).
 		Group(c.q.Comment.VideoID).
-		Scan(&result)
+		Scan(&results)
 
 	if err != nil {
 		log.Printf("failed to get comment counts for videoIDs %v: %v", videoIDs, err)
 		return nil, err
 	}
-	return result, nil
+	commentMap := make(map[int64]int64)
+	for _, r := range results {
+		commentMap[r.VideoID] = r.Count
+	}
 
+	return commentMap, nil
 }

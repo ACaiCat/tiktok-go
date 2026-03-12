@@ -942,7 +942,7 @@ func (p *Video) String() string {
 type Comment struct {
 	ID         string `thrift:"id,1,required" form:"id,required" json:"id,required" query:"id,required"`
 	UserID     string `thrift:"user_id,2,required" form:"user_id,required" json:"user_id,required" query:"user_id,required"`
-	VideoURL   string `thrift:"video_url,3,required" form:"video_url,required" json:"video_url,required" query:"video_url,required"`
+	VideoID    string `thrift:"video_id,3,required" form:"video_id,required" json:"video_id,required" query:"video_id,required"`
 	ParentID   string `thrift:"parent_id,4,required" form:"parent_id,required" json:"parent_id,required" query:"parent_id,required"`
 	LikeCount  int64  `thrift:"like_count,5,required" form:"like_count,required" json:"like_count,required" query:"like_count,required"`
 	ChildCount int64  `thrift:"child_count,6,required" form:"child_count,required" json:"child_count,required" query:"child_count,required"`
@@ -965,8 +965,8 @@ func (p *Comment) GetUserID() (v string) {
 	return p.UserID
 }
 
-func (p *Comment) GetVideoURL() (v string) {
-	return p.VideoURL
+func (p *Comment) GetVideoID() (v string) {
+	return p.VideoID
 }
 
 func (p *Comment) GetParentID() (v string) {
@@ -992,7 +992,7 @@ func (p *Comment) GetCreatedAt() (v string) {
 var fieldIDToName_Comment = map[int16]string{
 	1: "id",
 	2: "user_id",
-	3: "video_url",
+	3: "video_id",
 	4: "parent_id",
 	5: "like_count",
 	6: "child_count",
@@ -1006,7 +1006,7 @@ func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	var issetID bool = false
 	var issetUserID bool = false
-	var issetVideoURL bool = false
+	var issetVideoID bool = false
 	var issetParentID bool = false
 	var issetLikeCount bool = false
 	var issetChildCount bool = false
@@ -1050,7 +1050,7 @@ func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetVideoURL = true
+				issetVideoID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -1122,7 +1122,7 @@ func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetVideoURL {
+	if !issetVideoID {
 		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
@@ -1199,7 +1199,7 @@ func (p *Comment) ReadField3(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.VideoURL = _field
+	p.VideoID = _field
 	return nil
 }
 func (p *Comment) ReadField4(iprot thrift.TProtocol) error {
@@ -1349,10 +1349,10 @@ WriteFieldEndError:
 }
 
 func (p *Comment) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("video_url", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("video_id", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.VideoURL); err != nil {
+	if err := oprot.WriteString(p.VideoID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

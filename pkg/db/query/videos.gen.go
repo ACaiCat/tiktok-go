@@ -100,7 +100,7 @@ func (v *video) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (v *video) fillFieldMap() {
-	v.fieldMap = make(map[string]field.Expr, 10)
+	v.fieldMap = make(map[string]field.Expr, 12)
 	v.fieldMap["id"] = v.ID
 	v.fieldMap["user_id"] = v.UserID
 	v.fieldMap["video_url"] = v.VideoURL
@@ -111,6 +111,7 @@ func (v *video) fillFieldMap() {
 	v.fieldMap["created_at"] = v.CreatedAt
 	v.fieldMap["updated_at"] = v.UpdatedAt
 	v.fieldMap["deleted_at"] = v.DeletedAt
+
 }
 
 func (v video) clone(db *gorm.DB) video {

@@ -65,10 +65,7 @@ func (s *VideoService) SearchVideo(req *video.SearchReq) ([]*model.Video, error)
 		return nil, errno.ServiceErr
 	}
 
-	videos, err := s.GetLikeAndCommentCount(videosDao)
-	if err != nil {
-		return nil, errno.ServiceErr
-	}
+	videos := VideosDaoToDto(videosDao)
 
 	return videos, nil
 }

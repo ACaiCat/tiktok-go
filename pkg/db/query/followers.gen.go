@@ -32,8 +32,6 @@ func newFollower(db *gorm.DB, opts ...gen.DOOption) follower {
 	_follower.UserID = field.NewInt64(tableName, "user_id")
 	_follower.FollowerID = field.NewInt64(tableName, "follower_id")
 	_follower.CreatedAt = field.NewTime(tableName, "created_at")
-	_follower.UpdatedAt = field.NewTime(tableName, "updated_at")
-	_follower.DeletedAt = field.NewField(tableName, "deleted_at")
 
 	_follower.fillFieldMap()
 
@@ -48,8 +46,6 @@ type follower struct {
 	UserID     field.Int64 // 用户ID
 	FollowerID field.Int64 // 粉丝ID
 	CreatedAt  field.Time  // 创建时间
-	UpdatedAt  field.Time  // 更新时间
-	DeletedAt  field.Field // 删除时间
 
 	fieldMap map[string]field.Expr
 }
@@ -70,8 +66,6 @@ func (f *follower) updateTableName(table string) *follower {
 	f.UserID = field.NewInt64(table, "user_id")
 	f.FollowerID = field.NewInt64(table, "follower_id")
 	f.CreatedAt = field.NewTime(table, "created_at")
-	f.UpdatedAt = field.NewTime(table, "updated_at")
-	f.DeletedAt = field.NewField(table, "deleted_at")
 
 	f.fillFieldMap()
 
@@ -88,13 +82,11 @@ func (f *follower) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (f *follower) fillFieldMap() {
-	f.fieldMap = make(map[string]field.Expr, 6)
+	f.fieldMap = make(map[string]field.Expr, 4)
 	f.fieldMap["id"] = f.ID
 	f.fieldMap["user_id"] = f.UserID
 	f.fieldMap["follower_id"] = f.FollowerID
 	f.fieldMap["created_at"] = f.CreatedAt
-	f.fieldMap["updated_at"] = f.UpdatedAt
-	f.fieldMap["deleted_at"] = f.DeletedAt
 }
 
 func (f follower) clone(db *gorm.DB) follower {

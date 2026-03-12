@@ -49,8 +49,8 @@
 
 ### 互动模块(Interaction)
 
-- [ ] `POST   /like/action` — 点赞 / 取消点赞
-- [ ] `GET    /like/list` — 点赞列表
+- [X] `POST   /like/action` — 点赞 / 取消点赞
+- [X] `GET    /like/list` — 点赞列表
 - [ ] `POST   /comment/publish` — 发布评论
 - [ ] `GET    /comment/list` — 评论列表
 - [ ] `DELETE /comment/delete` — 删除评论

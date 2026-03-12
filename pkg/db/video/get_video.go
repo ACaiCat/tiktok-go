@@ -12,7 +12,11 @@ import (
 
 func (v *VideoDao) GetVideoByID(videoID int64) (*model.Video, error) {
 	var err error
+
 	video, err := v.q.Video.
+		Select(v.q.Video.ALL, v.q.Like.ID.Count().As("like_count")).
+		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
+		Group(v.q.Video.ID).
 		Where(v.q.Video.ID.Eq(videoID)).
 		First()
 
@@ -35,6 +39,9 @@ func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*mode
 	}
 
 	videos, err := statement.
+		Select(v.q.Video.ALL, v.q.Like.ID.Count().As("like_count")).
+		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
+		Group(v.q.Video.ID).
 		Limit(limit * 3).
 		Order(v.q.Video.CreatedAt.Desc()).
 		Find()
@@ -57,11 +64,16 @@ func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*mode
 
 func (v *VideoDao) GetVideosByUserID(userID int64, pageSize int, pageNum int) ([]*model.Video, error) {
 	var err error
+
 	videos, err := v.q.Video.
+		Select(v.q.Video.ALL, v.q.Like.ID.Count().As("like_count")).
+		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
+		Group(v.q.Video.ID).
 		Where(v.q.Video.UserID.Eq(userID)).
 		Offset(pageSize * pageNum).
 		Limit(pageSize).
 		Find()
+
 	if err != nil {
 		log.Printf("failed to get videos by user id: %v", err)
 		return nil, err
@@ -72,11 +84,16 @@ func (v *VideoDao) GetVideosByUserID(userID int64, pageSize int, pageNum int) ([
 
 func (v *VideoDao) GetPopularVideos(pageSize int, pageNum int) ([]*model.Video, error) {
 	var err error
+
 	videos, err := v.q.Video.
+		Select(v.q.Video.ALL, v.q.Like.ID.Count().As("like_count")).
+		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
+		Group(v.q.Video.ID).
 		Order(v.q.Video.VisitCount.Desc()).
 		Offset(pageSize * pageNum).
 		Limit(pageSize).
 		Find()
+
 	if err != nil {
 		log.Printf("failed to get popular videos: %v", err)
 		return nil, err
@@ -86,12 +103,37 @@ func (v *VideoDao) GetPopularVideos(pageSize int, pageNum int) ([]*model.Video, 
 
 func (v *VideoDao) GetVideoCountByUserID(userID int64) (int64, error) {
 	var err error
+
 	count, err := v.q.Video.
 		Where(v.q.Video.UserID.Eq(userID)).
 		Count()
+
 	if err != nil {
 		log.Printf("failed to get video count by user id: %v", err)
 		return 0, err
 	}
 	return count, nil
+}
+
+func (v *VideoDao) GetUserLikeList(userID int64, pageSize int, pageNum int) ([]*model.Video, error) {
+	var err error
+
+	videos, err := v.q.Video.
+		Join(
+			v.q.Like,
+			v.q.Like.VideoID.EqCol(v.q.Video.ID),
+		).
+		Select(v.q.Video.ALL, v.q.Like.ID.Count().As("like_count")).
+		Group(v.q.Video.ID).
+		Where(v.q.Like.UserID.Eq(userID)).
+		Offset(pageSize * pageNum).
+		Limit(pageSize).
+		Find()
+
+	if err != nil {
+		log.Printf("failed to get user like list: %v\n", err)
+		return nil, err
+	}
+
+	return videos, nil
 }

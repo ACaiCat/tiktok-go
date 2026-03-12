@@ -6,6 +6,10 @@ import (
 	"context"
 
 	interaction "github.com/ACaiCat/tiktok-go/biz/model/interaction"
+	mw "github.com/ACaiCat/tiktok-go/biz/mw/auth"
+	"github.com/ACaiCat/tiktok-go/biz/pack"
+	service "github.com/ACaiCat/tiktok-go/biz/service/interaction"
+	videoService "github.com/ACaiCat/tiktok-go/biz/service/video"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -21,9 +25,16 @@ func Like(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(interaction.LikeResp)
+	userID := mw.GetUserID(c)
 
-	c.JSON(consts.StatusOK, resp)
+	err = service.NewInteractionService().LikeVideo(&req, userID)
+
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespLike(c)
 }
 
 // ListLike .
@@ -37,9 +48,15 @@ func ListLike(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(interaction.ListLikeResp)
+	videos, err := videoService.NewVideoService().GetLikedVideos(&req)
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespLikeList(c, videos)
+
 }
 
 // Comment .

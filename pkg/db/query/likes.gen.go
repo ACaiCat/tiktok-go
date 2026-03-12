@@ -33,8 +33,6 @@ func newLike(db *gorm.DB, opts ...gen.DOOption) like {
 	_like.VideoID = field.NewInt64(tableName, "video_id")
 	_like.CommentID = field.NewInt64(tableName, "comment_id")
 	_like.CreatedAt = field.NewTime(tableName, "created_at")
-	_like.UpdatedAt = field.NewTime(tableName, "updated_at")
-	_like.DeletedAt = field.NewField(tableName, "deleted_at")
 
 	_like.fillFieldMap()
 
@@ -50,8 +48,6 @@ type like struct {
 	VideoID   field.Int64 // 视频ID
 	CommentID field.Int64 // 评论ID
 	CreatedAt field.Time  // 创建时间
-	UpdatedAt field.Time  // 更新时间
-	DeletedAt field.Field // 删除时间
 
 	fieldMap map[string]field.Expr
 }
@@ -73,8 +69,6 @@ func (l *like) updateTableName(table string) *like {
 	l.VideoID = field.NewInt64(table, "video_id")
 	l.CommentID = field.NewInt64(table, "comment_id")
 	l.CreatedAt = field.NewTime(table, "created_at")
-	l.UpdatedAt = field.NewTime(table, "updated_at")
-	l.DeletedAt = field.NewField(table, "deleted_at")
 
 	l.fillFieldMap()
 
@@ -91,14 +85,12 @@ func (l *like) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (l *like) fillFieldMap() {
-	l.fieldMap = make(map[string]field.Expr, 7)
+	l.fieldMap = make(map[string]field.Expr, 5)
 	l.fieldMap["id"] = l.ID
 	l.fieldMap["user_id"] = l.UserID
 	l.fieldMap["video_id"] = l.VideoID
 	l.fieldMap["comment_id"] = l.CommentID
 	l.fieldMap["created_at"] = l.CreatedAt
-	l.fieldMap["updated_at"] = l.UpdatedAt
-	l.fieldMap["deleted_at"] = l.DeletedAt
 }
 
 func (l like) clone(db *gorm.DB) like {

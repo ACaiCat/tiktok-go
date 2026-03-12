@@ -1,9 +1,10 @@
-﻿package main
+package main
 
 import (
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"gorm.io/gen"
+	"gorm.io/gen/field"
 )
 
 func main() {
@@ -16,6 +17,24 @@ func main() {
 
 	db.InitPostgres()
 	g.UseDB(db.DB)
-	g.ApplyBasic(g.GenerateAllTable()...)
+
+	videoModel := g.GenerateModel("videos",
+		gen.FieldNew("CommentCount", "int64", field.Tag{
+			"gorm": "column:comment_count;->",
+			"json": "comment_count",
+		}),
+		gen.FieldNew("LikeCount", "int64", field.Tag{
+			"gorm": "column:like_count;->",
+			"json": "like_count",
+		}),
+	)
+
+	userModel := g.GenerateModel("users")
+	likeModel := g.GenerateModel("likes")
+	commentModel := g.GenerateModel("comments")
+	followerModel := g.GenerateModel("followers")
+
+	g.ApplyBasic(videoModel, userModel, likeModel, commentModel, followerModel)
+
 	g.Execute()
 }

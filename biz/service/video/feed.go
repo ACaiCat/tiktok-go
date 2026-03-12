@@ -29,10 +29,7 @@ func (s *VideoService) GetFeed(req *video.FeedReq) ([]*model.Video, error) {
 		return nil, errno.ServiceErr
 	}
 
-	videos, err := s.GetLikeAndCommentCount(videosDao)
-	if err != nil {
-		return nil, err
-	}
+	videos := VideosDaoToDto(videosDao)
 
 	return videos, nil
 
