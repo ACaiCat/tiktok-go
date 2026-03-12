@@ -9,6 +9,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/biz/chat"
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/bucket"
+	"github.com/ACaiCat/tiktok-go/pkg/cache"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/adaptor"
@@ -17,6 +18,7 @@ import (
 func main() {
 	config.Init()
 	db.InitPostgres()
+	cache.InitRedis()
 	bucket.InitMinIO()
 
 	h := server.Default(

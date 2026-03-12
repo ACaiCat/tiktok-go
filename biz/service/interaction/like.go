@@ -1,10 +1,13 @@
 package service
 
 import (
+	"errors"
+	"log"
 	"strconv"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"github.com/redis/go-redis/v9"
 )
 
 func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) error {
@@ -28,38 +31,63 @@ func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) e
 	if !videoExists {
 		return errno.VideoNotExistErr
 	}
+	isLiked := false
 
-	likedVideos, err := s.likeDao.GetUserLikes(userID)
+	isLiked, err = s.userCache.IsVideoLiked(userID, videoID)
 	if err != nil {
-		return errno.ServiceErr
-	}
 
-	switch req.ActionType {
-	case interaction.LikeActionType_ADD:
-		for _, id := range likedVideos {
-			if videoID == id {
-				return errno.LikeAlreadyExistErr
-			}
-		}
+		isLiked = false
 
-		err := s.likeDao.AddVideoLike(userID, videoID)
+		likedVideos, err := s.likeDao.GetUserLikes(userID)
 		if err != nil {
 			return errno.ServiceErr
 		}
 
-		return nil
-	case interaction.LikeActionType_DELETE:
 		for _, id := range likedVideos {
 			if videoID == id {
-				err := s.likeDao.DeleteVideoLike(userID, videoID)
-				if err != nil {
-					return errno.ServiceErr
-				}
-				return nil
+				isLiked = true
+				break
 			}
 		}
 
-		return errno.LikeNotExistErr
+		err = s.userCache.SetLikeVideos(userID, likedVideos)
+		if err != nil {
+			log.Println("failed to cache liked videos for userID", userID, ":", err)
+		}
+
+		if !errors.Is(err, redis.Nil) {
+			log.Println("failed to check if video is liked for userID", userID, "and videoID", videoID, ":", err)
+		}
+	}
+
+	switch req.ActionType {
+	case interaction.LikeActionType_ADD:
+		if isLiked {
+			return errno.LikeAlreadyExistErr
+		}
+		err := s.likeDao.AddVideoLike(userID, videoID)
+		if err != nil {
+			return errno.ServiceErr
+		}
+		err = s.userCache.SetLikeVideo(userID, videoID)
+		if err != nil {
+			log.Println("failed to cache like video for userID", userID, "and videoID", videoID, ":", err)
+		}
+		return nil
+	case interaction.LikeActionType_DELETE:
+		if !isLiked {
+			return errno.LikeNotExistErr
+		}
+		err := s.likeDao.DeleteVideoLike(userID, videoID)
+		if err != nil {
+			return errno.ServiceErr
+		}
+		err = s.userCache.SetUnlikeVideo(userID, videoID)
+		if err != nil {
+			log.Println("failed to cache unlike video for userID", userID, "and videoID", videoID, ":", err)
+		}
+
+		return nil
 	}
 
 	return errno.NotSupportActionErr
