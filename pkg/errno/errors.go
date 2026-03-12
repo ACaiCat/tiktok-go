@@ -32,4 +32,8 @@ var (
 	VideoNotExistErr          = NewErrNo(VideoNotExistErrCode, "视频不存在")
 	CommentNotExistErr        = NewErrNo(CommentNotExistErrCode, "评论不存在")
 	CommentNotBelongToUserErr = NewErrNo(CommentNotBelongToUserErrCode, "评论不属于用户")
+
+	FollowAlreadyExistErr = NewErrNo(FollowAlreadyExistErrCode, "已经关注过了")
+	FollowNotExistErr     = NewErrNo(FollowNotExistErrCode, "没有关注过")
+	FollowSelfErr         = NewErrNo(FollowSelfErrCode, "不能关注自己")
 )

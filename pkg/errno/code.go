@@ -25,4 +25,7 @@ const (
 	VideoNotExistErrCode          = 15000
 	CommentNotExistErrCode        = 15001
 	CommentNotBelongToUserErrCode = 15002
+	FollowAlreadyExistErrCode     = 16000
+	FollowNotExistErrCode         = 16001
+	FollowSelfErrCode             = 16002
 )

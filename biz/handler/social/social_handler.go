@@ -6,7 +6,9 @@ import (
 	"context"
 
 	social "github.com/ACaiCat/tiktok-go/biz/model/social"
+	mw "github.com/ACaiCat/tiktok-go/biz/mw/auth"
 	"github.com/ACaiCat/tiktok-go/biz/pack"
+	service "github.com/ACaiCat/tiktok-go/biz/service/social"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -39,9 +41,17 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(social.FollowResp)
+	userID := mw.GetUserID(c)
 
-	c.JSON(consts.StatusOK, resp)
+	err = service.NewSocialService().FollowAction(&req, userID)
+
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespFollow(c)
+
 }
 
 // ListFollowing .
@@ -55,9 +65,14 @@ func ListFollowing(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(social.ListFollowingResp)
+	users, total, err := service.NewSocialService().ListFollowing(&req)
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespListFollowing(c, users, total)
 }
 
 // ListFollower .
@@ -71,9 +86,14 @@ func ListFollower(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(social.ListFollowerResp)
+	users, total, err := service.NewSocialService().ListFollower(&req)
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespListFollower(c, users, total)
 }
 
 // ListFriend .
@@ -87,7 +107,14 @@ func ListFriend(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(social.ListFriendResp)
+	userID := mw.GetUserID(c)
 
-	c.JSON(consts.StatusOK, resp)
+	users, total, err := service.NewSocialService().ListFriend(&req, userID)
+
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespListFriend(c, users, total)
 }

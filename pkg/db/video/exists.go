@@ -6,6 +6,7 @@ func (v *VideoDao) IsVideoExists(videoID int64) (bool, error) {
 	var err error
 
 	count, err := v.q.Video.
+		Select(v.q.Video.ID).
 		Where(v.q.Video.ID.Eq(videoID)).
 		Limit(1).
 		Count()

@@ -58,9 +58,9 @@
 
 ### 社交模块(Social)
 
-- [ ] `POST /relation/action` — 关注 / 取消关注
-- [ ] `GET  /following/list` — 关注列表
-- [ ] `GET  /follower/list` — 粉丝列表
-- [ ] `GET  /friends/list` — 好友列表
+- [X] `POST /relation/action` — 关注 / 取消关注
+- [X] `GET  /following/list` — 关注列表
+- [X] `GET  /follower/list` — 粉丝列表
+- [x] `GET  /friends/list` — 好友列表
 - [ ] `GET  /ws` — WebSocket 聊天
 
