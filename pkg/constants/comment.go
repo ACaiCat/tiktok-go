@@ -1,7 +1,6 @@
-﻿package constants
-
-import "time"
+package constants
 
 const (
-	CommentCountCacheExpiration = time.Minute * 10
+	DefaultCommentPageSize = 20
+	MaxCommentPageSize     = 50
 )

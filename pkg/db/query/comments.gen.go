@@ -34,8 +34,6 @@ func newComment(db *gorm.DB, opts ...gen.DOOption) comment {
 	_comment.ParentID = field.NewInt64(tableName, "parent_id")
 	_comment.Content = field.NewString(tableName, "content")
 	_comment.CreatedAt = field.NewTime(tableName, "created_at")
-	_comment.UpdatedAt = field.NewTime(tableName, "updated_at")
-	_comment.DeletedAt = field.NewField(tableName, "deleted_at")
 
 	_comment.fillFieldMap()
 
@@ -52,8 +50,6 @@ type comment struct {
 	ParentID  field.Int64  // 父评论ID
 	Content   field.String // 评论内容
 	CreatedAt field.Time   // 创建时间
-	UpdatedAt field.Time   // 更新时间
-	DeletedAt field.Field  // 删除时间
 
 	fieldMap map[string]field.Expr
 }
@@ -76,8 +72,6 @@ func (c *comment) updateTableName(table string) *comment {
 	c.ParentID = field.NewInt64(table, "parent_id")
 	c.Content = field.NewString(table, "content")
 	c.CreatedAt = field.NewTime(table, "created_at")
-	c.UpdatedAt = field.NewTime(table, "updated_at")
-	c.DeletedAt = field.NewField(table, "deleted_at")
 
 	c.fillFieldMap()
 
@@ -101,8 +95,7 @@ func (c *comment) fillFieldMap() {
 	c.fieldMap["parent_id"] = c.ParentID
 	c.fieldMap["content"] = c.Content
 	c.fieldMap["created_at"] = c.CreatedAt
-	c.fieldMap["updated_at"] = c.UpdatedAt
-	c.fieldMap["deleted_at"] = c.DeletedAt
+
 }
 
 func (c comment) clone(db *gorm.DB) comment {

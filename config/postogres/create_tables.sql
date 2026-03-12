@@ -53,9 +53,7 @@ CREATE TABLE IF NOT EXISTS comments
     video_id   BIGINT      NOT NULL,
     parent_id  BIGINT,
     content    TEXT        NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMENT ON TABLE comments IS '评论表';
@@ -65,8 +63,6 @@ COMMENT ON COLUMN comments.video_id IS '视频ID';
 COMMENT ON COLUMN comments.parent_id IS '父评论ID';
 COMMENT ON COLUMN comments.content IS '评论内容';
 COMMENT ON COLUMN comments.created_at IS '创建时间';
-COMMENT ON COLUMN comments.updated_at IS '更新时间';
-COMMENT ON COLUMN comments.deleted_at IS '删除时间';
 
 CREATE TABLE IF NOT EXISTS likes
 (

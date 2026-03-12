@@ -21,3 +21,24 @@ func RespLikeList(c *app.RequestContext, videoList []*model.Video) {
 		},
 	})
 }
+
+func RespComment(c *app.RequestContext) {
+	c.JSON(consts.StatusOK, interaction.CommentResp{
+		Base: SuccessBase,
+	})
+}
+
+func RespListComment(c *app.RequestContext, comments []*model.Comment) {
+	c.JSON(consts.StatusOK, interaction.ListCommentResp{
+		Base: SuccessBase,
+		Data: &interaction.CommentData{
+			Items: comments,
+		},
+	})
+}
+
+func RespDeleteComment(c *app.RequestContext) {
+	c.JSON(consts.StatusOK, interaction.DeleteCommentResp{
+		Base: SuccessBase,
+	})
+}

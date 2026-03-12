@@ -29,9 +29,19 @@ func main() {
 		}),
 	)
 
+	commentModel := g.GenerateModel("comments",
+		gen.FieldNew("ChildCount", "int64", field.Tag{
+			"gorm": "column:child_count;->",
+			"json": "child_count",
+		}),
+		gen.FieldNew("LikeCount", "int64", field.Tag{
+			"gorm": "column:like_count;->",
+			"json": "like_count",
+		}),
+	)
 	userModel := g.GenerateModel("users")
 	likeModel := g.GenerateModel("likes")
-	commentModel := g.GenerateModel("comments")
+
 	followerModel := g.GenerateModel("followers")
 
 	g.ApplyBasic(videoModel, userModel, likeModel, commentModel, followerModel)

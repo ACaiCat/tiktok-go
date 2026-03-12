@@ -1,6 +1,12 @@
 package commentDao
 
-import "log"
+import (
+	"errors"
+	"log"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+	"gorm.io/gorm"
+)
 
 func (c *CommentDao) GetCommentCount(videoID int64) (int64, error) {
 	var err error
@@ -42,4 +48,62 @@ func (c *CommentDao) GetCommentCounts(videoIDs []int64) (map[int64]int64, error)
 	}
 
 	return commentMap, nil
+}
+
+func (c *CommentDao) GetCommentByID(commentID int64) (*model.Comment, error) {
+	var err error
+
+	subComment := c.q.Comment.As("sub_comment")
+
+	comment, err := c.q.Comment.
+		Select(c.q.Comment.ALL,
+			c.q.Like.ID.Count().As("like_count"),
+			c.q.Comment.ID.Count().As("child_count"),
+		).
+		LeftJoin(c.q.Like, c.q.Like.CommentID.EqCol(c.q.Comment.ID)).
+		LeftJoin(subComment, subComment.ParentID.EqCol(c.q.Comment.ID)).
+		Group(c.q.Comment.ID).
+		Where(c.q.Comment.ID.Eq(commentID)).
+		First()
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		log.Printf("failed to get comment by ID %d: %v", commentID, err)
+		return nil, err
+	}
+
+	return comment, nil
+
+}
+
+func (c *CommentDao) GetCommentsByVideoID(videoID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
+	var err error
+
+	subComment := c.q.Comment.As("sub_comment")
+
+	comments, err := c.q.Comment.
+		Select(
+			c.q.Comment.ALL,
+			c.q.Like.ID.Count().As("like_count"),
+			c.q.Comment.ID.Count().As("child_count"),
+		).
+		LeftJoin(c.q.Like, c.q.Like.CommentID.EqCol(c.q.Comment.ID)).
+		LeftJoin(subComment, subComment.ParentID.EqCol(c.q.Comment.ID)).
+		Group(c.q.Comment.ID).
+		Where(c.q.Comment.VideoID.Eq(videoID)).
+		Order(c.q.Comment.CreatedAt.Desc()).
+		Offset(pageSize * pageNum).
+		Limit(pageSize).
+		Find()
+
+	if err != nil {
+		log.Printf("failed to get comments by video ID %d: %v", videoID, err)
+		return nil, err
+	}
+
+	return comments, nil
+
 }

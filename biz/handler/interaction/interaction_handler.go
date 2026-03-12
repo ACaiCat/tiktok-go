@@ -70,9 +70,14 @@ func Comment(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(interaction.CommentResp)
+	userID := mw.GetUserID(c)
 
-	c.JSON(consts.StatusOK, resp)
+	err = service.NewInteractionService().CommentAction(&req, userID)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespComment(c)
 }
 
 // ListComment .
@@ -86,9 +91,14 @@ func ListComment(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(interaction.ListCommentResp)
+	comments, err := service.NewInteractionService().ListComment(&req)
 
-	c.JSON(consts.StatusOK, resp)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespListComment(c, comments)
 }
 
 // DeleteComment .
@@ -102,7 +112,15 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(interaction.DeleteCommentResp)
+	userID := mw.GetUserID(c)
 
-	c.JSON(consts.StatusOK, resp)
+	err = service.NewInteractionService().DeleteComment(&req, userID)
+
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespDeleteComment(c)
+
 }

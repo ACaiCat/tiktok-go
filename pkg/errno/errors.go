@@ -24,10 +24,12 @@ var (
 
 	UsernameTooShortErr = NewErrNo(UsernameTooShortErrCode, "用户名长度太短")
 
-	UsernameTooLongErr  = NewErrNo(UsernameTooLongErrCode, "用户名长度太长")
-	PasswordTooLongErr  = NewErrNo(PasswordTooLongErrCode, "密码长度太长")
-	NotSupportActionErr = NewErrNo(NotSupportActionErrCode, "不支持的操作")
-	LikeAlreadyExistErr = NewErrNo(LikeAlreadyExistErrCode, "已经点赞过了")
-	LikeNotExistErr     = NewErrNo(LikeNotExistErrCode, "没有点赞过")
-	VideoNotExistErr    = NewErrNo(VideoNotExistErrCode, "视频不存在")
+	UsernameTooLongErr        = NewErrNo(UsernameTooLongErrCode, "用户名长度太长")
+	PasswordTooLongErr        = NewErrNo(PasswordTooLongErrCode, "密码长度太长")
+	NotSupportActionErr       = NewErrNo(NotSupportActionErrCode, "不支持的操作")
+	LikeAlreadyExistErr       = NewErrNo(LikeAlreadyExistErrCode, "已经点赞过了")
+	LikeNotExistErr           = NewErrNo(LikeNotExistErrCode, "没有点赞过")
+	VideoNotExistErr          = NewErrNo(VideoNotExistErrCode, "视频不存在")
+	CommentNotExistErr        = NewErrNo(CommentNotExistErrCode, "评论不存在")
+	CommentNotBelongToUserErr = NewErrNo(CommentNotBelongToUserErrCode, "评论不属于用户")
 )
