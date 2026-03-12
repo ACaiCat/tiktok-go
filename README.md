@@ -12,6 +12,10 @@
 - 认证：JWT (Access Token + Refresh Token)
 - 配置：Viper
 
+## API文档
+
+[文档](./API.md)
+
 ## 快速开始
 
 1. 复制配置文件并填写配置：
@@ -28,7 +32,7 @@
 
 ## TODO List
 
-### 用户模块(User)
+### 用户模块 (User)
 
 - [x] `POST /user/register` — 用户注册
 - [x] `POST /user/login` — 用户登录
@@ -39,7 +43,7 @@
 - [x] `POST /auth/mfa/bind` — 绑定 MFA
 - [ ] `POST /user/image/search` — 以图搜图 (没看懂，何意味)
 
-### 视频模块(Video)
+### 视频模块 (Video)
 
 - [X] `GET  /video/feed` — 视频流
 - [X] `POST /video/publish` — 发布视频
@@ -48,7 +52,7 @@
 - [X] `POST /video/search` — 搜索视频
 - [X] `GET  /video/visit` — 访问视频
 
-### 互动模块(Interaction)
+### 互动模块 (Interaction)
 
 - [X] `POST   /like/action` — 点赞 / 取消点赞
 - [X] `GET    /like/list` — 点赞列表
@@ -56,7 +60,7 @@
 - [X] `GET    /comment/list` — 评论列表
 - [X] `DELETE /comment/delete` — 删除评论
 
-### 社交模块(Social)
+### 社交模块 (Social)
 
 - [X] `POST /relation/action` — 关注 / 取消关注
 - [X] `GET  /following/list` — 关注列表
