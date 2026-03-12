@@ -127,9 +127,7 @@ code: ""
     "id": "483675103821824000",
     "username": "west2-online",
     "avatar_url": "https://west2.online/avatar-example.jpeg",
-    "created_at": "1970-01-01 08:00:00",
-    "updated_at": "1970-01-01 08:00:00",
-    "deleted_at": "1970-01-01 08:00:00"
+    "created_at": "1970-01-01 08:00:00"
   }
 }
 ```
