@@ -18,6 +18,6 @@ RUN apk add --no-cache tzdata
 WORKDIR /app
 ENV TZ=Asia/Shanghai
 COPY --from=builder /app/main .
-RUN apk update --no-cache && apk --no-cache add ca-certificates tzdata
+RUN apk update --no-cache && apk --no-cache add ca-certificates tzdata ffmpeg
 
 CMD ["./main"]
