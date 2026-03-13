@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/ACaiCat/tiktok-go/biz/chat"
+	mw "github.com/ACaiCat/tiktok-go/biz/mw/log"
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/bucket"
 	"github.com/ACaiCat/tiktok-go/pkg/cache"
@@ -25,6 +26,8 @@ func main() {
 		server.WithHostPorts(config.AppConfig.Server.Host+":"+strconv.Itoa(config.AppConfig.Server.Port)),
 		server.WithMaxRequestBodySize(10*1024*1024*1024), // 10GB
 	)
+
+	h.Use(mw.AccessLog())
 
 	h.GET("/ws", adaptor.HertzHandler(http.HandlerFunc(chat.Chat)))
 	register(h)
