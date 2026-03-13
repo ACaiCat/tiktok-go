@@ -12,6 +12,57 @@
 - 认证：JWT (Access Token + Refresh Token)
 - 配置：Viper
 
+## 项目结构
+```
+tiktok-go/
+├── main.go                        # 入口点
+├── router_gen.go
+├── config/                        # 配置模块
+├── idl/                           # 接口定义
+├── biz/                           # 业务逻辑层
+│   ├── handler/                   # HTTP处理器
+│   ├── service/                   # 业务服务层
+│   │   ├── user/                  # 用户
+│   │   ├── video/                 # 视频
+│   │   ├── interaction/           # 互动
+│   │   ├── social/                # 社交
+│   │   └── chat/                  # 聊天
+│   │
+│   ├── router/                    # 路由
+│   ├── model/                     # 请求和响应数据模型
+│   ├── pack/                      # 响应数据打包方法
+│   ├── mw/                        # 中间件
+│   │   └── auth/                  # JWT认证中间件
+│   │
+│   └── chat/                      # WebSocket聊天处理
+│
+├── pkg/                           # 通用工具包
+│   ├── db/                        # 数据库访问
+│   │   ├── postgres.go            # 数据库连接初始化
+│   │   ├── model/                 # 数据库模型
+│   │   ├── query/                 # Gen查询
+│   │   └── ...
+│   │
+│   ├── cache/                     # 缓存
+│   │   ├── redis.go               # Redis连接初始化
+│   │   └── ...
+│   │
+│   ├── bucket/                    # 对象存储
+│   │   ├── minio.go               # MinIO客户端初始化
+│   │   └── ...
+│   │
+│   ├── jwt/                       # JWT工具包
+│   ├── ffmpeg/                    # 媒体处理
+│   ├── img/                       # 图片处理
+│   ├── errno/                     # 错误码定义
+│   ├── constants/                 # 全局常量
+│   ├── totp/                      # TOTP多因素认证
+│   └── utils/                     # 工具函数          
+│
+└── cmd/
+    └── gorm-gen/                  # GORM Gen
+```
+
 ## API文档
 
 [文档](./API.md)
