@@ -9,11 +9,13 @@ import (
 
 func CommentDaoToDto(comment *commentDao.Comment) *model.Comment {
 	return &model.Comment{
-		ID:        strconv.FormatInt(comment.ID, 10),
-		UserID:    strconv.FormatInt(comment.UserID, 10),
-		VideoID:   strconv.FormatInt(comment.VideoID, 10),
-		Content:   comment.Content,
-		CreatedAt: strconv.FormatInt(comment.CreatedAt.UnixMilli(), 10),
+		ID:         strconv.FormatInt(comment.ID, 10),
+		UserID:     strconv.FormatInt(comment.UserID, 10),
+		VideoID:    strconv.FormatInt(comment.VideoID, 10),
+		Content:    comment.Content,
+		CreatedAt:  strconv.FormatInt(comment.CreatedAt.UnixMilli(), 10),
+		LikeCount:  comment.LikeCount,
+		ChildCount: comment.ChildCount,
 	}
 }
 

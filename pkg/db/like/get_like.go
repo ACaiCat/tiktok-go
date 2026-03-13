@@ -2,20 +2,6 @@ package likeDao
 
 import "log"
 
-func (l *LikeDao) GetLikeCount(videoID int64) (int64, error) {
-	var err error
-
-	count, err := l.q.Like.
-		Where(l.q.Like.VideoID.Eq(videoID)).
-		Count()
-	if err != nil {
-		log.Printf("failed to get like count for videoID %d: %v", videoID, err)
-		return 0, err
-	}
-
-	return count, nil
-}
-
 func (l *LikeDao) GetLikeCounts(videoIDs []int64) (map[int64]int64, error) {
 	var err error
 

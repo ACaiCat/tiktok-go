@@ -87,8 +87,8 @@ func (c *CommentDao) GetCommentsByVideoID(videoID int64, pageSize int, pageNum i
 	comments, err := c.q.Comment.
 		Select(
 			c.q.Comment.ALL,
-			c.q.Like.ID.Count().As("like_count"),
-			c.q.Comment.ID.Count().As("child_count"),
+			c.q.Like.ID.Distinct().Count().As("like_count"),
+			subComment.ID.Distinct().Count().As("child_count"),
 		).
 		LeftJoin(c.q.Like, c.q.Like.CommentID.EqCol(c.q.Comment.ID)).
 		LeftJoin(subComment, subComment.ParentID.EqCol(c.q.Comment.ID)).
@@ -106,4 +106,32 @@ func (c *CommentDao) GetCommentsByVideoID(videoID int64, pageSize int, pageNum i
 
 	return comments, nil
 
+}
+
+func (c *CommentDao) GetCommentsByCommentID(commentID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
+	var err error
+
+	subComment := c.q.Comment.As("sub_comment")
+
+	comments, err := c.q.Comment.
+		Select(
+			c.q.Comment.ALL,
+			c.q.Like.ID.Distinct().Count().As("like_count"),
+			subComment.ID.Distinct().Count().As("child_count"),
+		).
+		LeftJoin(c.q.Like, c.q.Like.CommentID.EqCol(c.q.Comment.ID)).
+		LeftJoin(subComment, subComment.ParentID.EqCol(c.q.Comment.ID)).
+		Group(c.q.Comment.ID).
+		Where(c.q.Comment.ParentID.Eq(commentID)).
+		Order(c.q.Comment.CreatedAt.Desc()).
+		Offset(pageSize * pageNum).
+		Limit(pageSize).
+		Find()
+
+	if err != nil {
+		log.Printf("failed to get comments by comment ID %d: %v", commentID, err)
+		return nil, err
+	}
+
+	return comments, nil
 }
