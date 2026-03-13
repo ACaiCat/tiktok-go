@@ -6,6 +6,8 @@ import (
 	"github.com/ACaiCat/tiktok-go/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	_ "time/tzdata"
 )
 
 var DB *gorm.DB

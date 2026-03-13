@@ -27,6 +27,20 @@
    ```bash
    go run main.go
    ```
+   
+## Docker部署
+
+1. 启动容器:
+    ```bash
+    docker run -d --name tiktok-go -p 13215:13215 -v C:/docker/tiktok-go/config:/app/config tiktok-go
+    ```
+   
+2. 修改配置文件 `config/config.yaml`
+
+3. 重启容器:
+    ```bash
+    docker restart tiktok-go
+    ```
 
 ---
 
