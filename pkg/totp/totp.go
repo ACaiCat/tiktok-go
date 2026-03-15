@@ -1,6 +1,7 @@
 package totp
 
 import (
+	"errors"
 	"log"
 	"time"
 
@@ -31,6 +32,10 @@ func ValidateCode(secret string, code string) (bool, error) {
 		Digits: constants.TotpDigitLength,
 	})
 	if err != nil {
+		if errors.Is(err, otp.ErrValidateInputInvalidLength) {
+			return false, nil
+		}
+
 		log.Println("failed to validate totp code:", err)
 		return false, err
 	}

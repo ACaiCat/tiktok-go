@@ -36,7 +36,7 @@ func (s *UserService) UserLogin(req *user.LoginReq) (*model.User, string, string
 	}
 
 	if usr.TotpSecret != "" {
-		if *req.Code == "" {
+		if req.Code == nil || *req.Code == "" {
 			return nil, "", "", errno.MFAMissingErr
 		}
 
