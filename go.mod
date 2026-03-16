@@ -1,6 +1,6 @@
 module github.com/ACaiCat/tiktok-go
 
-go 1.25
+go 1.25.0
 
 require (
 	github.com/apache/thrift v0.0.0-00010101000000-000000000000
@@ -14,7 +14,7 @@ require (
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/viper v1.21.0
 	github.com/u2takey/ffmpeg-go v0.5.0
-	golang.org/x/crypto v0.48.0
+	golang.org/x/crypto v0.49.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gen v0.3.27
 	gorm.io/gorm v1.31.1
@@ -69,10 +69,10 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
 	golang.org/x/mod v0.33.0 // indirect
-	golang.org/x/net v0.50.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
+	golang.org/x/net v0.51.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
 	golang.org/x/tools v0.42.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gorm.io/datatypes v1.2.7 // indirect
