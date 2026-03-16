@@ -12,7 +12,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v8
         with:
-          name: tiktok-go-*
+          pattern: tiktok-go-*
           path: publish
           merge-multiple: true
 
