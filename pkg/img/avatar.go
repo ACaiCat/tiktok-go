@@ -3,6 +3,7 @@ package img
 import (
 	"fmt"
 	"log"
+	"slices"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
@@ -20,10 +21,8 @@ func CheckAvatar(data []byte) (string, error) {
 		return "", errno.AvatarFormatErr
 	}
 
-	for _, allowedFormat := range constants.AvatarFormat {
-		if format == allowedFormat {
-			return format, nil
-		}
+	if slices.Contains(constants.AvatarFormat, format) {
+		return format, nil
 	}
 
 	return "", errno.AvatarFormatErr

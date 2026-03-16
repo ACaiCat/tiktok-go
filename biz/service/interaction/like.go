@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"log"
+	"slices"
 	"strconv"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
@@ -41,21 +42,12 @@ func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) e
 
 		isLiked, err = s.userCache.IsVideoLiked(userID, videoID)
 		if err != nil {
-
-			isLiked = false
-
 			likedVideos, err := s.likeDao.GetUserLikes(userID)
 			if err != nil {
 				return errno.ServiceErr
 			}
 
-			for _, id := range likedVideos {
-				if videoID == id {
-					isLiked = true
-					break
-				}
-			}
-
+			isLiked = slices.Contains(likedVideos, videoID)
 			err = s.userCache.SetLikeVideos(userID, likedVideos)
 			if err != nil {
 				log.Println("failed to cache liked videos for userID", userID, ":", err)
