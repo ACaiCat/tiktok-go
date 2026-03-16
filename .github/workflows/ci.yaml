@@ -34,7 +34,7 @@ jobs:
         shell: bash
         run: |
           mkdir publish/config
-          cp config/config.example.yaml publish/config/config.yaml
+          cp config/config.yaml.example publish/config/config.yaml
 
 
       - name: Upload artifact
