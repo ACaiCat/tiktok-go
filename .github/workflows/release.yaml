@@ -19,7 +19,7 @@ jobs:
       - name: Publish to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
-          files: publish/*
+          files: publish/*.zip
           tag_name: ${{ github.ref_name }}
           name: tiktok-go ${{ github.ref_name }}
           generate_release_notes: true

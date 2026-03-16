@@ -36,12 +36,19 @@ jobs:
           mkdir publish/config
           cp config/config.yaml.example publish/config/config.yaml
 
+      - name: Zip Release
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          type: 'zip'
+          filename: 'tiktok-go-${{ matrix.platform }}.zip'
+          directory: 'publish'
+          path: '.'
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: tiktok-go-${{ matrix.platform }}
-          path: publish/*
+          path: publish/*.zip
 
   publish:
     needs: build
