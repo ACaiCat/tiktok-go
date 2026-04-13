@@ -1,14 +1,15 @@
-﻿package jwt
+package jwt
 
 import (
 	"errors"
 	"log"
 	"time"
 
+	"github.com/golang-jwt/jwt/v4"
+
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"github.com/golang-jwt/jwt/v4"
 )
 
 func CreateToken(tokenType int8, userID int64) (string, error) {
@@ -50,7 +51,6 @@ func CreateToken(tokenType int8, userID int64) (string, error) {
 	}
 
 	return token, nil
-
 }
 
 func ValidateToken(token string, tokenType int8) (int64, error) {
@@ -60,12 +60,14 @@ func ValidateToken(token string, tokenType int8) (int64, error) {
 
 	claims := &Claims{}
 	parsedToken, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
-		if claims.TokenType == constants.TypeAccessToken {
+		switch claims.TokenType {
+		case constants.TypeAccessToken:
 			return []byte(config.AppConfig.JWT.AccessSecret), nil
-		} else if claims.TokenType == constants.TypeRefreshToken {
+		case constants.TypeRefreshToken:
 			return []byte(config.AppConfig.JWT.RefreshSecret), nil
+		default:
+			return 0, errno.AuthErr.WithMessage("令牌无效")
 		}
-		return 0, errno.AuthErr.WithMessage("令牌无效")
 	})
 
 	if claims.TokenType != tokenType {
@@ -84,5 +86,4 @@ func ValidateToken(token string, tokenType int8) (int64, error) {
 	}
 
 	return claims.UserID, nil
-
 }

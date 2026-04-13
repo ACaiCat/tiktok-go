@@ -1,8 +1,9 @@
-﻿package likeDao
+package likedao
 
 import (
-	"github.com/ACaiCat/tiktok-go/pkg/db/query"
 	"gorm.io/gorm"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/query"
 )
 
 type LikeDao struct {

@@ -3,11 +3,10 @@ package ffmpeg
 import (
 	"bytes"
 
-	"github.com/u2takey/ffmpeg-go"
+	ffmpeg_go "github.com/u2takey/ffmpeg-go"
 )
 
 func GetVideoCover(filePath string) ([]byte, error) {
-
 	buf := bytes.NewBuffer(nil)
 
 	err := ffmpeg_go.Input(filePath).
@@ -19,5 +18,4 @@ func GetVideoCover(filePath string) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
-
 }

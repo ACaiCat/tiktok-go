@@ -1,13 +1,13 @@
-﻿package db
+package db
 
 import (
 	"fmt"
+	_ "time/tzdata"
 
-	"github.com/ACaiCat/tiktok-go/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	_ "time/tzdata"
+	"github.com/ACaiCat/tiktok-go/config"
 )
 
 var DB *gorm.DB

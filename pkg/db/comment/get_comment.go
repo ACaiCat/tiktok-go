@@ -1,11 +1,12 @@
-package commentDao
+package commentdao
 
 import (
 	"errors"
 	"log"
 
-	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"gorm.io/gorm"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func (c *CommentDao) GetCommentCount(videoID int64) (int64, error) {
@@ -76,7 +77,6 @@ func (c *CommentDao) GetCommentByID(commentID int64) (*model.Comment, error) {
 	}
 
 	return comment, nil
-
 }
 
 func (c *CommentDao) GetCommentsByVideoID(videoID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
@@ -105,7 +105,6 @@ func (c *CommentDao) GetCommentsByVideoID(videoID int64, pageSize int, pageNum i
 	}
 
 	return comments, nil
-
 }
 
 func (c *CommentDao) GetCommentsByCommentID(commentID int64, pageSize int, pageNum int) ([]*model.Comment, error) {

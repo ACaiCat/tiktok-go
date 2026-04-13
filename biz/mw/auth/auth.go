@@ -4,10 +4,11 @@ import (
 	"context"
 	"strings"
 
+	"github.com/cloudwego/hertz/pkg/app"
+
 	"github.com/ACaiCat/tiktok-go/biz/pack"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/jwt"
-	"github.com/cloudwego/hertz/pkg/app"
 )
 
 func Auth() app.HandlerFunc {
@@ -21,7 +22,7 @@ func Auth() app.HandlerFunc {
 			return
 		}
 
-		c.Set(constants.UserIdKey, userID)
+		c.Set(constants.UserIDKey, userID)
 		c.Next(ctx)
 	}
 }

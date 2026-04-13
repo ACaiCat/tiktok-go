@@ -3,12 +3,12 @@ package bucket
 import (
 	"context"
 	"net/url"
-	"time"
+
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 var Bucket *minio.Client
@@ -24,7 +24,7 @@ func InitMinIO() {
 		panic(err)
 	}
 
-	cancel, err := Bucket.HealthCheck(time.Second * 5)
+	cancel, err := Bucket.HealthCheck(constants.HealthCheckTime)
 	if err != nil {
 		panic(err)
 	}

@@ -1,4 +1,4 @@
-package videoDao
+package videodao
 
 import "log"
 

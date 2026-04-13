@@ -1,11 +1,12 @@
-﻿package cache
+package cache
 
 import (
 	"context"
 	"strconv"
 
-	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/ACaiCat/tiktok-go/config"
 )
 
 var Cache *redis.Client
@@ -22,5 +23,4 @@ func InitRedis() {
 	if err != nil {
 		panic(err)
 	}
-
 }

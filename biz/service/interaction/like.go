@@ -6,14 +6,13 @@ import (
 	"slices"
 	"strconv"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"github.com/redis/go-redis/v9"
 )
 
 func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) error {
-	var err error
-
 	if req.VideoID == nil && req.CommentID == nil {
 		return errno.ParamErr.WithMessage("视频ID或评论ID不能为空")
 	}
@@ -23,76 +22,71 @@ func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) e
 	}
 
 	if req.VideoID != nil {
+		return s.likeVideoByID(*req.VideoID, userID, req.ActionType)
+	}
 
-		videoID, err := strconv.ParseInt(*req.VideoID, 10, 64)
+	return s.likeCommentByID(*req.CommentID, userID, req.ActionType)
+}
 
-		if err != nil {
-			return errno.ParamErr.WithError(err)
-		}
+func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, actionType interaction.LikeActionType) error {
+	videoID, err := strconv.ParseInt(videoIDStr, 10, 64)
+	if err != nil {
+		return errno.ParamErr.WithError(err)
+	}
 
-		videoExists, err := s.videoDao.IsVideoExists(videoID)
+	videoExists, err := s.videoDao.IsVideoExists(videoID)
+	if err != nil {
+		return errno.ServiceErr
+	}
+	if !videoExists {
+		return errno.VideoNotExistErr
+	}
+
+	isLiked, err := s.userCache.IsVideoLiked(userID, videoID)
+	if err != nil {
+		likedVideos, err := s.likeDao.GetUserLikes(userID)
 		if err != nil {
 			return errno.ServiceErr
 		}
-
-		if !videoExists {
-			return errno.VideoNotExistErr
+		isLiked = slices.Contains(likedVideos, videoID)
+		if cacheErr := s.userCache.SetLikeVideos(userID, likedVideos); cacheErr != nil {
+			log.Println("failed to cache liked videos for userID", userID, ":", cacheErr)
 		}
-		isLiked := false
-
-		isLiked, err = s.userCache.IsVideoLiked(userID, videoID)
-		if err != nil {
-			likedVideos, err := s.likeDao.GetUserLikes(userID)
-			if err != nil {
-				return errno.ServiceErr
-			}
-
-			isLiked = slices.Contains(likedVideos, videoID)
-			err = s.userCache.SetLikeVideos(userID, likedVideos)
-			if err != nil {
-				log.Println("failed to cache liked videos for userID", userID, ":", err)
-			}
-
-			if !errors.Is(err, redis.Nil) {
-				log.Println("failed to check if video is liked for userID", userID, "and videoID", videoID, ":", err)
-			}
+		if !errors.Is(err, redis.Nil) {
+			log.Println("failed to check if video is liked for userID", userID, "and videoID", videoID, ":", err)
 		}
-
-		switch req.ActionType {
-		case interaction.LikeActionType_ADD:
-			if isLiked {
-				return errno.LikeAlreadyExistErr
-			}
-			err := s.likeDao.AddVideoLike(userID, videoID)
-			if err != nil {
-				return errno.ServiceErr
-			}
-			err = s.userCache.SetLikeVideo(userID, videoID)
-			if err != nil {
-				log.Println("failed to cache like video for userID", userID, "and videoID", videoID, ":", err)
-			}
-			return nil
-		case interaction.LikeActionType_DELETE:
-			if !isLiked {
-				return errno.LikeNotExistErr
-			}
-			err := s.likeDao.DeleteVideoLike(userID, videoID)
-			if err != nil {
-				return errno.ServiceErr
-			}
-			err = s.userCache.SetUnlikeVideo(userID, videoID)
-			if err != nil {
-				log.Println("failed to cache unlike video for userID", userID, "and videoID", videoID, ":", err)
-			}
-
-			return nil
-		}
-
-		return errno.NotSupportActionErr
 	}
 
-	commentID, err := strconv.ParseInt(*req.CommentID, 10, 64)
+	switch actionType {
+	case interaction.LikeActionType_ADD:
+		if isLiked {
+			return errno.LikeAlreadyExistErr
+		}
+		if err := s.likeDao.AddVideoLike(userID, videoID); err != nil {
+			return errno.ServiceErr
+		}
+		if err := s.userCache.SetLikeVideo(userID, videoID); err != nil {
+			log.Println("failed to cache like video for userID", userID, "and videoID", videoID, ":", err)
+		}
+		return nil
+	case interaction.LikeActionType_DELETE:
+		if !isLiked {
+			return errno.LikeNotExistErr
+		}
+		if err := s.likeDao.DeleteVideoLike(userID, videoID); err != nil {
+			return errno.ServiceErr
+		}
+		if err := s.userCache.SetUnlikeVideo(userID, videoID); err != nil {
+			log.Println("failed to cache unlike video for userID", userID, "and videoID", videoID, ":", err)
+		}
+		return nil
+	}
 
+	return errno.NotSupportActionErr
+}
+
+func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, actionType interaction.LikeActionType) error {
+	commentID, err := strconv.ParseInt(commentIDStr, 10, 64)
 	if err != nil {
 		return errno.ParamErr.WithError(err)
 	}
@@ -101,24 +95,21 @@ func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) e
 	if err != nil {
 		return errno.ServiceErr
 	}
-
 	if !commentExists {
 		return errno.CommentNotExistErr
 	}
 
 	isLiked, err := s.likeDao.IsCommentLikeExists(userID, commentID)
-
 	if err != nil {
 		return errno.ServiceErr
 	}
 
-	switch req.ActionType {
+	switch actionType {
 	case interaction.LikeActionType_ADD:
 		if isLiked {
 			return errno.LikeAlreadyExistErr
 		}
-		err := s.likeDao.AddCommentLike(userID, commentID)
-		if err != nil {
+		if err := s.likeDao.AddCommentLike(userID, commentID); err != nil {
 			return errno.ServiceErr
 		}
 		return nil
@@ -126,8 +117,7 @@ func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) e
 		if !isLiked {
 			return errno.LikeNotExistErr
 		}
-		err := s.likeDao.DeleteCommentLike(userID, commentID)
-		if err != nil {
+		if err := s.likeDao.DeleteCommentLike(userID, commentID); err != nil {
 			return errno.ServiceErr
 		}
 		return nil

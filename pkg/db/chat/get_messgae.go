@@ -1,4 +1,4 @@
-package chatDao
+package chatdao
 
 import (
 	"log"

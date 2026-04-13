@@ -5,9 +5,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
+
+	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
 
 func CreateKey(accountName string) (*otp.Key, error) {

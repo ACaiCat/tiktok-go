@@ -9,12 +9,10 @@ import (
 )
 
 func GetImageFormat(data []byte) (string, error) {
-
 	_, format, err := image.DecodeConfig(bytes.NewReader(data))
 	if err != nil {
 		return "", err
 	}
-
 	return format, nil
 }
 

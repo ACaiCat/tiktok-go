@@ -4,13 +4,14 @@ import (
 	"errors"
 	"log"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/jwt"
 	totp "github.com/ACaiCat/tiktok-go/pkg/totp"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *UserService) UserLogin(req *user.LoginReq) (*model.User, string, string, error) {
@@ -64,5 +65,4 @@ func (s *UserService) UserLogin(req *user.LoginReq) (*model.User, string, string
 	}
 
 	return UserDaoToDto(usr), accessToken, refreshToken, nil
-
 }

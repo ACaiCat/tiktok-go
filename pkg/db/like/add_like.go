@@ -1,4 +1,4 @@
-package likeDao
+package likedao
 
 import (
 	"log"

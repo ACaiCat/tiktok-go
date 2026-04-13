@@ -46,5 +46,4 @@ func (s *UserService) UploadAvatar(fileHeader *multipart.FileHeader, userID int6
 	}
 
 	return nil
-
 }

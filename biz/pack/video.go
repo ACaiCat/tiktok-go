@@ -1,10 +1,11 @@
 package pack
 
 import (
-	"github.com/ACaiCat/tiktok-go/biz/model/model"
-	"github.com/ACaiCat/tiktok-go/biz/model/video"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
+	"github.com/ACaiCat/tiktok-go/biz/model/model"
+	"github.com/ACaiCat/tiktok-go/biz/model/video"
 )
 
 func RespFeedList(c *app.RequestContext, videoList []*model.Video) {

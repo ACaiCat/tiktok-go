@@ -32,5 +32,4 @@ func (s *VideoService) GetFeed(req *video.FeedReq) ([]*model.Video, error) {
 	videos := VideosDaoToDto(videosDao)
 
 	return videos, nil
-
 }

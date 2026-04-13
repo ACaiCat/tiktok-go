@@ -11,7 +11,7 @@ const (
 	AuthHeader                  = "Authorization"
 	AccessTokenHeader           = "Access-Token"
 	RefreshTokenHeader          = "Refresh-Token"
-	UserIdKey                   = "user_id"
+	UserIDKey                   = "user_id"
 
 	MinPasswordLength = 6
 	MaxPasswordLength = 64

@@ -1,19 +1,22 @@
 package pack
 
 import (
+	"net/http"
+
+	"github.com/cloudwego/hertz/pkg/app"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/social"
-	"github.com/cloudwego/hertz/pkg/app"
 )
 
 func RespFollow(c *app.RequestContext) {
-	c.JSON(200, social.FollowResp{
+	c.JSON(http.StatusOK, social.FollowResp{
 		Base: SuccessBase,
 	})
 }
 
 func RespListFollower(c *app.RequestContext, userList []*model.SocialUser, total int) {
-	c.JSON(200, social.ListFollowerResp{
+	c.JSON(http.StatusOK, social.ListFollowerResp{
 		Base: SuccessBase,
 		Data: &social.SocialUserData{
 			Items: userList,
@@ -23,7 +26,7 @@ func RespListFollower(c *app.RequestContext, userList []*model.SocialUser, total
 }
 
 func RespListFollowing(c *app.RequestContext, userList []*model.SocialUser, total int) {
-	c.JSON(200, social.ListFollowingResp{
+	c.JSON(http.StatusOK, social.ListFollowingResp{
 		Base: SuccessBase,
 		Data: &social.SocialUserData{
 			Items: userList,
@@ -33,7 +36,7 @@ func RespListFollowing(c *app.RequestContext, userList []*model.SocialUser, tota
 }
 
 func RespListFriend(c *app.RequestContext, userList []*model.SocialUser, total int) {
-	c.JSON(200, social.ListFriendResp{
+	c.JSON(http.StatusOK, social.ListFriendResp{
 		Base: SuccessBase,
 		Data: &social.SocialUserData{
 			Items: userList,

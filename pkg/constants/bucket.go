@@ -1,11 +1,15 @@
 package constants
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 const (
 	AvatarBucketName = "avatar"
 	VideoBucketName  = "video"
 	CoverBucketName  = "cover"
+	HealthCheckTime  = time.Second * 5
 )
 
 var (

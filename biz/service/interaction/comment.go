@@ -65,7 +65,6 @@ func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID i
 	}
 
 	return nil
-
 }
 
 func (s *InteractionService) DeleteComment(req *interaction.DeleteCommentReq, userID int64) error {
@@ -98,7 +97,6 @@ func (s *InteractionService) DeleteComment(req *interaction.DeleteCommentReq, us
 	}
 
 	return nil
-
 }
 
 func (s *InteractionService) ListComment(req *interaction.ListCommentReq) ([]*model.Comment, error) {
@@ -171,5 +169,4 @@ func (s *InteractionService) ListComment(req *interaction.ListCommentReq) ([]*mo
 	}
 
 	return CommentsDaoToDto(comments), nil
-
 }

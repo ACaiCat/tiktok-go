@@ -1,4 +1,4 @@
-﻿package service
+package service
 
 import (
 	"github.com/ACaiCat/tiktok-go/pkg/cache"

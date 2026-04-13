@@ -5,11 +5,12 @@ import (
 	"mime/multipart"
 	"os"
 
+	"github.com/google/uuid"
+
 	"github.com/ACaiCat/tiktok-go/pkg/bucket"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/ffmpeg"
 	"github.com/ACaiCat/tiktok-go/pkg/utils"
-	"github.com/google/uuid"
 )
 
 func (s *VideoService) PublishVideo(userID int64, title string, description string, fileHeader *multipart.FileHeader) error {

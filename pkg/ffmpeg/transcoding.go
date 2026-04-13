@@ -3,7 +3,7 @@ package ffmpeg
 import (
 	"bytes"
 
-	"github.com/u2takey/ffmpeg-go"
+	ffmpeg_go "github.com/u2takey/ffmpeg-go"
 )
 
 func TranscodeVideo(filePath string) ([]byte, error) {

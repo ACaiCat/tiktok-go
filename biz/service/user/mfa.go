@@ -4,10 +4,12 @@ import (
 	"encoding/base64"
 	"log"
 
-	"github.com/ACaiCat/tiktok-go/biz/model/user"
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	totp "github.com/ACaiCat/tiktok-go/pkg/totp"
 	"github.com/skip2/go-qrcode"
+
+	"github.com/ACaiCat/tiktok-go/biz/model/user"
+	"github.com/ACaiCat/tiktok-go/pkg/constants"
+	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"github.com/ACaiCat/tiktok-go/pkg/totp"
 )
 
 func (s *UserService) GetMFA(userID int64) (string, string, error) {
@@ -27,7 +29,7 @@ func (s *UserService) GetMFA(userID int64) (string, string, error) {
 		return "", "", errno.ServiceErr
 	}
 
-	rawQrcode, err := qrcode.Encode(key.String(), qrcode.Low, 256)
+	rawQrcode, err := qrcode.Encode(key.String(), qrcode.Low, constants.TotpQRCodeSize)
 	if err != nil {
 		log.Println("failed to generate QR code for user", usr.Username, ":", err)
 		return "", "", errno.ServiceErr
@@ -57,5 +59,4 @@ func (s *UserService) BindMFA(req *user.BindMFAReq, userID int64) error {
 	}
 
 	return nil
-
 }

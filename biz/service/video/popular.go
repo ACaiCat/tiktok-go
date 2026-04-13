@@ -4,12 +4,13 @@ import (
 	"errors"
 	"log"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"github.com/redis/go-redis/v9"
 )
 
 func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, error) {
@@ -64,5 +65,4 @@ func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, 
 	videos := VideosDaoToDto(targetVideos)
 
 	return videos, nil
-
 }

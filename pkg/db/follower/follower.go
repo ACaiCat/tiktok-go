@@ -1,8 +1,9 @@
-﻿package followerDao
+package followerdao
 
 import (
-	"github.com/ACaiCat/tiktok-go/pkg/db/query"
 	"gorm.io/gorm"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/query"
 )
 
 type FollowerDao struct {

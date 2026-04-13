@@ -1,4 +1,4 @@
-package videoDao
+package videodao
 
 import "log"
 
@@ -17,5 +17,4 @@ func (v *VideoDao) IsVideoExists(videoID int64) (bool, error) {
 	}
 
 	return count > 0, nil
-
 }
