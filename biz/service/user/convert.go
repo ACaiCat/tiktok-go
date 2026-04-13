@@ -3,9 +3,9 @@ package service
 import (
 	"strconv"
 
+	dto "github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
-import dto "github.com/ACaiCat/tiktok-go/biz/model/model"
 
 func UserDaoToDto(user *model.User) *dto.User {
 	return &dto.User{

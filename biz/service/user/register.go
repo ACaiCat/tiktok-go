@@ -3,10 +3,11 @@ package service
 import (
 	"fmt"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *UserService) UserRegister(req *user.RegisterReq) error {
@@ -39,11 +40,14 @@ func (s *UserService) UserRegister(req *user.RegisterReq) error {
 
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 
+	if err != nil {
+		return errno.ServiceErr
+	}
+
 	_, err = s.dao.CreateUser(req.Username, string(hashPassword))
 	if err != nil {
 		return errno.ServiceErr
 	}
 
 	return nil
-
 }

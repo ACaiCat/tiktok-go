@@ -44,7 +44,6 @@ func (s *VideoService) GetVideoList(req *video.ListReq) ([]*model.Video, int64, 
 	}
 
 	return videos, total, nil
-
 }
 
 func (s *VideoService) GetLikedVideos(req *interaction.ListLikeReq) ([]*model.Video, error) {

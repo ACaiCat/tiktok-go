@@ -9,10 +9,12 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
 
+const BToMB = 1024 * 1024
+
 func CheckAvatar(data []byte) (string, error) {
 	if len(data) > constants.AvatarMaxSize {
 		log.Printf("avatar size exceeds the maximum limit: %d bytes", len(data))
-		return "", errno.AvatarTooLargeErr.WithMessage(fmt.Sprintf("图片超过最大限制，请上传小于%dMB的图片", constants.AvatarMaxSize/(1024*1024)))
+		return "", errno.AvatarTooLargeErr.WithMessage(fmt.Sprintf("图片超过最大限制，请上传小于%dMB的图片", constants.AvatarMaxSize/BToMB))
 	}
 
 	format, err := GetImageFormat(data)

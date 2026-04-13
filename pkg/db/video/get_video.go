@@ -1,4 +1,4 @@
-package videoDao
+package videodao
 
 import (
 	"errors"
@@ -6,8 +6,10 @@ import (
 	"math/rand/v2"
 	"time"
 
-	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"gorm.io/gorm"
+
+	"github.com/ACaiCat/tiktok-go/pkg/constants"
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func (v *VideoDao) GetVideoByID(videoID int64) (*model.Video, error) {
@@ -52,7 +54,7 @@ func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*mode
 		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
 		LeftJoin(v.q.Comment, v.q.Comment.VideoID.EqCol(v.q.Video.ID)).
 		Group(v.q.Video.ID).
-		Limit(limit * 3).
+		Limit(limit * constants.FetchVideoMultiple).
 		Order(v.q.Video.CreatedAt.Desc()).
 		Find()
 
@@ -94,7 +96,6 @@ func (v *VideoDao) GetVideosByUserID(userID int64, pageSize int, pageNum int) ([
 		return nil, err
 	}
 	return videos, nil
-
 }
 
 func (v *VideoDao) GetPopularVideos(pageSize int, pageNum int) ([]*model.Video, error) {

@@ -1,8 +1,9 @@
-package chatDao
+package chatdao
 
 import (
-	"github.com/ACaiCat/tiktok-go/pkg/db/query"
 	"gorm.io/gorm"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/query"
 )
 
 type ChatDao struct {

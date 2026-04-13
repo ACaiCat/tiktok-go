@@ -27,5 +27,4 @@ func CommentsDaoToDto(commentsDao []*commentDao.Comment) []*model.Comment {
 	}
 
 	return comments
-
 }

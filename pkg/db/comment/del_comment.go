@@ -1,4 +1,4 @@
-package commentDao
+package commentdao
 
 import "log"
 

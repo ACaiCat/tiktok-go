@@ -3,9 +3,10 @@ package service
 import (
 	"log"
 
+	"github.com/cloudwego/hertz/pkg/common/json"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"github.com/cloudwego/hertz/pkg/common/json"
 )
 
 func (s *ChatService) SendErr(userID int64, err errno.ErrNo) {

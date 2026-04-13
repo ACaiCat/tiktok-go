@@ -1,11 +1,12 @@
 package pack
 
 import (
-	"github.com/ACaiCat/tiktok-go/biz/model/common"
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
+	"github.com/ACaiCat/tiktok-go/biz/model/common"
+	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
 
 var (

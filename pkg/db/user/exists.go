@@ -1,4 +1,4 @@
-package userDao
+package userdao
 
 import "log"
 
@@ -17,5 +17,4 @@ func (u *UserDao) IsUserExists(userID int64) (bool, error) {
 	}
 
 	return count > 0, nil
-
 }

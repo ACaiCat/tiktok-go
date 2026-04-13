@@ -1,6 +1,8 @@
-package followerDao
+package followerdao
 
 import "log"
+
+const mutualFollowCount = 2
 
 func (f *FollowerDao) IsExistFollow(userID int64, followerID int64) (bool, error) {
 	count, err := f.q.Follower.
@@ -29,5 +31,5 @@ func (f *FollowerDao) IsExistFriend(userID int64, friendID int64) (bool, error) 
 		return false, err
 	}
 
-	return count == 2, nil
+	return count == mutualFollowCount, nil
 }

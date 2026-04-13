@@ -1,8 +1,9 @@
-package videoDao
+package videodao
 
 import (
-	"github.com/ACaiCat/tiktok-go/pkg/db/query"
 	"gorm.io/gorm"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/query"
 )
 
 type VideoDao struct {

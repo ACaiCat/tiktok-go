@@ -1,4 +1,4 @@
-package followerDao
+package followerdao
 
 import (
 	"log"

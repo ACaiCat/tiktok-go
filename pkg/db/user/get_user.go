@@ -1,11 +1,12 @@
-package userDao
+package userdao
 
 import (
 	"errors"
 	"log"
 
-	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"gorm.io/gorm"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func (u *UserDao) GetByID(id int64) (*model.User, error) {

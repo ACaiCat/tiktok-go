@@ -1,4 +1,4 @@
-package userCache
+package usercache
 
 import (
 	"context"

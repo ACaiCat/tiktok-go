@@ -1,10 +1,11 @@
 package pack
 
 import (
-	"github.com/ACaiCat/tiktok-go/biz/model/model"
-	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
+	"github.com/ACaiCat/tiktok-go/biz/model/model"
+	"github.com/ACaiCat/tiktok-go/biz/model/user"
 )
 
 func RespRefreshToken(c *app.RequestContext, accessToken string, refreshToken string) {

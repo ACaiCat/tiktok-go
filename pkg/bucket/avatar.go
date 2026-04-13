@@ -5,8 +5,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/minio/minio-go/v7"
+
+	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
 
 func avatarObject(userID int64) string {

@@ -57,7 +57,6 @@ func (s *SocialService) FollowAction(req *social.FollowReq, followerID int64) er
 	}
 
 	return errno.NotSupportActionErr
-
 }
 
 func (s *SocialService) ListFollowing(req *social.ListFollowingReq) ([]*model.SocialUser, int, error) {
@@ -94,7 +93,6 @@ func (s *SocialService) ListFollowing(req *social.ListFollowingReq) ([]*model.So
 	}
 
 	return UsersToSocialUsers(users), total, nil
-
 }
 
 func (s *SocialService) ListFollower(req *social.ListFollowerReq) ([]*model.SocialUser, int, error) {
@@ -134,7 +132,6 @@ func (s *SocialService) ListFollower(req *social.ListFollowerReq) ([]*model.Soci
 }
 
 func (s *SocialService) ListFriend(req *social.ListFriendReq, userID int64) ([]*model.SocialUser, int, error) {
-
 	pageSize := req.PageSize
 	if pageSize <= 0 {
 		pageSize = constants.DefaultSocialUserPageSize
