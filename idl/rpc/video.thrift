@@ -1,18 +1,7 @@
 namespace go video
 
-include "model.thrift"
-include "common.thrift"
-
-struct VideoList {
-  // 视频列表
-  1: required list<model.Video> items;
-}
-
-struct VideoListWithTotal {
-  // 视频列表
-  1: required list<model.Video> items;
-  2: required i64 total;
-}
+include "../model.thrift"
+include "../common.thrift"
 
 
 // 视频流请求
@@ -26,7 +15,7 @@ struct FeedResp {
   // 响应状态
   1: required common.Base base;
   // 视频列表
-  2: required VideoList data;
+  2: required model.VideoList data;
 }
 
 // 投稿视频请求
@@ -60,7 +49,7 @@ struct ListResp {
   // 响应状态
   1: required common.Base base;
   // 视频列表
-  2: required VideoListWithTotal data;
+  2: required model.VideoListWithTotal data;
 }
 
 // 热门排行榜请求
@@ -76,7 +65,7 @@ struct PopularResp {
   // 响应状态
   1: required common.Base base;
   // 视频列表
-  2: required VideoList data;
+  2: required model.VideoList data;
 }
 
 // 搜索视频请求
@@ -100,7 +89,7 @@ struct SearchResp {
   // 响应状态
   1: required common.Base base;
   // 视频列表
-  2: required VideoList data;
+  2: required model.VideoList data;
 }
 
 struct VisitVideoReq {
@@ -113,7 +102,7 @@ struct VisitVideoResp {
   1: required common.Base base;
 }
 
-service VideoHandler {
+service VideoService {
   // 视频流
   FeedResp Feed(1: FeedReq req) (api.get = "/video/feed")
 

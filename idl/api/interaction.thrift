@@ -1,12 +1,7 @@
 namespace go interaction
 
-include "model.thrift"
-include "common.thrift"
-
-enum LikeActionType {
-  ADD = 1,
-  DELETE = 2
-}
+include "../model.thrift"
+include "../common.thrift"
 
 // 点赞请求
 struct LikeReq {
@@ -15,19 +10,13 @@ struct LikeReq {
   // 评论ID
   2: optional string comment_id (api.form = 'comment_id');
   // 操作类型
-  3: required LikeActionType action_type (api.form = 'action_type');
+  3: required model.LikeActionType action_type (api.form = 'action_type');
 }
 
 // 点赞响应
 struct LikeResp {
   // 响应状态
   1: required common.Base base;
-}
-
-// 视频数据
-struct VideoData {
-  // 视频列表
-  1: required list<model.Video> items;
 }
 
 // 点赞列表请求
@@ -45,7 +34,7 @@ struct ListLikeResp {
   // 响应状态
   1: required common.Base base;
   // 响应数据
-  2: optional VideoData data;
+  2: optional model.VideoList data;
 }
 
 // 评论请求
@@ -62,12 +51,6 @@ struct CommentReq {
 struct CommentResp {
   // 响应状态
   1: required common.Base base;
-}
-
-// 评论数据
-struct CommentData {
-  // 评论列表
-  1: required list<model.Comment> items;
 }
 
 // 评论列表请求
@@ -87,7 +70,7 @@ struct ListCommentResp {
   // 响应状态
   1: required common.Base base;
   // 响应数据
-  2: optional CommentData data;
+  2: optional model.CommentList data;
 }
 
 // 删除评论请求

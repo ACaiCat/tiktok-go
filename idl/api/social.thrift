@@ -3,34 +3,18 @@ namespace go social
 include "model.thrift"
 include "common.thrift"
 
-// 关注操作类型
-enum FollowActionType {
-  // 关注
-  FOLLOW = 1,
-  // 取消关注
-  UNFOLLOW = 2
-}
-
 // 关注请求
 struct FollowReq {
   // 操作对象ID
   1: required string to_user_id (api.form = 'to_user_id');
   // 操作类型
-  2: required FollowActionType action_type (api.form = 'action_type');
+  2: required model.FollowActionType action_type (api.form = 'action_type');
 }
 
 // 关注响应
 struct FollowResp {
   // 响应状态
   1: required common.Base base;
-}
-
-// 社交用户数据
-struct SocialUserData {
-  // 社交用户列表
-  1: required list<model.SocialUser> items;
-  // 总数
-  2: required i32 total;
 }
 
 // 关注列表请求
@@ -48,7 +32,7 @@ struct ListFollowingResp {
   // 响应状态
   1: required common.Base base;
   // 响应数据
-  2: optional SocialUserData data;
+  2: optional model.SocialUserListWithTotal data;
 }
 
 // 粉丝列表请求
@@ -66,7 +50,7 @@ struct ListFollowerResp {
   // 响应状态
   1: required common.Base base;
   // 响应数据
-  2: optional SocialUserData data;
+  2: optional model.SocialUserListWithTotal data;
 }
 
 // 好友列表请求
@@ -82,7 +66,7 @@ struct ListFriendResp {
   // 响应状态
   1: required common.Base base;
   // 响应数据
-  2: optional SocialUserData data;
+  2: optional model.SocialUserListWithTotal data;
 }
 
 service SocialHandler {
