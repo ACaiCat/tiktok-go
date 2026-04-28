@@ -80,4 +80,4 @@ require (
 	gorm.io/hints v1.1.2 // indirect
 )
 
-replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
+replace github.com/apache/thrift => github.com/apache/thrift v0.23.0
