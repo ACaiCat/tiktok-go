@@ -11,7 +11,7 @@ func (l *LikeDao) AddVideoLike(userID, videoID int64) error {
 
 	like := model.Like{
 		UserID:  userID,
-		VideoID: videoID,
+		VideoID: new(videoID),
 	}
 
 	err = l.q.Like.Create(&like)
@@ -28,7 +28,7 @@ func (l *LikeDao) AddCommentLike(userID, commentID int64) error {
 
 	like := model.Like{
 		UserID:    userID,
-		CommentID: commentID,
+		CommentID: new(commentID),
 	}
 
 	err = l.q.Like.Create(&like)

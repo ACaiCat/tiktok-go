@@ -29,7 +29,7 @@ func (c *CommentDao) AddCommentReply(userID int64, commentID int64, content stri
 
 	comment := model.Comment{
 		UserID:   userID,
-		ParentID: commentID,
+		ParentID: new(commentID),
 		Content:  content,
 	}
 

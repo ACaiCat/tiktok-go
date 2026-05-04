@@ -14,8 +14,8 @@ const TableNameLike = "likes"
 type Like struct {
 	ID        int64     `gorm:"column:id;primaryKey;autoIncrement:true;comment:点赞ID" json:"id"`                      // 点赞ID
 	UserID    int64     `gorm:"column:user_id;not null;comment:用户ID" json:"user_id"`                                 // 用户ID
-	VideoID   int64     `gorm:"column:video_id;comment:视频ID" json:"video_id"`                                        // 视频ID
-	CommentID int64     `gorm:"column:comment_id;comment:评论ID" json:"comment_id"`                                    // 评论ID
+	VideoID   *int64    `gorm:"column:video_id;comment:视频ID" json:"video_id"`                                        // 视频ID
+	CommentID *int64    `gorm:"column:comment_id;comment:评论ID" json:"comment_id"`                                    // 评论ID
 	CreatedAt time.Time `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"created_at"` // 创建时间
 }
 

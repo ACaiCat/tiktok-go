@@ -41,14 +41,6 @@ func (v *VideoDao) SearchVideo(
 	}
 
 	videos, err := statement.
-		Select(
-			v.q.Video.ALL,
-			v.q.Like.ID.Distinct().Count().As("like_count"),
-			v.q.Comment.ID.Distinct().Count().As("comment_count"),
-		).
-		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
-		LeftJoin(v.q.Comment, v.q.Comment.VideoID.EqCol(v.q.Video.ID)).
-		Group(v.q.Video.ID).
 		Offset(pageSize * pageNum).Limit(pageSize).Find()
 
 	if err != nil {

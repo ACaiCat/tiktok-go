@@ -2,6 +2,7 @@ package chatdao
 
 import (
 	"log"
+	"time"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
@@ -11,7 +12,7 @@ func (c *ChatDao) GetUnreadMessages(userID int64, senderID int64) ([]*model.Chat
 		Where(
 			c.q.ChatMessage.SenderID.Eq(senderID),
 			c.q.ChatMessage.ReceiverID.Eq(userID),
-			c.q.ChatMessage.Read.Is(false),
+			c.q.ChatMessage.ReadAt.IsNull(),
 		).
 		Find()
 
@@ -28,9 +29,9 @@ func (c *ChatDao) MarkMessagesAsRead(userID int64, senderID int64) error {
 		Where(
 			c.q.ChatMessage.SenderID.Eq(senderID),
 			c.q.ChatMessage.ReceiverID.Eq(userID),
-			c.q.ChatMessage.Read.Is(false),
+			c.q.ChatMessage.ReadAt.IsNull(),
 		).
-		Update(c.q.ChatMessage.Read, true)
+		Update(c.q.ChatMessage.ReadAt, time.Now())
 
 	if err != nil {
 		log.Println("failed to mark messages as read for userID", userID, "from senderID", senderID, ":", err)

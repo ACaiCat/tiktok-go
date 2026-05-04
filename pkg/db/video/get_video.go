@@ -16,14 +16,6 @@ func (v *VideoDao) GetVideoByID(videoID int64) (*model.Video, error) {
 	var err error
 
 	video, err := v.q.Video.
-		Select(
-			v.q.Video.ALL,
-			v.q.Like.ID.Distinct().Count().As("like_count"),
-			v.q.Comment.ID.Distinct().Count().As("comment_count"),
-		).
-		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
-		LeftJoin(v.q.Comment, v.q.Comment.VideoID.EqCol(v.q.Video.ID)).
-		Group(v.q.Video.ID).
 		Where(v.q.Video.ID.Eq(videoID)).
 		First()
 
@@ -46,14 +38,6 @@ func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*mode
 	}
 
 	videos, err := statement.
-		Select(
-			v.q.Video.ALL,
-			v.q.Like.ID.Distinct().Count().As("like_count"),
-			v.q.Comment.ID.Distinct().Count().As("comment_count"),
-		).
-		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
-		LeftJoin(v.q.Comment, v.q.Comment.VideoID.EqCol(v.q.Video.ID)).
-		Group(v.q.Video.ID).
 		Limit(limit * constants.FetchVideoMultiple).
 		Order(v.q.Video.CreatedAt.Desc()).
 		Find()
@@ -78,14 +62,6 @@ func (v *VideoDao) GetVideosByUserID(userID int64, pageSize int, pageNum int) ([
 	var err error
 
 	videos, err := v.q.Video.
-		Select(
-			v.q.Video.ALL,
-			v.q.Like.ID.Distinct().Count().As("like_count"),
-			v.q.Comment.ID.Distinct().Count().As("comment_count"),
-		).
-		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
-		LeftJoin(v.q.Comment, v.q.Comment.VideoID.EqCol(v.q.Video.ID)).
-		Group(v.q.Video.ID).
 		Where(v.q.Video.UserID.Eq(userID)).
 		Offset(pageSize * pageNum).
 		Limit(pageSize).
@@ -102,14 +78,6 @@ func (v *VideoDao) GetPopularVideos(pageSize int, pageNum int) ([]*model.Video, 
 	var err error
 
 	videos, err := v.q.Video.
-		Select(
-			v.q.Video.ALL,
-			v.q.Like.ID.Distinct().Count().As("like_count"),
-			v.q.Comment.ID.Distinct().Count().As("comment_count"),
-		).
-		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
-		LeftJoin(v.q.Comment, v.q.Comment.VideoID.EqCol(v.q.Video.ID)).
-		Group(v.q.Video.ID).
 		Order(v.q.Video.VisitCount.Desc()).
 		Offset(pageSize * pageNum).
 		Limit(pageSize).
@@ -152,14 +120,6 @@ func (v *VideoDao) GetUserLikeList(userID int64, pageSize int, pageNum int) ([]*
 	}
 
 	videos, err := v.q.Video.
-		Select(
-			v.q.Video.ALL,
-			v.q.Like.ID.Distinct().Count().As("like_count"),
-			v.q.Comment.ID.Distinct().Count().As("comment_count"),
-		).
-		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
-		LeftJoin(v.q.Comment, v.q.Comment.VideoID.EqCol(v.q.Video.ID)).
-		Group(v.q.Video.ID).
 		Offset(pageSize * pageNum).
 		Where(v.q.Video.ID.In(videoIDs...)).
 		Limit(pageSize).
