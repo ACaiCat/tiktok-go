@@ -14,8 +14,7 @@ func coverObject(videoID int64) string {
 	return fmt.Sprintf("cover_%d", videoID)
 }
 
-func UploadCover(videoID int64, data []byte) error {
-	ctx := context.Background()
+func UploadCover(ctx context.Context, videoID int64, data []byte) error {
 	_, err := Bucket.PutObject(ctx, constants.CoverBucketName, coverObject(videoID),
 		bytes.NewReader(data), int64(len(data)),
 		minio.PutObjectOptions{ContentType: "image/jpeg"},

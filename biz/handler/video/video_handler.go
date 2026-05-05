@@ -24,7 +24,7 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	videos, err := service.NewVideoService().GetFeed(&req)
+	videos, err := service.NewVideoService(ctx).GetFeed(&req)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -52,7 +52,7 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	err = service.NewVideoService().PublishVideo(userID, req.Title, req.Description, fileHeader)
+	err = service.NewVideoService(ctx).PublishVideo(userID, req.Title, req.Description, fileHeader)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -73,7 +73,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	videos, total, err := service.NewVideoService().GetVideoList(&req)
+	videos, total, err := service.NewVideoService(ctx).GetVideoList(&req)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -93,7 +93,7 @@ func Popular(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	videos, err := service.NewVideoService().GetPopularVideos(&req)
+	videos, err := service.NewVideoService(ctx).GetPopularVideos(&req)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -114,7 +114,7 @@ func Search(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	videos, err := service.NewVideoService().SearchVideo(&req)
+	videos, err := service.NewVideoService(ctx).SearchVideo(&req)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -135,7 +135,7 @@ func VisitVideo(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	err = service.NewVideoService().VisitVideo(&req)
+	err = service.NewVideoService(ctx).VisitVideo(&req)
 
 	if err != nil {
 		pack.RespError(c, err)

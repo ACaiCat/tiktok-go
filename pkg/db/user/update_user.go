@@ -1,9 +1,12 @@
 package userdao
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
-func (u *UserDao) UpdateUserMFA(userID int64, secrete string) error {
-	_, err := u.q.User.
+func (u *UserDao) UpdateUserMFA(ctx context.Context, userID int64, secrete string) error {
+	_, err := u.q.User.WithContext(ctx).
 		Where(u.q.User.ID.Eq(userID)).
 		Update(u.q.User.TotpSecret, secrete)
 	if err != nil {
@@ -14,8 +17,8 @@ func (u *UserDao) UpdateUserMFA(userID int64, secrete string) error {
 	return nil
 }
 
-func (u *UserDao) UpdateUserAvatarURL(userID int64, avatarURL string) error {
-	_, err := u.q.User.
+func (u *UserDao) UpdateUserAvatarURL(ctx context.Context, userID int64, avatarURL string) error {
+	_, err := u.q.User.WithContext(ctx).
 		Where(u.q.User.ID.Eq(userID)).
 		Update(u.q.User.AvatarURL, avatarURL)
 	if err != nil {

@@ -1,9 +1,12 @@
 package commentdao
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
-func (c *CommentDao) IncrCommentCount(commentID int64) error {
-	_, err := c.q.Comment.
+func (c *CommentDao) IncrCommentCount(ctx context.Context, commentID int64) error {
+	_, err := c.q.Comment.WithContext(ctx).
 		Where(c.q.Comment.ID.Eq(commentID)).
 		UpdateColumn(c.q.Comment.CommentCount, c.q.Comment.CommentCount.Add(1))
 
@@ -15,8 +18,8 @@ func (c *CommentDao) IncrCommentCount(commentID int64) error {
 	return nil
 }
 
-func (c *CommentDao) DecrCommentCount(commentID int64) error {
-	_, err := c.q.Comment.
+func (c *CommentDao) DecrCommentCount(ctx context.Context, commentID int64) error {
+	_, err := c.q.Comment.WithContext(ctx).
 		Where(c.q.Comment.ID.Eq(commentID)).
 		UpdateColumn(c.q.Comment.CommentCount, c.q.Comment.CommentCount.Add(-1))
 

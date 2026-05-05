@@ -1,6 +1,7 @@
 package videodao
 
 import (
+	"context"
 	"errors"
 	"log"
 	"math/rand/v2"
@@ -12,10 +13,10 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func (v *VideoDao) GetVideoByID(videoID int64) (*model.Video, error) {
+func (v *VideoDao) GetVideoByID(ctx context.Context, videoID int64) (*model.Video, error) {
 	var err error
 
-	video, err := v.q.Video.
+	video, err := v.q.Video.WithContext(ctx).
 		Where(v.q.Video.ID.Eq(videoID)).
 		First()
 
@@ -28,10 +29,10 @@ func (v *VideoDao) GetVideoByID(videoID int64) (*model.Video, error) {
 	return video, nil
 }
 
-func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*model.Video, error) {
+func (v *VideoDao) GetFeedByLatestTime(ctx context.Context, latestTime time.Time, limit int) ([]*model.Video, error) {
 	var err error
 
-	statement := v.q.Video.Where()
+	statement := v.q.Video.WithContext(ctx).Where()
 
 	if !latestTime.IsZero() {
 		statement = statement.Where(v.q.Video.CreatedAt.Gt(latestTime))
@@ -58,10 +59,10 @@ func (v *VideoDao) GetFeedByLatestTime(latestTime time.Time, limit int) ([]*mode
 	return videos[:limit], nil
 }
 
-func (v *VideoDao) GetVideosByUserID(userID int64, pageSize int, pageNum int) ([]*model.Video, error) {
+func (v *VideoDao) GetVideosByUserID(ctx context.Context, userID int64, pageSize int, pageNum int) ([]*model.Video, error) {
 	var err error
 
-	videos, err := v.q.Video.
+	videos, err := v.q.Video.WithContext(ctx).
 		Where(v.q.Video.UserID.Eq(userID)).
 		Offset(pageSize * pageNum).
 		Limit(pageSize).
@@ -74,10 +75,10 @@ func (v *VideoDao) GetVideosByUserID(userID int64, pageSize int, pageNum int) ([
 	return videos, nil
 }
 
-func (v *VideoDao) GetPopularVideos(pageSize int, pageNum int) ([]*model.Video, error) {
+func (v *VideoDao) GetPopularVideos(ctx context.Context, pageSize int, pageNum int) ([]*model.Video, error) {
 	var err error
 
-	videos, err := v.q.Video.
+	videos, err := v.q.Video.WithContext(ctx).
 		Order(v.q.Video.VisitCount.Desc()).
 		Offset(pageSize * pageNum).
 		Limit(pageSize).
@@ -90,10 +91,10 @@ func (v *VideoDao) GetPopularVideos(pageSize int, pageNum int) ([]*model.Video, 
 	return videos, nil
 }
 
-func (v *VideoDao) GetVideoCountByUserID(userID int64) (int64, error) {
+func (v *VideoDao) GetVideoCountByUserID(ctx context.Context, userID int64) (int64, error) {
 	var err error
 
-	count, err := v.q.Video.
+	count, err := v.q.Video.WithContext(ctx).
 		Where(v.q.Video.UserID.Eq(userID)).
 		Count()
 
@@ -104,12 +105,12 @@ func (v *VideoDao) GetVideoCountByUserID(userID int64) (int64, error) {
 	return count, nil
 }
 
-func (v *VideoDao) GetUserLikeList(userID int64, pageSize int, pageNum int) ([]*model.Video, error) {
+func (v *VideoDao) GetUserLikeList(ctx context.Context, userID int64, pageSize int, pageNum int) ([]*model.Video, error) {
 	var err error
 
 	var videoIDs []int64
 
-	err = v.q.Like.
+	err = v.q.Like.WithContext(ctx).
 		Select(v.q.Like.VideoID).
 		Where(v.q.Like.UserID.Eq(userID)).
 		Scan(&videoIDs)
@@ -119,7 +120,7 @@ func (v *VideoDao) GetUserLikeList(userID int64, pageSize int, pageNum int) ([]*
 		return nil, err
 	}
 
-	videos, err := v.q.Video.
+	videos, err := v.q.Video.WithContext(ctx).
 		Offset(pageSize * pageNum).
 		Where(v.q.Video.ID.In(videoIDs...)).
 		Limit(pageSize).

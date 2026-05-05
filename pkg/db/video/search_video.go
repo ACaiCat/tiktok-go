@@ -1,6 +1,7 @@
 package videodao
 
 import (
+	"context"
 	"log"
 	"strings"
 	"time"
@@ -9,6 +10,7 @@ import (
 )
 
 func (v *VideoDao) SearchVideo(
+	ctx context.Context,
 	keywords []string,
 	pageSize int, pageNum int,
 	fromDate time.Time, toDate time.Time,
@@ -16,7 +18,7 @@ func (v *VideoDao) SearchVideo(
 ) ([]*model.Video, error) {
 	var err error
 
-	var statement = v.q.Video.Where()
+	var statement = v.q.Video.WithContext(ctx).Where()
 	if !fromDate.IsZero() {
 		statement = statement.Where(v.q.Video.CreatedAt.Gt(fromDate))
 	}

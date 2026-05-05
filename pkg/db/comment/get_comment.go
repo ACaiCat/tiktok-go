@@ -1,6 +1,7 @@
 package commentdao
 
 import (
+	"context"
 	"errors"
 	"log"
 
@@ -9,10 +10,10 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func (c *CommentDao) GetCommentByID(commentID int64) (*model.Comment, error) {
+func (c *CommentDao) GetCommentByID(ctx context.Context, commentID int64) (*model.Comment, error) {
 	var err error
 
-	comment, err := c.q.Comment.
+	comment, err := c.q.Comment.WithContext(ctx).
 		Where(c.q.Comment.ID.Eq(commentID)).
 		First()
 
@@ -28,10 +29,10 @@ func (c *CommentDao) GetCommentByID(commentID int64) (*model.Comment, error) {
 	return comment, nil
 }
 
-func (c *CommentDao) GetCommentsByVideoID(videoID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
+func (c *CommentDao) GetCommentsByVideoID(ctx context.Context, videoID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
 	var err error
 
-	comments, err := c.q.Comment.
+	comments, err := c.q.Comment.WithContext(ctx).
 		Where(c.q.Comment.VideoID.Eq(videoID), c.q.Comment.ParentID.IsNull()).
 		Order(c.q.Comment.CreatedAt.Desc()).
 		Offset(pageSize * pageNum).
@@ -46,10 +47,10 @@ func (c *CommentDao) GetCommentsByVideoID(videoID int64, pageSize int, pageNum i
 	return comments, nil
 }
 
-func (c *CommentDao) GetCommentsByCommentID(commentID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
+func (c *CommentDao) GetCommentsByCommentID(ctx context.Context, commentID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
 	var err error
 
-	comments, err := c.q.Comment.
+	comments, err := c.q.Comment.WithContext(ctx).
 		Where(c.q.Comment.ParentID.Eq(commentID)).
 		Order(c.q.Comment.CreatedAt.Desc()).
 		Offset(pageSize * pageNum).

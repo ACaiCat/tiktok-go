@@ -16,7 +16,7 @@ func (s *VideoService) VisitVideo(req *video.VisitVideoReq) error {
 		return errno.ParamErr.WithError(err)
 	}
 
-	err = s.videoDao.IncrVisitCount(videoID)
+	err = s.videoDao.IncrVisitCount(s.ctx, videoID)
 	if err != nil {
 		return errno.ServiceErr
 	}

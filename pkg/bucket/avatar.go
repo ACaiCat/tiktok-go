@@ -14,8 +14,7 @@ func avatarObject(userID int64) string {
 	return fmt.Sprintf("avatar_%d", userID)
 }
 
-func UploadAvatar(userID int64, data []byte) error {
-	ctx := context.Background()
+func UploadAvatar(ctx context.Context, userID int64, data []byte) error {
 	_, err := Bucket.PutObject(ctx, constants.AvatarBucketName, avatarObject(userID),
 		bytes.NewReader(data), int64(len(data)),
 		minio.PutObjectOptions{ContentType: "image/jpeg"},

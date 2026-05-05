@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/ACaiCat/tiktok-go/pkg/cache"
 	userCache "github.com/ACaiCat/tiktok-go/pkg/cache/user"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
@@ -10,11 +12,13 @@ import (
 type UserService struct {
 	dao   *userDao.UserDao
 	cache *userCache.UserCache
+	ctx   context.Context
 }
 
-func NewUserService() *UserService {
+func NewUserService(ctx context.Context) *UserService {
 	return &UserService{
 		dao:   userDao.NewUserDao(db.DB),
 		cache: userCache.NewUserCache(cache.Cache),
+		ctx:   ctx,
 	}
 }

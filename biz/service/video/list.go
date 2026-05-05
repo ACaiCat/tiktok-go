@@ -38,12 +38,12 @@ func (s *VideoService) GetVideoList(req *video.ListReq) ([]*model.Video, int64, 
 	var total int64
 
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
-		videosDao, err = s.videoDao.WithTx(tx).GetVideosByUserID(userID, int(pageSize), int(pageNum))
+		videosDao, err = s.videoDao.WithTx(tx).GetVideosByUserID(s.ctx, userID, int(pageSize), int(pageNum))
 		if err != nil {
 			return errno.ServiceErr
 		}
 
-		total, err = s.videoDao.WithTx(tx).GetVideoCountByUserID(userID)
+		total, err = s.videoDao.WithTx(tx).GetVideoCountByUserID(s.ctx, userID)
 		if err != nil {
 			return errno.ServiceErr
 		}
@@ -78,7 +78,7 @@ func (s *VideoService) GetLikedVideos(req *interaction.ListLikeReq) ([]*model.Vi
 		return nil, errno.ParamErr.WithError(err)
 	}
 
-	likedVideos, err := s.videoDao.GetUserLikeList(userID, int(pageSize), int(pageNum))
+	likedVideos, err := s.videoDao.GetUserLikeList(s.ctx, userID, int(pageSize), int(pageNum))
 	if err != nil {
 		return nil, errno.ServiceErr
 	}

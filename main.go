@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -20,7 +21,7 @@ func main() {
 	config.Init()
 	db.InitPostgres()
 	cache.InitRedis()
-	bucket.InitMinIO()
+	bucket.InitMinIO(context.Background())
 
 	h := server.Default(
 		server.WithHostPorts(config.AppConfig.Server.Host+":"+strconv.Itoa(config.AppConfig.Server.Port)),

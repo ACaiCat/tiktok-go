@@ -1,12 +1,13 @@
 package followerdao
 
 import (
+	"context"
 	"log"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func (f *FollowerDao) AddFollow(userID int64, followerID int64) error {
+func (f *FollowerDao) AddFollow(ctx context.Context, userID int64, followerID int64) error {
 	var err error
 
 	follower := model.Follower{
@@ -14,7 +15,7 @@ func (f *FollowerDao) AddFollow(userID int64, followerID int64) error {
 		FollowerID: followerID,
 	}
 
-	err = f.q.Follower.Create(&follower)
+	err = f.q.Follower.WithContext(ctx).Create(&follower)
 	if err != nil {
 		log.Println("failed to add follow:", err)
 		return err
@@ -23,10 +24,10 @@ func (f *FollowerDao) AddFollow(userID int64, followerID int64) error {
 	return nil
 }
 
-func (f *FollowerDao) DeleteFollow(userID int64, followerID int64) error {
+func (f *FollowerDao) DeleteFollow(ctx context.Context, userID int64, followerID int64) error {
 	var err error
 
-	_, err = f.q.Follower.
+	_, err = f.q.Follower.WithContext(ctx).
 		Where(f.q.Follower.UserID.Eq(userID), f.q.Follower.FollowerID.Eq(followerID)).
 		Delete()
 

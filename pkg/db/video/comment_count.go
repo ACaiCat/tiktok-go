@@ -1,9 +1,12 @@
 package videodao
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
-func (v *VideoDao) IncrCommentCount(videoID int64) error {
-	_, err := v.q.Video.
+func (v *VideoDao) IncrCommentCount(ctx context.Context, videoID int64) error {
+	_, err := v.q.Video.WithContext(ctx).
 		Where(v.q.Video.ID.Eq(videoID)).
 		UpdateColumn(v.q.Video.CommentCount, v.q.Video.CommentCount.Add(1))
 
@@ -15,8 +18,8 @@ func (v *VideoDao) IncrCommentCount(videoID int64) error {
 	return nil
 }
 
-func (v *VideoDao) DecrCommentCount(videoID int64) error {
-	_, err := v.q.Video.
+func (v *VideoDao) DecrCommentCount(ctx context.Context, videoID int64) error {
+	_, err := v.q.Video.WithContext(ctx).
 		Where(v.q.Video.ID.Eq(videoID)).
 		UpdateColumn(v.q.Video.CommentCount, v.q.Video.CommentCount.Add(-1))
 

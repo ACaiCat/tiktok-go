@@ -1,9 +1,12 @@
 package videodao
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
-func (v *VideoDao) IncrLikeCount(videoID int64) error {
-	_, err := v.q.Video.
+func (v *VideoDao) IncrLikeCount(ctx context.Context, videoID int64) error {
+	_, err := v.q.Video.WithContext(ctx).
 		Where(v.q.Video.ID.Eq(videoID)).
 		UpdateColumn(v.q.Video.LikeCount, v.q.Video.LikeCount.Add(1))
 
@@ -15,8 +18,8 @@ func (v *VideoDao) IncrLikeCount(videoID int64) error {
 	return nil
 }
 
-func (v *VideoDao) DecrLikeCount(videoID int64) error {
-	_, err := v.q.Video.
+func (v *VideoDao) DecrLikeCount(ctx context.Context, videoID int64) error {
+	_, err := v.q.Video.WithContext(ctx).
 		Where(v.q.Video.ID.Eq(videoID)).
 		UpdateColumn(v.q.Video.LikeCount, v.q.Video.LikeCount.Add(-1))
 

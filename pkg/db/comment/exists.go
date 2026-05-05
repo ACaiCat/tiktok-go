@@ -1,11 +1,15 @@
 package commentdao
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
-func (c *CommentDao) IsCommentExists(commentID int64) (bool, error) {
+func (c *CommentDao) IsCommentExists(ctx context.Context, commentID int64) (bool, error) {
 	var err error
 
-	count, err := c.q.Comment.Select(c.q.Comment.ID).
+	count, err := c.q.Comment.WithContext(ctx).
+		Select(c.q.Comment.ID).
 		Where(c.q.Comment.ID.Eq(commentID)).
 		Count()
 

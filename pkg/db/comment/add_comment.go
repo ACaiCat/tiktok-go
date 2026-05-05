@@ -1,12 +1,13 @@
 package commentdao
 
 import (
+	"context"
 	"log"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func (c *CommentDao) AddVideoComment(userID int64, videoID int64, content string) error {
+func (c *CommentDao) AddVideoComment(ctx context.Context, userID int64, videoID int64, content string) error {
 	var err error
 
 	comment := model.Comment{
@@ -15,7 +16,7 @@ func (c *CommentDao) AddVideoComment(userID int64, videoID int64, content string
 		Content: content,
 	}
 
-	err = c.q.Comment.Create(&comment)
+	err = c.q.Comment.WithContext(ctx).Create(&comment)
 	if err != nil {
 		log.Printf("failed to add video comment: %v", err)
 		return err
@@ -24,7 +25,7 @@ func (c *CommentDao) AddVideoComment(userID int64, videoID int64, content string
 	return nil
 }
 
-func (c *CommentDao) AddCommentReply(userID int64, videoID int64, commentID int64, content string) error {
+func (c *CommentDao) AddCommentReply(ctx context.Context, userID int64, videoID int64, commentID int64, content string) error {
 	var err error
 
 	comment := model.Comment{
@@ -34,7 +35,7 @@ func (c *CommentDao) AddCommentReply(userID int64, videoID int64, commentID int6
 		VideoID:  videoID,
 	}
 
-	err = c.q.Comment.Create(&comment)
+	err = c.q.Comment.WithContext(ctx).Create(&comment)
 	if err != nil {
 		log.Printf("failed to add comment reply: %v", err)
 		return err

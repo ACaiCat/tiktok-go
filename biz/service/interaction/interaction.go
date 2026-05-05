@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/ACaiCat/tiktok-go/pkg/cache"
 	userCache "github.com/ACaiCat/tiktok-go/pkg/cache/user"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
@@ -14,13 +16,15 @@ type InteractionService struct {
 	videoDao   *videoDao.VideoDao
 	likeDao    *likeDao.LikeDao
 	userCache  *userCache.UserCache
+	ctx        context.Context
 }
 
-func NewInteractionService() *InteractionService {
+func NewInteractionService(ctx context.Context) *InteractionService {
 	return &InteractionService{
 		commentDao: commentDao.NewCommentDao(db.DB),
 		likeDao:    likeDao.NewLikeDao(db.DB),
 		videoDao:   videoDao.NewVideoDao(db.DB),
 		userCache:  userCache.NewUserCache(cache.Cache),
+		ctx:        ctx,
 	}
 }

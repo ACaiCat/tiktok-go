@@ -17,7 +17,7 @@ import (
 func (s *UserService) UserLogin(req *user.LoginReq) (*model.User, string, string, error) {
 	var err error
 
-	usr, err := s.dao.GetByUsername(req.Username)
+	usr, err := s.dao.GetByUsername(s.ctx, req.Username)
 	if err != nil {
 		return nil, "", "", errno.ServiceErr
 	}

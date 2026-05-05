@@ -27,7 +27,7 @@ func Like(ctx context.Context, c *app.RequestContext) {
 
 	userID := mw.GetUserID(c)
 
-	err = service.NewInteractionService().LikeVideo(&req, userID)
+	err = service.NewInteractionService(ctx).LikeVideo(&req, userID)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -48,7 +48,7 @@ func ListLike(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	videos, err := videoService.NewVideoService().GetLikedVideos(&req)
+	videos, err := videoService.NewVideoService(ctx).GetLikedVideos(&req)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -72,7 +72,7 @@ func Comment(ctx context.Context, c *app.RequestContext) {
 
 	userID := mw.GetUserID(c)
 
-	err = service.NewInteractionService().CommentAction(&req, userID)
+	err = service.NewInteractionService(ctx).CommentAction(&req, userID)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -91,7 +91,7 @@ func ListComment(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	comments, err := service.NewInteractionService().ListComment(&req)
+	comments, err := service.NewInteractionService(ctx).ListComment(&req)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -114,7 +114,7 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 
 	userID := mw.GetUserID(c)
 
-	err = service.NewInteractionService().DeleteComment(&req, userID)
+	err = service.NewInteractionService(ctx).DeleteComment(&req, userID)
 
 	if err != nil {
 		pack.RespError(c, err)

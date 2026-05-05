@@ -27,7 +27,7 @@ func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID i
 			return errno.ParamErr.WithError(err)
 		}
 
-		exist, err := s.videoDao.IsVideoExists(videoID)
+		exist, err := s.videoDao.IsVideoExists(s.ctx, videoID)
 		if err != nil {
 			return errno.ServiceErr
 		}
@@ -37,10 +37,10 @@ func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID i
 		}
 
 		err = db.DB.Transaction(func(tx *gorm.DB) error {
-			if err = s.commentDao.WithTx(tx).AddVideoComment(userID, videoID, req.Content); err != nil {
+			if err = s.commentDao.WithTx(tx).AddVideoComment(s.ctx, userID, videoID, req.Content); err != nil {
 				return err
 			}
-			if err = s.videoDao.WithTx(tx).IncrCommentCount(videoID); err != nil {
+			if err = s.videoDao.WithTx(tx).IncrCommentCount(s.ctx, videoID); err != nil {
 				return err
 			}
 			return nil
@@ -58,7 +58,7 @@ func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID i
 		return errno.ParamErr.WithError(err)
 	}
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
-		comment, err := s.commentDao.WithTx(tx).GetCommentByID(commentID)
+		comment, err := s.commentDao.WithTx(tx).GetCommentByID(s.ctx, commentID)
 		if err != nil {
 			return errno.ServiceErr
 		}
@@ -67,10 +67,10 @@ func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID i
 			return errno.CommentNotExistErr
 		}
 
-		if err = s.commentDao.WithTx(tx).AddCommentReply(userID, comment.VideoID, commentID, req.Content); err != nil {
+		if err = s.commentDao.WithTx(tx).AddCommentReply(s.ctx, userID, comment.VideoID, commentID, req.Content); err != nil {
 			return errno.ServiceErr
 		}
-		if err = s.commentDao.WithTx(tx).IncrCommentCount(commentID); err != nil {
+		if err = s.commentDao.WithTx(tx).IncrCommentCount(s.ctx, commentID); err != nil {
 			return errno.ServiceErr
 		}
 		return nil
@@ -93,7 +93,7 @@ func (s *InteractionService) DeleteComment(req *interaction.DeleteCommentReq, us
 	}
 
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
-		comment, err := s.commentDao.WithTx(tx).GetCommentByID(commentID)
+		comment, err := s.commentDao.WithTx(tx).GetCommentByID(s.ctx, commentID)
 
 		if err != nil {
 			return errno.ServiceErr
@@ -108,16 +108,16 @@ func (s *InteractionService) DeleteComment(req *interaction.DeleteCommentReq, us
 		}
 
 		if comment.ParentID != nil {
-			if err := s.commentDao.WithTx(tx).DecrCommentCount(*comment.ParentID); err != nil {
+			if err := s.commentDao.WithTx(tx).DecrCommentCount(s.ctx, *comment.ParentID); err != nil {
 				return errno.ServiceErr
 			}
 		} else {
-			if err := s.videoDao.WithTx(tx).DecrCommentCount(comment.VideoID); err != nil {
+			if err := s.videoDao.WithTx(tx).DecrCommentCount(s.ctx, comment.VideoID); err != nil {
 				return errno.ServiceErr
 			}
 		}
 
-		err = s.commentDao.WithTx(tx).DeleteComment(commentID)
+		err = s.commentDao.WithTx(tx).DeleteComment(s.ctx, commentID)
 		if err != nil {
 			return errno.ServiceErr
 		}
@@ -163,7 +163,7 @@ func (s *InteractionService) ListComment(req *interaction.ListCommentReq) ([]*mo
 			return nil, errno.ParamErr.WithError(err)
 		}
 
-		exist, err := s.videoDao.IsVideoExists(videoID)
+		exist, err := s.videoDao.IsVideoExists(s.ctx, videoID)
 		if err != nil {
 			return nil, errno.ServiceErr
 		}
@@ -172,7 +172,7 @@ func (s *InteractionService) ListComment(req *interaction.ListCommentReq) ([]*mo
 			return nil, errno.VideoNotExistErr
 		}
 
-		comments, err := s.commentDao.GetCommentsByVideoID(videoID, int(pageSize), int(pageNum))
+		comments, err := s.commentDao.GetCommentsByVideoID(s.ctx, videoID, int(pageSize), int(pageNum))
 		if err != nil {
 			return nil, errno.ServiceErr
 		}
@@ -186,7 +186,7 @@ func (s *InteractionService) ListComment(req *interaction.ListCommentReq) ([]*mo
 		return nil, errno.ParamErr.WithError(err)
 	}
 
-	exist, err := s.commentDao.IsCommentExists(commentID)
+	exist, err := s.commentDao.IsCommentExists(s.ctx, commentID)
 	if err != nil {
 		return nil, errno.ServiceErr
 	}
@@ -195,7 +195,7 @@ func (s *InteractionService) ListComment(req *interaction.ListCommentReq) ([]*mo
 		return nil, errno.CommentNotExistErr
 	}
 
-	comments, err := s.commentDao.GetCommentsByCommentID(commentID, int(pageSize), int(pageNum))
+	comments, err := s.commentDao.GetCommentsByCommentID(s.ctx, commentID, int(pageSize), int(pageNum))
 	if err != nil {
 		return nil, errno.ServiceErr
 	}

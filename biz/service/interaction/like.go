@@ -38,7 +38,7 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 		return errno.NotSupportActionErr
 	}
 
-	videoExists, err := s.videoDao.IsVideoExists(videoID)
+	videoExists, err := s.videoDao.IsVideoExists(s.ctx, videoID)
 	if err != nil {
 		return errno.ServiceErr
 	}
@@ -47,16 +47,16 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 	}
 
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
-		isLiked, err := s.userCache.IsVideoLiked(userID, videoID)
+		isLiked, err := s.userCache.IsVideoLiked(s.ctx, userID, videoID)
 		if err != nil {
-			likedVideos, err := s.likeDao.WithTx(tx).GetUserLikes(userID)
+			likedVideos, err := s.likeDao.WithTx(tx).GetUserLikes(s.ctx, userID)
 			if err != nil {
 				return errno.ServiceErr
 			}
 			isLiked = slices.Contains(likedVideos, videoID)
 
 			go func() {
-				if err := s.userCache.SetLikeVideos(userID, likedVideos); err != nil {
+				if err := s.userCache.SetLikeVideos(s.ctx, userID, likedVideos); err != nil {
 					log.Println("failed to cache liked videos for userID", userID, ":", err)
 				}
 			}()
@@ -68,14 +68,14 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 				return errno.LikeAlreadyExistErr
 			}
 
-			if err := s.likeDao.WithTx(tx).AddVideoLike(userID, videoID); err != nil {
+			if err := s.likeDao.WithTx(tx).AddVideoLike(s.ctx, userID, videoID); err != nil {
 				return errno.ServiceErr
 			}
-			if err := s.videoDao.WithTx(tx).IncrLikeCount(videoID); err != nil {
+			if err := s.videoDao.WithTx(tx).IncrLikeCount(s.ctx, videoID); err != nil {
 				return errno.ServiceErr
 			}
 
-			if err := s.userCache.SetLikeVideo(userID, videoID); err != nil {
+			if err := s.userCache.SetLikeVideo(s.ctx, userID, videoID); err != nil {
 				log.Println("failed to cache like video for userID", userID, "and videoID", videoID, ":", err)
 			}
 		} else {
@@ -83,10 +83,10 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 				return errno.LikeNotExistErr
 			}
 
-			if err := s.likeDao.WithTx(tx).DeleteVideoLike(userID, videoID); err != nil {
+			if err := s.likeDao.WithTx(tx).DeleteVideoLike(s.ctx, userID, videoID); err != nil {
 				return errno.ServiceErr
 			}
-			if err := s.videoDao.WithTx(tx).DecrLikeCount(videoID); err != nil {
+			if err := s.videoDao.WithTx(tx).DecrLikeCount(s.ctx, videoID); err != nil {
 				return errno.ServiceErr
 			}
 
@@ -94,7 +94,7 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 				return errno.ServiceErr
 			}
 
-			if err := s.userCache.SetUnlikeVideo(userID, videoID); err != nil {
+			if err := s.userCache.SetUnlikeVideo(s.ctx, userID, videoID); err != nil {
 				log.Println("failed to cache unlike video for userID", userID, "and videoID", videoID, ":", err)
 			}
 		}
@@ -120,7 +120,7 @@ func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, 
 	}
 
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
-		commentExists, err := s.commentDao.WithTx(tx).IsCommentExists(commentID)
+		commentExists, err := s.commentDao.WithTx(tx).IsCommentExists(s.ctx, commentID)
 		if err != nil {
 			return errno.ServiceErr
 		}
@@ -128,7 +128,7 @@ func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, 
 			return errno.CommentNotExistErr
 		}
 
-		isLiked, err := s.likeDao.IsCommentLikeExists(userID, commentID)
+		isLiked, err := s.likeDao.IsCommentLikeExists(s.ctx, userID, commentID)
 		if err != nil {
 			return errno.ServiceErr
 		}
@@ -138,10 +138,10 @@ func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, 
 				return errno.LikeAlreadyExistErr
 			}
 			err := db.DB.Transaction(func(tx *gorm.DB) error {
-				if err := s.likeDao.WithTx(tx).AddCommentLike(userID, commentID); err != nil {
+				if err := s.likeDao.WithTx(tx).AddCommentLike(s.ctx, userID, commentID); err != nil {
 					return errno.ServiceErr
 				}
-				if err := s.commentDao.WithTx(tx).IncrLikeCount(commentID); err != nil {
+				if err := s.commentDao.WithTx(tx).IncrLikeCount(s.ctx, commentID); err != nil {
 					return errno.ServiceErr
 				}
 				return nil
@@ -155,10 +155,10 @@ func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, 
 				return errno.LikeNotExistErr
 			}
 
-			if err := s.likeDao.WithTx(tx).DeleteCommentLike(userID, commentID); err != nil {
+			if err := s.likeDao.WithTx(tx).DeleteCommentLike(s.ctx, userID, commentID); err != nil {
 				return errno.ServiceErr
 			}
-			if err := s.commentDao.WithTx(tx).DecrLikeCount(commentID); err != nil {
+			if err := s.commentDao.WithTx(tx).DecrLikeCount(s.ctx, commentID); err != nil {
 				return errno.ServiceErr
 			}
 		}

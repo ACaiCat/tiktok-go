@@ -1,8 +1,11 @@
 package likedao
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
-func (l *LikeDao) GetLikeCounts(videoIDs []int64) (map[int64]int64, error) {
+func (l *LikeDao) GetLikeCounts(ctx context.Context, videoIDs []int64) (map[int64]int64, error) {
 	var err error
 
 	type Result struct {
@@ -12,7 +15,7 @@ func (l *LikeDao) GetLikeCounts(videoIDs []int64) (map[int64]int64, error) {
 
 	var results []Result
 
-	err = l.q.Like.
+	err = l.q.Like.WithContext(ctx).
 		Select(l.q.Like.VideoID, l.q.Like.ID.Count().As("count")).
 		Where(l.q.Like.VideoID.In(videoIDs...)).
 		Group(l.q.Like.VideoID).
@@ -31,12 +34,12 @@ func (l *LikeDao) GetLikeCounts(videoIDs []int64) (map[int64]int64, error) {
 	return likeMap, nil
 }
 
-func (l *LikeDao) GetUserLikes(userID int64) ([]int64, error) {
+func (l *LikeDao) GetUserLikes(ctx context.Context, userID int64) ([]int64, error) {
 	var err error
 
 	var videoIDs []int64
 
-	err = l.q.Like.
+	err = l.q.Like.WithContext(ctx).
 		Select(l.q.Like.VideoID).
 		Where(l.q.Like.UserID.Eq(userID)).
 		Scan(&videoIDs)

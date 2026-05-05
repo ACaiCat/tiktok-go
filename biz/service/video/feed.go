@@ -24,7 +24,7 @@ func (s *VideoService) GetFeed(req *video.FeedReq) ([]*model.Video, error) {
 		latestTime = time.UnixMilli(unixMilliStamp)
 	}
 
-	videosDao, err := s.videoDao.GetFeedByLatestTime(latestTime, constants.FeedCount)
+	videosDao, err := s.videoDao.GetFeedByLatestTime(s.ctx, latestTime, constants.FeedCount)
 	if err != nil {
 		return nil, errno.ServiceErr
 	}

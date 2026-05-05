@@ -27,7 +27,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	err = service.NewUserService().UserRegister(&req)
+	err = service.NewUserService(ctx).UserRegister(&req)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -46,7 +46,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	usr, accessToken, refreshToken, err := service.NewUserService().UserLogin(&req)
+	usr, accessToken, refreshToken, err := service.NewUserService(ctx).UserLogin(&req)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -69,7 +69,7 @@ func Refresh(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	accessToken, refreshToken, err := service.NewUserService().RefreshToken(&req)
+	accessToken, refreshToken, err := service.NewUserService(ctx).RefreshToken(&req)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -102,7 +102,7 @@ func Info(ctx context.Context, c *app.RequestContext) {
 		}
 	}
 
-	usr, err := service.NewUserService().GetUserInfo(userID)
+	usr, err := service.NewUserService(ctx).GetUserInfo(userID)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -131,7 +131,7 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 	}
 
 	userID := mw.GetUserID(c)
-	userService := service.NewUserService()
+	userService := service.NewUserService(ctx)
 
 	err = userService.UploadAvatar(fileHeader, userID)
 	if err != nil {
@@ -161,7 +161,7 @@ func MFAQRCode(ctx context.Context, c *app.RequestContext) {
 	}
 	userID := mw.GetUserID(c)
 
-	secret, base64Qrcode, err := service.NewUserService().GetMFA(userID)
+	secret, base64Qrcode, err := service.NewUserService(ctx).GetMFA(userID)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -183,7 +183,7 @@ func BindMFA(ctx context.Context, c *app.RequestContext) {
 
 	userID := mw.GetUserID(c)
 
-	err = service.NewUserService().BindMFA(&req, userID)
+	err = service.NewUserService(ctx).BindMFA(&req, userID)
 	if err != nil {
 		pack.RespError(c, err)
 		return

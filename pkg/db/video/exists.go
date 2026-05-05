@@ -1,11 +1,14 @@
 package videodao
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
-func (v *VideoDao) IsVideoExists(videoID int64) (bool, error) {
+func (v *VideoDao) IsVideoExists(ctx context.Context, videoID int64) (bool, error) {
 	var err error
 
-	count, err := v.q.Video.
+	count, err := v.q.Video.WithContext(ctx).
 		Select(v.q.Video.ID).
 		Where(v.q.Video.ID.Eq(videoID)).
 		Limit(1).

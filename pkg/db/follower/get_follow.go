@@ -1,20 +1,21 @@
 package followerdao
 
 import (
+	"context"
 	"log"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/db/query"
 )
 
-func (f *FollowerDao) GetFollower(userID int64, pageSize int, pageNum int) ([]*model.User, int, error) {
+func (f *FollowerDao) GetFollower(ctx context.Context, userID int64, pageSize int, pageNum int) ([]*model.User, int, error) {
 	var err error
 
 	var userIDs []int64
 	var users []*model.User
 
 	err = f.q.Transaction(func(tx *query.Query) error {
-		err = tx.Follower.
+		err = tx.Follower.WithContext(ctx).
 			Select(f.q.Follower.FollowerID).
 			Where(f.q.Follower.UserID.Eq(userID)).
 			Scan(&userIDs)
@@ -24,7 +25,7 @@ func (f *FollowerDao) GetFollower(userID int64, pageSize int, pageNum int) ([]*m
 			return err
 		}
 
-		users, err = tx.User.
+		users, err = tx.User.WithContext(ctx).
 			Where(f.q.User.ID.In(userIDs...)).
 			Offset(pageSize * pageNum).
 			Limit(pageSize).
@@ -44,14 +45,14 @@ func (f *FollowerDao) GetFollower(userID int64, pageSize int, pageNum int) ([]*m
 	return users, len(userIDs), nil
 }
 
-func (f *FollowerDao) GetFollowing(userID int64, pageSize int, pageNum int) ([]*model.User, int, error) {
+func (f *FollowerDao) GetFollowing(ctx context.Context, userID int64, pageSize int, pageNum int) ([]*model.User, int, error) {
 	var err error
 
 	var userIDs []int64
 	var users []*model.User
 
 	err = f.q.Transaction(func(tx *query.Query) error {
-		err = tx.Follower.
+		err = tx.Follower.WithContext(ctx).
 			Select(f.q.Follower.UserID).
 			Where(f.q.Follower.FollowerID.Eq(userID)).
 			Scan(&userIDs)
@@ -61,7 +62,7 @@ func (f *FollowerDao) GetFollowing(userID int64, pageSize int, pageNum int) ([]*
 			return err
 		}
 
-		users, err = tx.User.
+		users, err = tx.User.WithContext(ctx).
 			Where(f.q.User.ID.In(userIDs...)).
 			Offset(pageSize * pageNum).
 			Limit(pageSize).
@@ -82,7 +83,7 @@ func (f *FollowerDao) GetFollowing(userID int64, pageSize int, pageNum int) ([]*
 	return users, len(userIDs), nil
 }
 
-func (f *FollowerDao) GetFriends(userID int64, pageSize int, pageNum int) ([]*model.User, int, error) {
+func (f *FollowerDao) GetFriends(ctx context.Context, userID int64, pageSize int, pageNum int) ([]*model.User, int, error) {
 	var err error
 
 	var followerIDs []int64
@@ -90,7 +91,7 @@ func (f *FollowerDao) GetFriends(userID int64, pageSize int, pageNum int) ([]*mo
 	var users []*model.User
 
 	err = f.q.Transaction(func(tx *query.Query) error {
-		err = tx.Follower.
+		err = tx.Follower.WithContext(ctx).
 			Select(f.q.Follower.UserID).
 			Where(f.q.Follower.FollowerID.Eq(userID)).
 			Scan(&followerIDs)
@@ -100,7 +101,7 @@ func (f *FollowerDao) GetFriends(userID int64, pageSize int, pageNum int) ([]*mo
 			return err
 		}
 
-		err = tx.Follower.
+		err = tx.Follower.WithContext(ctx).
 			Select(f.q.Follower.FollowerID).
 			Where(f.q.Follower.UserID.Eq(userID), f.q.Follower.FollowerID.In(followerIDs...)).
 			Scan(&friendIDs)
@@ -110,7 +111,7 @@ func (f *FollowerDao) GetFriends(userID int64, pageSize int, pageNum int) ([]*mo
 			return err
 		}
 
-		users, err = tx.User.
+		users, err = tx.User.WithContext(ctx).
 			Where(f.q.User.ID.In(friendIDs...)).
 			Offset(pageSize * pageNum).
 			Limit(pageSize).

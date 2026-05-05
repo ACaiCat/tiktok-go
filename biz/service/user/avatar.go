@@ -32,7 +32,7 @@ func (s *UserService) UploadAvatar(fileHeader *multipart.FileHeader, userID int6
 		}
 	}
 
-	err = bucket.UploadAvatar(userID, data)
+	err = bucket.UploadAvatar(s.ctx, userID, data)
 	if err != nil {
 		log.Printf("failed to upload avatar: %v\n", err)
 		return errno.ServiceErr
@@ -40,7 +40,7 @@ func (s *UserService) UploadAvatar(fileHeader *multipart.FileHeader, userID int6
 
 	avatarURL := bucket.GetAvatarURL(userID)
 
-	err = s.dao.UpdateUserAvatarURL(userID, avatarURL)
+	err = s.dao.UpdateUserAvatarURL(s.ctx, userID, avatarURL)
 	if err != nil {
 		return errno.ServiceErr
 	}

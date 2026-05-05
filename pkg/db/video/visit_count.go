@@ -1,9 +1,12 @@
 package videodao
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
-func (v *VideoDao) IncrVisitCount(videoID int64) error {
-	_, err := v.q.Video.
+func (v *VideoDao) IncrVisitCount(ctx context.Context, videoID int64) error {
+	_, err := v.q.Video.WithContext(ctx).
 		Where(v.q.Video.ID.Eq(videoID)).
 		UpdateColumn(v.q.Video.VisitCount, v.q.Video.VisitCount.Add(1))
 

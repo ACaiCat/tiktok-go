@@ -12,18 +12,18 @@ func GetPopularVideoKey() string {
 	return "popular_videos"
 }
 
-func (p *VideoCache) SetPopularVideos(videos []*model.Video) error {
+func (p *VideoCache) SetPopularVideos(ctx context.Context, videos []*model.Video) error {
 	data, err := json.Marshal(videos)
 	if err != nil {
 		return err
 	}
 
-	return p.c.Set(context.Background(), GetPopularVideoKey(), data, constants.PopularVideoCacheExpiration).Err()
+	return p.c.Set(ctx, GetPopularVideoKey(), data, constants.PopularVideoCacheExpiration).Err()
 }
 
-func (p *VideoCache) GetPopularVideos() ([]*model.Video, error) {
+func (p *VideoCache) GetPopularVideos(ctx context.Context) ([]*model.Video, error) {
 	var videos []*model.Video
-	data, err := p.c.Get(context.Background(), GetPopularVideoKey()).Bytes()
+	data, err := p.c.Get(ctx, GetPopularVideoKey()).Bytes()
 	if err != nil {
 		return nil, err
 	}
