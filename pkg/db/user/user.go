@@ -13,3 +13,7 @@ type UserDao struct {
 func NewUserDao(db *gorm.DB) *UserDao {
 	return &UserDao{q: query.Use(db)}
 }
+
+func (u *UserDao) WithTx(tx *gorm.DB) *UserDao {
+	return &UserDao{q: query.Use(tx)}
+}

@@ -33,8 +33,6 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.Password = field.NewString(tableName, "password")
 	_user.AvatarURL = field.NewString(tableName, "avatar_url")
 	_user.TotpSecret = field.NewString(tableName, "totp_secret")
-	_user.FollowingCount = field.NewInt64(tableName, "following_count")
-	_user.FollowerCount = field.NewInt64(tableName, "follower_count")
 	_user.CreatedAt = field.NewTime(tableName, "created_at")
 	_user.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_user.DeletedAt = field.NewField(tableName, "deleted_at")
@@ -47,17 +45,15 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 type user struct {
 	userDo
 
-	ALL            field.Asterisk
-	ID             field.Int64  // 用户ID
-	Username       field.String // 用户名
-	Password       field.String // 密码
-	AvatarURL      field.String // 头像URL
-	TotpSecret     field.String // TOTP密钥
-	FollowingCount field.Int64  // 关注数
-	FollowerCount  field.Int64  // 粉丝数
-	CreatedAt      field.Time   // 创建时间
-	UpdatedAt      field.Time   // 更新时间
-	DeletedAt      field.Field  // 删除时间
+	ALL        field.Asterisk
+	ID         field.Int64  // 用户ID
+	Username   field.String // 用户名
+	Password   field.String // 密码
+	AvatarURL  field.String // 头像URL
+	TotpSecret field.String // TOTP密钥
+	CreatedAt  field.Time   // 创建时间
+	UpdatedAt  field.Time   // 更新时间
+	DeletedAt  field.Field  // 删除时间
 
 	fieldMap map[string]field.Expr
 }
@@ -79,8 +75,6 @@ func (u *user) updateTableName(table string) *user {
 	u.Password = field.NewString(table, "password")
 	u.AvatarURL = field.NewString(table, "avatar_url")
 	u.TotpSecret = field.NewString(table, "totp_secret")
-	u.FollowingCount = field.NewInt64(table, "following_count")
-	u.FollowerCount = field.NewInt64(table, "follower_count")
 	u.CreatedAt = field.NewTime(table, "created_at")
 	u.UpdatedAt = field.NewTime(table, "updated_at")
 	u.DeletedAt = field.NewField(table, "deleted_at")
@@ -100,14 +94,12 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 10)
+	u.fieldMap = make(map[string]field.Expr, 8)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["username"] = u.Username
 	u.fieldMap["password"] = u.Password
 	u.fieldMap["avatar_url"] = u.AvatarURL
 	u.fieldMap["totp_secret"] = u.TotpSecret
-	u.fieldMap["following_count"] = u.FollowingCount
-	u.fieldMap["follower_count"] = u.FollowerCount
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
 	u.fieldMap["deleted_at"] = u.DeletedAt

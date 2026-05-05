@@ -1,12 +1,12 @@
 package service
 
 import (
-	"errors"
 	"log"
 	"slices"
 	"strconv"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/ACaiCat/tiktok-go/pkg/db"
+	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
@@ -34,6 +34,10 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 		return errno.ParamErr.WithError(err)
 	}
 
+	if actionType != interaction.LikeActionType_ADD && actionType != interaction.LikeActionType_DELETE {
+		return errno.NotSupportActionErr
+	}
+
 	videoExists, err := s.videoDao.IsVideoExists(videoID)
 	if err != nil {
 		return errno.ServiceErr
@@ -42,47 +46,67 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 		return errno.VideoNotExistErr
 	}
 
-	isLiked, err := s.userCache.IsVideoLiked(userID, videoID)
-	if err != nil {
-		likedVideos, err := s.likeDao.GetUserLikes(userID)
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		isLiked, err := s.userCache.IsVideoLiked(userID, videoID)
 		if err != nil {
-			return errno.ServiceErr
+			likedVideos, err := s.likeDao.WithTx(tx).GetUserLikes(userID)
+			if err != nil {
+				return errno.ServiceErr
+			}
+			isLiked = slices.Contains(likedVideos, videoID)
+
+			go func() {
+				if err := s.userCache.SetLikeVideos(userID, likedVideos); err != nil {
+					log.Println("failed to cache liked videos for userID", userID, ":", err)
+				}
+			}()
+
 		}
-		isLiked = slices.Contains(likedVideos, videoID)
-		if cacheErr := s.userCache.SetLikeVideos(userID, likedVideos); cacheErr != nil {
-			log.Println("failed to cache liked videos for userID", userID, ":", cacheErr)
+
+		if actionType == interaction.LikeActionType_ADD {
+			if isLiked {
+				return errno.LikeAlreadyExistErr
+			}
+
+			if err := s.likeDao.WithTx(tx).AddVideoLike(userID, videoID); err != nil {
+				return errno.ServiceErr
+			}
+			if err := s.videoDao.WithTx(tx).IncrLikeCount(videoID); err != nil {
+				return errno.ServiceErr
+			}
+
+			if err := s.userCache.SetLikeVideo(userID, videoID); err != nil {
+				log.Println("failed to cache like video for userID", userID, "and videoID", videoID, ":", err)
+			}
+		} else {
+			if !isLiked {
+				return errno.LikeNotExistErr
+			}
+
+			if err := s.likeDao.WithTx(tx).DeleteVideoLike(userID, videoID); err != nil {
+				return errno.ServiceErr
+			}
+			if err := s.videoDao.WithTx(tx).DecrLikeCount(videoID); err != nil {
+				return errno.ServiceErr
+			}
+
+			if err != nil {
+				return errno.ServiceErr
+			}
+
+			if err := s.userCache.SetUnlikeVideo(userID, videoID); err != nil {
+				log.Println("failed to cache unlike video for userID", userID, "and videoID", videoID, ":", err)
+			}
 		}
-		if !errors.Is(err, redis.Nil) {
-			log.Println("failed to check if video is liked for userID", userID, "and videoID", videoID, ":", err)
-		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
 	}
 
-	switch actionType {
-	case interaction.LikeActionType_ADD:
-		if isLiked {
-			return errno.LikeAlreadyExistErr
-		}
-		if err := s.likeDao.AddVideoLike(userID, videoID); err != nil {
-			return errno.ServiceErr
-		}
-		if err := s.userCache.SetLikeVideo(userID, videoID); err != nil {
-			log.Println("failed to cache like video for userID", userID, "and videoID", videoID, ":", err)
-		}
-		return nil
-	case interaction.LikeActionType_DELETE:
-		if !isLiked {
-			return errno.LikeNotExistErr
-		}
-		if err := s.likeDao.DeleteVideoLike(userID, videoID); err != nil {
-			return errno.ServiceErr
-		}
-		if err := s.userCache.SetUnlikeVideo(userID, videoID); err != nil {
-			log.Println("failed to cache unlike video for userID", userID, "and videoID", videoID, ":", err)
-		}
-		return nil
-	}
-
-	return errno.NotSupportActionErr
+	return nil
 }
 
 func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, actionType interaction.LikeActionType) error {
@@ -91,37 +115,59 @@ func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, 
 		return errno.ParamErr.WithError(err)
 	}
 
-	commentExists, err := s.commentDao.IsCommentExists(commentID)
-	if err != nil {
-		return errno.ServiceErr
-	}
-	if !commentExists {
-		return errno.CommentNotExistErr
+	if actionType != interaction.LikeActionType_ADD && actionType != interaction.LikeActionType_DELETE {
+		return errno.NotSupportActionErr
 	}
 
-	isLiked, err := s.likeDao.IsCommentLikeExists(userID, commentID)
-	if err != nil {
-		return errno.ServiceErr
-	}
-
-	switch actionType {
-	case interaction.LikeActionType_ADD:
-		if isLiked {
-			return errno.LikeAlreadyExistErr
-		}
-		if err := s.likeDao.AddCommentLike(userID, commentID); err != nil {
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		commentExists, err := s.commentDao.WithTx(tx).IsCommentExists(commentID)
+		if err != nil {
 			return errno.ServiceErr
 		}
-		return nil
-	case interaction.LikeActionType_DELETE:
-		if !isLiked {
-			return errno.LikeNotExistErr
+		if !commentExists {
+			return errno.CommentNotExistErr
 		}
-		if err := s.likeDao.DeleteCommentLike(userID, commentID); err != nil {
+
+		isLiked, err := s.likeDao.IsCommentLikeExists(userID, commentID)
+		if err != nil {
 			return errno.ServiceErr
 		}
+
+		if actionType == interaction.LikeActionType_ADD {
+			if isLiked {
+				return errno.LikeAlreadyExistErr
+			}
+			err := db.DB.Transaction(func(tx *gorm.DB) error {
+				if err := s.likeDao.WithTx(tx).AddCommentLike(userID, commentID); err != nil {
+					return errno.ServiceErr
+				}
+				if err := s.commentDao.WithTx(tx).IncrLikeCount(commentID); err != nil {
+					return errno.ServiceErr
+				}
+				return nil
+			})
+
+			if err != nil {
+				return errno.ServiceErr
+			}
+		} else {
+			if !isLiked {
+				return errno.LikeNotExistErr
+			}
+
+			if err := s.likeDao.WithTx(tx).DeleteCommentLike(userID, commentID); err != nil {
+				return errno.ServiceErr
+			}
+			if err := s.commentDao.WithTx(tx).DecrLikeCount(commentID); err != nil {
+				return errno.ServiceErr
+			}
+		}
 		return nil
+	})
+
+	if err != nil {
+		return err
 	}
 
-	return errno.NotSupportActionErr
+	return nil
 }

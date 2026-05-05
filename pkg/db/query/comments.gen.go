@@ -32,7 +32,6 @@ func newComment(db *gorm.DB, opts ...gen.DOOption) comment {
 	_comment.UserID = field.NewInt64(tableName, "user_id")
 	_comment.VideoID = field.NewInt64(tableName, "video_id")
 	_comment.ParentID = field.NewInt64(tableName, "parent_id")
-	_comment.RootID = field.NewInt64(tableName, "root_id")
 	_comment.Content = field.NewString(tableName, "content")
 	_comment.LikeCount = field.NewInt64(tableName, "like_count")
 	_comment.CommentCount = field.NewInt64(tableName, "comment_count")
@@ -51,7 +50,6 @@ type comment struct {
 	UserID       field.Int64  // 用户ID
 	VideoID      field.Int64  // 视频ID
 	ParentID     field.Int64  // 父评论ID
-	RootID       field.Int64  // 根评论ID
 	Content      field.String // 评论内容
 	LikeCount    field.Int64  // 点赞数
 	CommentCount field.Int64  // 评论数
@@ -76,7 +74,6 @@ func (c *comment) updateTableName(table string) *comment {
 	c.UserID = field.NewInt64(table, "user_id")
 	c.VideoID = field.NewInt64(table, "video_id")
 	c.ParentID = field.NewInt64(table, "parent_id")
-	c.RootID = field.NewInt64(table, "root_id")
 	c.Content = field.NewString(table, "content")
 	c.LikeCount = field.NewInt64(table, "like_count")
 	c.CommentCount = field.NewInt64(table, "comment_count")
@@ -97,12 +94,11 @@ func (c *comment) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *comment) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 9)
+	c.fieldMap = make(map[string]field.Expr, 8)
 	c.fieldMap["id"] = c.ID
 	c.fieldMap["user_id"] = c.UserID
 	c.fieldMap["video_id"] = c.VideoID
 	c.fieldMap["parent_id"] = c.ParentID
-	c.fieldMap["root_id"] = c.RootID
 	c.fieldMap["content"] = c.Content
 	c.fieldMap["like_count"] = c.LikeCount
 	c.fieldMap["comment_count"] = c.CommentCount

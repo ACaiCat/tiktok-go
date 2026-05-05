@@ -36,12 +36,12 @@ func (s *UserService) UserLogin(req *user.LoginReq) (*model.User, string, string
 		return nil, "", "", errno.ServiceErr
 	}
 
-	if usr.TotpSecret != "" {
+	if usr.TotpSecret != nil {
 		if req.Code == nil || *req.Code == "" {
 			return nil, "", "", errno.MFAMissingErr
 		}
 
-		ok, err := totp.ValidateCode(usr.TotpSecret, *req.Code)
+		ok, err := totp.ValidateCode(*usr.TotpSecret, *req.Code)
 
 		if err != nil {
 			return nil, "", "", errno.ServiceErr

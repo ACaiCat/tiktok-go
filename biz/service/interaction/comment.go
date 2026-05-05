@@ -6,12 +6,12 @@ import (
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
+	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"gorm.io/gorm"
 )
 
 func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID int64) error {
-	var err error
-
 	if req.VideoID == nil && req.CommentID == nil {
 		return errno.ParamErr.WithMessage("视频ID或评论ID不能为空")
 	}
@@ -36,32 +36,48 @@ func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID i
 			return errno.VideoNotExistErr
 		}
 
-		err = s.commentDao.AddVideoComment(userID, videoID, req.Content)
+		err = db.DB.Transaction(func(tx *gorm.DB) error {
+			if err = s.commentDao.WithTx(tx).AddVideoComment(userID, videoID, req.Content); err != nil {
+				return err
+			}
+			if err = s.videoDao.WithTx(tx).IncrCommentCount(videoID); err != nil {
+				return err
+			}
+			return nil
+		})
+
 		if err != nil {
 			return errno.ServiceErr
 		}
 
 		return nil
 	}
-
 	commentID, err := strconv.ParseInt(*req.CommentID, 10, 64)
 
 	if err != nil {
 		return errno.ParamErr.WithError(err)
 	}
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		comment, err := s.commentDao.WithTx(tx).GetCommentByID(commentID)
+		if err != nil {
+			return errno.ServiceErr
+		}
 
-	exist, err := s.commentDao.IsCommentExists(commentID)
+		if comment == nil {
+			return errno.CommentNotExistErr
+		}
+
+		if err = s.commentDao.WithTx(tx).AddCommentReply(userID, comment.VideoID, commentID, req.Content); err != nil {
+			return errno.ServiceErr
+		}
+		if err = s.commentDao.WithTx(tx).IncrCommentCount(commentID); err != nil {
+			return errno.ServiceErr
+		}
+		return nil
+	})
+
 	if err != nil {
-		return errno.ServiceErr
-	}
-
-	if !exist {
-		return errno.CommentNotExistErr
-	}
-
-	err = s.commentDao.AddCommentReply(userID, commentID, req.Content)
-	if err != nil {
-		return errno.ServiceErr
+		return err
 	}
 
 	return nil
@@ -76,24 +92,40 @@ func (s *InteractionService) DeleteComment(req *interaction.DeleteCommentReq, us
 		return errno.ParamErr.WithError(err)
 	}
 
-	comment, err := s.commentDao.GetCommentByID(commentID)
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		comment, err := s.commentDao.WithTx(tx).GetCommentByID(commentID)
 
+		if err != nil {
+			return errno.ServiceErr
+		}
+
+		if comment == nil {
+			return errno.CommentNotExistErr
+		}
+
+		if comment.UserID != userID {
+			return errno.CommentNotBelongToUserErr
+		}
+
+		if comment.ParentID != nil {
+			if err := s.commentDao.WithTx(tx).DecrCommentCount(*comment.ParentID); err != nil {
+				return errno.ServiceErr
+			}
+		} else {
+			if err := s.videoDao.WithTx(tx).DecrCommentCount(comment.VideoID); err != nil {
+				return errno.ServiceErr
+			}
+		}
+
+		err = s.commentDao.WithTx(tx).DeleteComment(commentID)
+		if err != nil {
+			return errno.ServiceErr
+		}
+
+		return nil
+	})
 	if err != nil {
-		return errno.ServiceErr
-	}
-
-	if comment == nil {
-		return errno.CommentNotExistErr
-	}
-
-	if comment.UserID != userID {
-		return errno.CommentNotBelongToUserErr
-	}
-
-	err = s.commentDao.DeleteComment(commentID)
-
-	if err != nil {
-		return errno.ServiceErr
+		return err
 	}
 
 	return nil

@@ -2,7 +2,6 @@ package service
 
 import (
 	"log"
-	"time"
 
 	"github.com/cloudwego/hertz/pkg/common/json"
 
@@ -52,12 +51,12 @@ func (s *ChatService) HandleMessage(userID int64, messageText string) {
 			if err := receiver.SendMessage(ws.MessageTypeChat, &chatMessage); err != nil {
 				log.Println("failed to forward message to receiver:", err)
 			}
-			if err := s.chatDao.AddMessage(userID, chatMessage.ReceiverID, chatMessage.Content, time.Now()); err != nil {
+			if err := s.chatDao.AddMessage(userID, chatMessage.ReceiverID, chatMessage.Content, true); err != nil {
 				s.SendErr(userID, errno.ServiceErr.WithMessage("消息保存失败"))
 				return
 			}
 		} else {
-			if err := s.chatDao.AddMessage(userID, chatMessage.ReceiverID, chatMessage.Content, nil); err != nil {
+			if err := s.chatDao.AddMessage(userID, chatMessage.ReceiverID, chatMessage.Content, false); err != nil {
 				s.SendErr(userID, errno.ServiceErr.WithMessage("消息保存失败"))
 				return
 			}

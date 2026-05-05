@@ -7,7 +7,10 @@ import (
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
+	"github.com/ACaiCat/tiktok-go/pkg/db"
+	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"gorm.io/gorm"
 )
 
 func (s *VideoService) GetVideoList(req *video.ListReq) ([]*model.Video, int64, error) {
@@ -31,19 +34,28 @@ func (s *VideoService) GetVideoList(req *video.ListReq) ([]*model.Video, int64, 
 		return nil, 0, errno.ParamErr.WithError(err)
 	}
 
-	videosDao, err := s.videoDao.GetVideosByUserID(userID, int(pageSize), int(pageNum))
+	var videosDao []*modelDao.Video
+	var total int64
+
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		videosDao, err = s.videoDao.WithTx(tx).GetVideosByUserID(userID, int(pageSize), int(pageNum))
+		if err != nil {
+			return errno.ServiceErr
+		}
+
+		total, err = s.videoDao.WithTx(tx).GetVideoCountByUserID(userID)
+		if err != nil {
+			return errno.ServiceErr
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return nil, 0, errno.ServiceErr
+		return nil, 0, err
 	}
 
-	videos := VideosDaoToDto(videosDao)
-
-	total, err := s.videoDao.GetVideoCountByUserID(userID)
-	if err != nil {
-		return nil, 0, errno.ServiceErr
-	}
-
-	return videos, total, nil
+	return VideosDaoToDto(videosDao), total, nil
 }
 
 func (s *VideoService) GetLikedVideos(req *interaction.ListLikeReq) ([]*model.Video, error) {

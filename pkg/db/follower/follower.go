@@ -13,3 +13,7 @@ type FollowerDao struct {
 func NewFollowerDao(db *gorm.DB) *FollowerDao {
 	return &FollowerDao{q: query.Use(db)}
 }
+
+func (f *FollowerDao) WithTx(tx *gorm.DB) *FollowerDao {
+	return &FollowerDao{q: query.Use(tx)}
+}

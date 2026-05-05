@@ -5,14 +5,9 @@
     password        TEXT        NOT NULL,
     avatar_url      TEXT,
     totp_secret     TEXT,
-    following_count BIGINT      NOT NULL DEFAULT 0,
-    follower_count  BIGINT      NOT NULL DEFAULT 0,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at      TIMESTAMPTZ,
-
-    CONSTRAINT chk_users_following_count_nonnegative CHECK (following_count >= 0),
-    CONSTRAINT chk_users_follower_count_nonnegative CHECK (follower_count >= 0)
+    deleted_at      TIMESTAMPTZ
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_users_username_active
@@ -49,9 +44,7 @@ CREATE TABLE IF NOT EXISTS videos
     CONSTRAINT fk_videos_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT,
     CONSTRAINT chk_videos_visit_count_nonnegative CHECK (visit_count >= 0),
     CONSTRAINT chk_videos_like_count_nonnegative CHECK (like_count >= 0),
-    CONSTRAINT chk_videos_comment_count_nonnegative CHECK (comment_count >= 0),
-    CONSTRAINT chk_videos_video_url_not_blank CHECK (length(trim(video_url)) > 0),
-    CONSTRAINT chk_videos_cover_url_not_blank CHECK (length(trim(cover_url)) > 0)
+    CONSTRAINT chk_videos_comment_count_nonnegative CHECK (comment_count >= 0)
 );
 
 CREATE INDEX IF NOT EXISTS idx_videos_user_id
@@ -86,7 +79,6 @@ CREATE TABLE IF NOT EXISTS comments
     user_id       BIGINT      NOT NULL,
     video_id      BIGINT      NOT NULL,
     parent_id     BIGINT,
-    root_id       BIGINT,
     content       TEXT        NOT NULL,
     like_count    BIGINT      NOT NULL DEFAULT 0,
     comment_count BIGINT      NOT NULL DEFAULT 0,
@@ -94,10 +86,8 @@ CREATE TABLE IF NOT EXISTS comments
 
     CONSTRAINT fk_comments_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT,
     CONSTRAINT fk_comments_video_id FOREIGN KEY (video_id) REFERENCES videos (id) ON DELETE RESTRICT,
-    CONSTRAINT fk_comments_parent_id FOREIGN KEY (parent_id) REFERENCES comments (id) ON DELETE RESTRICT,
-    CONSTRAINT fk_comments_root_id FOREIGN KEY (root_id) REFERENCES comments (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_comments_parent_id FOREIGN KEY (parent_id) REFERENCES comments (id) ON DELETE CASCADE,
     CONSTRAINT chk_comments_not_self_parent CHECK (parent_id IS NULL OR parent_id <> id),
-    CONSTRAINT chk_comments_not_self_root CHECK (root_id IS NULL OR root_id <> id),
     CONSTRAINT chk_comments_like_count_non_negative CHECK (like_count >= 0),
     CONSTRAINT chk_comments_comment_count_non_negative CHECK (comment_count >= 0)
 );
@@ -106,9 +96,6 @@ CREATE INDEX IF NOT EXISTS idx_comments_video_top_created_at
     ON comments (video_id, created_at DESC)
     WHERE parent_id IS NULL;
 
-CREATE INDEX IF NOT EXISTS idx_comments_root_created_at
-    ON comments (root_id, created_at ASC)
-    WHERE root_id IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_comments_parent_created_at
     ON comments (parent_id, created_at ASC)
@@ -122,7 +109,6 @@ COMMENT ON COLUMN comments.id IS '评论ID';
 COMMENT ON COLUMN comments.user_id IS '用户ID';
 COMMENT ON COLUMN comments.video_id IS '视频ID';
 COMMENT ON COLUMN comments.parent_id IS '父评论ID';
-COMMENT ON COLUMN comments.root_id IS '根评论ID';
 COMMENT ON COLUMN comments.content IS '评论内容';
 COMMENT ON COLUMN comments.like_count IS '点赞数';
 COMMENT ON COLUMN comments.comment_count IS '评论数';
@@ -138,7 +124,7 @@ CREATE TABLE IF NOT EXISTS likes
 
     CONSTRAINT fk_likes_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
     CONSTRAINT fk_likes_video_id FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE RESTRICT,
-    CONSTRAINT fk_likes_comment_id FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_likes_comment_id FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
     CONSTRAINT chk_likes_target_exactly_one CHECK (
         (video_id IS NOT NULL AND comment_id IS NULL)
             OR

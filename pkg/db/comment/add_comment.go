@@ -24,13 +24,14 @@ func (c *CommentDao) AddVideoComment(userID int64, videoID int64, content string
 	return nil
 }
 
-func (c *CommentDao) AddCommentReply(userID int64, commentID int64, content string) error {
+func (c *CommentDao) AddCommentReply(userID int64, videoID int64, commentID int64, content string) error {
 	var err error
 
 	comment := model.Comment{
 		UserID:   userID,
 		ParentID: new(commentID),
 		Content:  content,
+		VideoID:  videoID,
 	}
 
 	err = c.q.Comment.Create(&comment)

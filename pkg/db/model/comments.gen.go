@@ -16,7 +16,6 @@ type Comment struct {
 	UserID       int64     `gorm:"column:user_id;not null;comment:用户ID" json:"user_id"`                                 // 用户ID
 	VideoID      int64     `gorm:"column:video_id;not null;comment:视频ID" json:"video_id"`                               // 视频ID
 	ParentID     *int64    `gorm:"column:parent_id;comment:父评论ID" json:"parent_id"`                                     // 父评论ID
-	RootID       *int64    `gorm:"column:root_id;comment:根评论ID" json:"root_id"`                                         // 根评论ID
 	Content      string    `gorm:"column:content;not null;comment:评论内容" json:"content"`                                 // 评论内容
 	LikeCount    int64     `gorm:"column:like_count;not null;comment:点赞数" json:"like_count"`                            // 点赞数
 	CommentCount int64     `gorm:"column:comment_count;not null;comment:评论数" json:"comment_count"`                      // 评论数
