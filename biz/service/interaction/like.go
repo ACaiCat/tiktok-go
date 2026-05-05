@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"log"
 	"slices"
 	"strconv"
@@ -56,11 +57,10 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 			isLiked = slices.Contains(likedVideos, videoID)
 
 			go func() {
-				if err := s.userCache.SetLikeVideos(s.ctx, userID, likedVideos); err != nil {
+				if err := s.userCache.SetLikeVideos(context.Background(), userID, likedVideos); err != nil {
 					log.Println("failed to cache liked videos for userID", userID, ":", err)
 				}
 			}()
-
 		}
 
 		if actionType == interaction.LikeActionType_ADD {

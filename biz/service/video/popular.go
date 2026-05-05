@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"log"
 
@@ -42,7 +43,7 @@ func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, 
 		}
 
 		go func() {
-			err = s.cache.SetPopularVideos(s.ctx, popularVideos)
+			err = s.cache.SetPopularVideos(context.Background(), popularVideos)
 			if err != nil {
 				log.Println("failed to cache popular videos:", err)
 			}
