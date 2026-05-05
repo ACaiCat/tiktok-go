@@ -207,9 +207,9 @@ data: ""
 
 ### 请求参数
 
-| 名称            | 位置     | 类型             | 必选 | 说明                |
-|---------------|--------|----------------|----|-------------------|
-| data          | body   | string(binary) | 否  | 图片原始数据，服务端需校验文件类型 |
+| 名称   | 位置   | 类型             | 必选 | 说明                |
+|------|------|----------------|----|-------------------|
+| data | body | string(binary) | 否  | 图片原始数据，服务端需校验文件类型 |
 
 > 返回示例
 
@@ -291,10 +291,10 @@ secret: ""
 
 ### 请求参数
 
-| 名称            | 位置     | 类型     | 必选 | 说明  |
-|---------------|--------|--------|----|-----|
-| code          | body   | string | 否  | 校验码 |
-| secret        | body   | string | 否  | 密钥  |
+| 名称     | 位置   | 类型     | 必选 | 说明  |
+|--------|------|--------|----|-----|
+| code   | body | string | 否  | 校验码 |
+| secret | body | string | 否  | 密钥  |
 
 > 返回示例
 
@@ -473,11 +473,11 @@ description: west2@online
 
 ### 请求参数
 
-| 名称            | 位置     | 类型             | 必选 | 说明     |
-|---------------|--------|----------------|----|--------|
-| data          | body   | string(binary) | 否  | 视频原始数据 |
-| title         | body   | string         | 否  | 视频标题   |
-| description   | body   | string         | 否  | 描述     |
+| 名称          | 位置   | 类型             | 必选 | 说明     |
+|-------------|------|----------------|----|--------|
+| data        | body | string(binary) | 否  | 视频原始数据 |
+| title       | body | string         | 否  | 视频标题   |
+| description | body | string         | 否  | 描述     |
 
 > 返回示例
 
@@ -510,11 +510,11 @@ description: west2@online
 
 ### 请求参数
 
-| 名称            | 位置     | 类型      | 必选 | 说明        |
-|---------------|--------|---------|----|-----------|
-| user_id       | query  | string  | 是  | -         |
-| page_num      | query  | integer | 是  | 页码，从 0 开始 |
-| page_size     | query  | integer | 是  | 单页尺寸      |
+| 名称        | 位置    | 类型      | 必选 | 说明        |
+|-----------|-------|---------|----|-----------|
+| user_id   | query | string  | 是  | -         |
+| page_num  | query | integer | 是  | 页码，从 0 开始 |
+| page_size | query | integer | 是  | 单页尺寸      |
 
 > 返回示例
 
@@ -575,10 +575,10 @@ description: west2@online
 
 ### 请求参数
 
-| 名称            | 位置     | 类型      | 必选 | 说明   |
-|---------------|--------|---------|----|------|
-| page_size     | query  | integer | 否  | 单页尺寸 |
-| page_num      | query  | integer | 否  | 页码   |
+| 名称        | 位置    | 类型      | 必选 | 说明   |
+|-----------|-------|---------|----|------|
+| page_size | query | integer | 否  | 单页尺寸 |
+| page_num  | query | integer | 否  | 页码   |
 
 > 返回示例
 
@@ -651,14 +651,14 @@ username: ""
 
 ### 请求参数
 
-| 名称            | 位置     | 类型      | 必选 | 说明               |
-|---------------|--------|---------|----|------------------|
-| keywords      | body   | string  | 是  | 关键字，留空则不限制       |
-| page_size     | body   | integer | 是  | 单页尺寸             |
-| page_num      | body   | integer | 是  | 页码               |
-| from_date     | body   | integer | 否  | 起始时间，13 位时间戳     |
-| to_date       | body   | integer | 否  | 结束时间，13 位时间戳     |
-| username      | body   | string  | 否  | 查询包含指定字符的用户发布的视频 |
+| 名称        | 位置   | 类型      | 必选 | 说明               |
+|-----------|------|---------|----|------------------|
+| keywords  | body | string  | 是  | 关键字，留空则不限制       |
+| page_size | body | integer | 是  | 单页尺寸             |
+| page_num  | body | integer | 是  | 页码               |
+| from_date | body | integer | 否  | 起始时间，13 位时间戳     |
+| to_date   | body | integer | 否  | 结束时间，13 位时间戳     |
+| username  | body | string  | 否  | 查询包含指定字符的用户发布的视频 |
 
 > 返回示例
 
@@ -727,11 +727,11 @@ action_type: "1"
 
 ### 请求参数
 
-| 名称            | 位置     | 类型     | 必选 | 说明                             |
-|---------------|--------|--------|----|--------------------------------|
-| video_id      | body   | string | 否  | video_id 和 comment_id 必须存在其中一个 |
-| comment_id    | body   | string | 否  | video_id 和 comment_id 必须存在其中一个 |
-| action_type   | body   | string | 否  | 1：点赞，2：取消点赞                    |
+| 名称          | 位置   | 类型     | 必选 | 说明                             |
+|-------------|------|--------|----|--------------------------------|
+| video_id    | body | string | 否  | video_id 和 comment_id 必须存在其中一个 |
+| comment_id  | body | string | 否  | video_id 和 comment_id 必须存在其中一个 |
+| action_type | body | string | 否  | 1：点赞，2：取消点赞                    |
 
 #### 枚举值
 
@@ -780,11 +780,11 @@ action_type: "1"
 
 ### 请求参数
 
-| 名称            | 位置     | 类型      | 必选 | 说明   |
-|---------------|--------|---------|----|------|
-| user_id       | query  | string  | 否  | -    |
-| page_size     | query  | integer | 否  | 单页尺寸 |
-| page_num      | query  | integer | 否  | 页码   |
+| 名称        | 位置    | 类型      | 必选 | 说明   |
+|-----------|-------|---------|----|------|
+| user_id   | query | string  | 否  | -    |
+| page_size | query | integer | 否  | 单页尺寸 |
+| page_num  | query | integer | 否  | 页码   |
 
 > 返回示例
 
@@ -853,11 +853,11 @@ content: 我想睡觉
 
 ### 请求参数
 
-| 名称            | 位置     | 类型     | 必选 | 说明                             |
-|---------------|--------|--------|----|--------------------------------|
-| video_id      | body   | string | 否  | video_id 和 comment_id 必须存在其中一个 |
-| comment_id    | body   | string | 否  | video_id 和 comment_id 必须存在其中一个 |
-| content       | body   | string | 是  | 评论内容                           |
+| 名称         | 位置   | 类型     | 必选 | 说明                             |
+|------------|------|--------|----|--------------------------------|
+| video_id   | body | string | 否  | video_id 和 comment_id 必须存在其中一个 |
+| comment_id | body | string | 否  | video_id 和 comment_id 必须存在其中一个 |
+| content    | body | string | 是  | 评论内容                           |
 
 > 返回示例
 
@@ -888,12 +888,12 @@ content: 我想睡觉
 
 ### 请求参数
 
-| 名称            | 位置     | 类型      | 必选 | 说明                             |
-|---------------|--------|---------|----|--------------------------------|
-| video_id      | query  | string  | 否  | video_id 和 comment_id 必须存在其中一个 |
-| comment_id    | query  | string  | 否  | video_id 和 comment_id 必须存在其中一个 |
-| page_size     | query  | integer | 否  | 单页尺寸                           |
-| page_num      | query  | integer | 否  | 页码                             |
+| 名称         | 位置    | 类型      | 必选 | 说明                             |
+|------------|-------|---------|----|--------------------------------|
+| video_id   | query | string  | 否  | video_id 和 comment_id 必须存在其中一个 |
+| comment_id | query | string  | 否  | video_id 和 comment_id 必须存在其中一个 |
+| page_size  | query | integer | 否  | 单页尺寸                           |
+| page_num   | query | integer | 否  | 页码                             |
 
 > 返回示例
 
@@ -954,9 +954,9 @@ comment_id: "1"
 
 ### 请求参数
 
-| 名称            | 位置     | 类型     | 必选 | 说明    |
-|---------------|--------|--------|----|-------|
-| comment_id    | body   | string | 否  | 评论 ID |
+| 名称         | 位置   | 类型     | 必选 | 说明    |
+|------------|------|--------|----|-------|
+| comment_id | body | string | 否  | 评论 ID |
 
 > 返回示例
 
@@ -996,10 +996,10 @@ action_type: 1
 
 ### 请求参数
 
-| 名称            | 位置     | 类型      | 必选 | 说明        |
-|---------------|--------|---------|----|-----------|
-| to_user_id    | body   | string  | 是  | 操作对象用户 ID |
-| action_type   | body   | integer | 是  | 1：关注，2：取关 |
+| 名称          | 位置   | 类型      | 必选 | 说明        |
+|-------------|------|---------|----|-----------|
+| to_user_id  | body | string  | 是  | 操作对象用户 ID |
+| action_type | body | integer | 是  | 1：关注，2：取关 |
 
 #### 枚举值
 
@@ -1039,11 +1039,11 @@ action_type: 1
 
 ### 请求参数
 
-| 名称            | 位置     | 类型      | 必选 | 说明        |
-|---------------|--------|---------|----|-----------|
-| user_id       | query  | string  | 是  | -         |
-| page_num      | query  | integer | 否  | 页码，从 0 开始 |
-| page_size     | query  | integer | 否  | 单页尺寸      |
+| 名称        | 位置    | 类型      | 必选 | 说明        |
+|-----------|-------|---------|----|-----------|
+| user_id   | query | string  | 是  | -         |
+| page_num  | query | integer | 否  | 页码，从 0 开始 |
+| page_size | query | integer | 否  | 单页尺寸      |
 
 > 返回示例
 
@@ -1092,11 +1092,11 @@ action_type: 1
 
 ### 请求参数
 
-| 名称            | 位置     | 类型      | 必选 | 说明        |
-|---------------|--------|---------|----|-----------|
-| user_id       | query  | string  | 是  | -         |
-| page_num      | query  | integer | 否  | 页码，从 0 开始 |
-| page_size     | query  | integer | 否  | 单页尺寸      |
+| 名称        | 位置    | 类型      | 必选 | 说明        |
+|-----------|-------|---------|----|-----------|
+| user_id   | query | string  | 是  | -         |
+| page_num  | query | integer | 否  | 页码，从 0 开始 |
+| page_size | query | integer | 否  | 单页尺寸      |
 
 > 返回示例
 
@@ -1145,10 +1145,10 @@ action_type: 1
 
 ### 请求参数
 
-| 名称            | 位置     | 类型      | 必选 | 说明        |
-|---------------|--------|---------|----|-----------|
-| page_num      | query  | integer | 否  | 页码，从 0 开始 |
-| page_size     | query  | integer | 否  | 单页尺寸      |
+| 名称        | 位置    | 类型      | 必选 | 说明        |
+|-----------|-------|---------|----|-----------|
+| page_num  | query | integer | 否  | 页码，从 0 开始 |
+| page_size | query | integer | 否  | 单页尺寸      |
 
 > 返回示例
 

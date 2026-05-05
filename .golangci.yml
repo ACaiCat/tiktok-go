@@ -37,12 +37,6 @@ linters:
       errorf-multi: true
       asserts: true
       comparison: true
-      allowed-errors:
-        - err: io.EOF
-          fun: example.com/pkg.Read
-      allowed-errors-wildcard:
-        - err: github.com/west2-online/fzuhelper-server/pkg/errno
-          fun: github.com/west2-online/fzuhelper-server/pkg/errno
     lll:
       line-length: 160
       tab-width: 1

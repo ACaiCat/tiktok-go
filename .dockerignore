@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+
+# Docker files not needed inside image
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+
+# Go build outputs
+bin/
+build/
+dist/
+out/
+*.exe
+*.test
+*.prof
+coverage.out
+
+# Go workspace / cache-like files
+vendor/
+tmp/
+temp/
+
+# Test / coverage
+coverage/
+*.cover
+*.cov
+
+# Logs
+*.log
+logs/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+/output
+*.local.yml
+dumped_hertz_remote_config.json
+/config/config.yaml
