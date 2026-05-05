@@ -1,9 +1,10 @@
 package main
 
 import (
+	"gorm.io/gen"
+
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
-	"gorm.io/gen"
 )
 
 func main() {

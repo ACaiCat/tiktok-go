@@ -3,13 +3,14 @@ package service
 import (
 	"strconv"
 
+	"gorm.io/gorm"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/social"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"gorm.io/gorm"
 )
 
 func (s *SocialService) FollowAction(req *social.FollowReq, followerID int64) error {
@@ -182,7 +183,6 @@ func (s *SocialService) ListFriend(req *social.ListFriendReq, userID int64) ([]*
 	var total int
 
 	err := db.DB.Transaction(func(tx *gorm.DB) error {
-
 		exists, err := s.userDao.WithTx(tx).IsUserExists(s.ctx, userID)
 		if err != nil {
 			return errno.ServiceErr

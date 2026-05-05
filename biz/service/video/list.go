@@ -3,6 +3,8 @@ package service
 import (
 	"strconv"
 
+	"gorm.io/gorm"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
@@ -10,7 +12,6 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"gorm.io/gorm"
 )
 
 func (s *VideoService) GetVideoList(req *video.ListReq) ([]*model.Video, int64, error) {

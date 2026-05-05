@@ -3,12 +3,13 @@ package service
 import (
 	"strconv"
 
+	"gorm.io/gorm"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"gorm.io/gorm"
 )
 
 func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID int64) error {
