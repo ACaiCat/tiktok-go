@@ -42,7 +42,7 @@ func (c *ChatDao) MarkMessagesAsRead(ctx context.Context, userID int64, senderID
 }
 
 func (c *ChatDao) GetChatHistory(ctx context.Context, userID int64, otherUserID int64, pageSize int, pageNum int) ([]*model.ChatMessage, error) {
-	messages, err := c.q.ChatMessage.WithContext(ctx).Debug().
+	messages, err := c.q.ChatMessage.WithContext(ctx).
 		Where(
 			c.q.ChatMessage.SenderID.In(userID, otherUserID),
 			c.q.ChatMessage.ReceiverID.In(userID, otherUserID),
