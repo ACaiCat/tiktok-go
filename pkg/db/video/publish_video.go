@@ -1,6 +1,7 @@
 package videodao
 
 import (
+	"context"
 	"log"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
@@ -8,6 +9,7 @@ import (
 )
 
 func (v *VideoDao) PublishVideo(
+	ctx context.Context,
 	userID int64,
 	title string,
 	description string,
@@ -22,7 +24,7 @@ func (v *VideoDao) PublishVideo(
 			Description: description,
 			VisitCount:  0,
 		}
-		if err := tx.Video.Create(&video); err != nil {
+		if err := tx.Video.WithContext(ctx).Create(&video); err != nil {
 			log.Printf("failed to publish video in tx: %v\n", err)
 			return err
 		}
@@ -30,7 +32,7 @@ func (v *VideoDao) PublishVideo(
 			log.Printf("failed to upload files in tx: %v\n", err)
 			return err
 		}
-		_, err := tx.Video.Where(tx.Video.ID.Eq(video.ID)).
+		_, err := tx.Video.WithContext(ctx).Where(tx.Video.ID.Eq(video.ID)).
 			Updates(map[string]interface{}{
 				"video_url": videoURLFn(video.ID),
 				"cover_url": coverURLFn(video.ID),

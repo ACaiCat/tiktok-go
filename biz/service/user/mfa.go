@@ -15,7 +15,7 @@ import (
 func (s *UserService) GetMFA(userID int64) (string, string, error) {
 	var err error
 
-	usr, err := s.dao.GetByID(userID)
+	usr, err := s.dao.GetByID(s.ctx, userID)
 	if err != nil {
 		return "", "", errno.ServiceErr
 	}
@@ -53,7 +53,7 @@ func (s *UserService) BindMFA(req *user.BindMFAReq, userID int64) error {
 		return errno.MFACodeInvalidErr
 	}
 
-	err = s.dao.UpdateUserMFA(userID, req.Secret)
+	err = s.dao.UpdateUserMFA(s.ctx, userID, req.Secret)
 	if err != nil {
 		return errno.ServiceErr
 	}

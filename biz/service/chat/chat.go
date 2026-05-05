@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	chatDao "github.com/ACaiCat/tiktok-go/pkg/db/chat"
@@ -13,13 +15,15 @@ type ChatService struct {
 	followerDao *followerDao.FollowerDao
 	chatDao     *chatDao.ChatDao
 	manager     *ws.OnlineUserManager
+	ctx         context.Context
 }
 
-func NewChatService(manger *ws.OnlineUserManager) *ChatService {
+func NewChatService(ctx context.Context, manger *ws.OnlineUserManager) *ChatService {
 	return &ChatService{
 		userDao:     userDao.NewUserDao(db.DB),
 		followerDao: followerDao.NewFollowerDao(db.DB),
 		chatDao:     chatDao.NewChatDao(db.DB),
 		manager:     manger,
+		ctx:         ctx,
 	}
 }

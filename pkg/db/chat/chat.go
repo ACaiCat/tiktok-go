@@ -13,3 +13,7 @@ type ChatDao struct {
 func NewChatDao(db *gorm.DB) *ChatDao {
 	return &ChatDao{q: query.Use(db)}
 }
+
+func (c *ChatDao) WithTx(tx *gorm.DB) *ChatDao {
+	return &ChatDao{q: query.Use(tx)}
+}

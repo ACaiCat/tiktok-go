@@ -1,6 +1,7 @@
 package videodao
 
 import (
+	"context"
 	"log"
 	"strings"
 	"time"
@@ -9,6 +10,7 @@ import (
 )
 
 func (v *VideoDao) SearchVideo(
+	ctx context.Context,
 	keywords []string,
 	pageSize int, pageNum int,
 	fromDate time.Time, toDate time.Time,
@@ -16,7 +18,7 @@ func (v *VideoDao) SearchVideo(
 ) ([]*model.Video, error) {
 	var err error
 
-	var statement = v.q.Video.Where()
+	var statement = v.q.Video.WithContext(ctx).Where()
 	if !fromDate.IsZero() {
 		statement = statement.Where(v.q.Video.CreatedAt.Gt(fromDate))
 	}
@@ -41,14 +43,6 @@ func (v *VideoDao) SearchVideo(
 	}
 
 	videos, err := statement.
-		Select(
-			v.q.Video.ALL,
-			v.q.Like.ID.Distinct().Count().As("like_count"),
-			v.q.Comment.ID.Distinct().Count().As("comment_count"),
-		).
-		LeftJoin(v.q.Like, v.q.Like.VideoID.EqCol(v.q.Video.ID)).
-		LeftJoin(v.q.Comment, v.q.Comment.VideoID.EqCol(v.q.Video.ID)).
-		Group(v.q.Video.ID).
 		Offset(pageSize * pageNum).Limit(pageSize).Find()
 
 	if err != nil {

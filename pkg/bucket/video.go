@@ -14,8 +14,7 @@ func videoObject(videoID int64) string {
 	return fmt.Sprintf("video_%d", videoID)
 }
 
-func UploadVideo(videoID int64, data []byte) error {
-	ctx := context.Background()
+func UploadVideo(ctx context.Context, videoID int64, data []byte) error {
 	_, err := Bucket.PutObject(ctx, constants.VideoBucketName, videoObject(videoID),
 		bytes.NewReader(data), int64(len(data)),
 		minio.PutObjectOptions{ContentType: "video/mp4"},

@@ -29,7 +29,7 @@ func (s *UserService) UserRegister(req *user.RegisterReq) error {
 		return errno.PasswordTooLongErr.WithMessage(fmt.Sprintf("密码长度必须不超过%d位", constants.MaxPasswordLength))
 	}
 
-	usr, err := s.dao.GetByUsername(req.Username)
+	usr, err := s.dao.GetByUsername(s.ctx, req.Username)
 	if err != nil {
 		return errno.ServiceErr
 	}
@@ -44,7 +44,7 @@ func (s *UserService) UserRegister(req *user.RegisterReq) error {
 		return errno.ServiceErr
 	}
 
-	_, err = s.dao.CreateUser(req.Username, string(hashPassword))
+	_, err = s.dao.CreateUser(s.ctx, req.Username, string(hashPassword))
 	if err != nil {
 		return errno.ServiceErr
 	}

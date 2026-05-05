@@ -13,3 +13,9 @@ type VideoDao struct {
 func NewVideoDao(db *gorm.DB) *VideoDao {
 	return &VideoDao{q: query.Use(db)}
 }
+
+func (v *VideoDao) WithTx(tx *gorm.DB) *VideoDao {
+	return &VideoDao{
+		q: query.Use(tx),
+	}
+}

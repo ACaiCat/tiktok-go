@@ -13,7 +13,7 @@ import (
 
 var Bucket *minio.Client
 
-func InitMinIO() {
+func InitMinIO(ctx context.Context) {
 	bucketConfig := config.AppConfig.Minio
 	var err error
 	Bucket, err = minio.New(bucketConfig.Endpoint, &minio.Options{
@@ -30,13 +30,12 @@ func InitMinIO() {
 	}
 	defer cancel()
 
-	initBucket(constants.AvatarBucketName, constants.AvatarBucketPolicy)
-	initBucket(constants.VideoBucketName, constants.VideoBucketPolicy)
-	initBucket(constants.CoverBucketName, constants.CoverBucketPolicy)
+	initBucket(ctx, constants.AvatarBucketName, constants.AvatarBucketPolicy)
+	initBucket(ctx, constants.VideoBucketName, constants.VideoBucketPolicy)
+	initBucket(ctx, constants.CoverBucketName, constants.CoverBucketPolicy)
 }
 
-func initBucket(name, policy string) {
-	ctx := context.Background()
+func initBucket(ctx context.Context, name, policy string) {
 	exist, err := Bucket.BucketExists(ctx, name)
 	if err != nil {
 		panic(err)

@@ -1,11 +1,14 @@
 package userdao
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
-func (u *UserDao) IsUserExists(userID int64) (bool, error) {
+func (u *UserDao) IsUserExists(ctx context.Context, userID int64) (bool, error) {
 	var err error
 
-	count, err := u.q.User.
+	count, err := u.q.User.WithContext(ctx).
 		Select(u.q.User.ID).
 		Where(u.q.User.ID.Eq(userID)).
 		Limit(1).

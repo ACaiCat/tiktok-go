@@ -47,13 +47,13 @@ func (s *VideoService) PublishVideo(userID int64, title string, description stri
 	}
 
 	err = s.videoDao.PublishVideo(
-		userID, title, description,
+		s.ctx, userID, title, description,
 		func(videoID int64) error {
-			if err := bucket.UploadVideo(videoID, transcodeData); err != nil {
+			if err := bucket.UploadVideo(s.ctx, videoID, transcodeData); err != nil {
 				log.Printf("failed to upload video: %v\n", err)
 				return err
 			}
-			if err := bucket.UploadCover(videoID, coverData); err != nil {
+			if err := bucket.UploadCover(s.ctx, videoID, coverData); err != nil {
 				log.Printf("failed to upload cover: %v\n", err)
 				return err
 			}

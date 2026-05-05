@@ -13,3 +13,7 @@ type CommentDao struct {
 func NewCommentDao(db *gorm.DB) *CommentDao {
 	return &CommentDao{q: query.Use(db)}
 }
+
+func (c *CommentDao) WithTx(tx *gorm.DB) *CommentDao {
+	return &CommentDao{q: query.Use(tx)}
+}

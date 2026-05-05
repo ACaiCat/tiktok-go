@@ -1,14 +1,15 @@
 package service
 
 import (
-	"errors"
+	"context"
 	"log"
 	"slices"
 	"strconv"
 
-	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
+	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
 
@@ -34,7 +35,11 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 		return errno.ParamErr.WithError(err)
 	}
 
-	videoExists, err := s.videoDao.IsVideoExists(videoID)
+	if actionType != interaction.LikeActionType_ADD && actionType != interaction.LikeActionType_DELETE {
+		return errno.NotSupportActionErr
+	}
+
+	videoExists, err := s.videoDao.IsVideoExists(s.ctx, videoID)
 	if err != nil {
 		return errno.ServiceErr
 	}
@@ -42,47 +47,73 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 		return errno.VideoNotExistErr
 	}
 
-	isLiked, err := s.userCache.IsVideoLiked(userID, videoID)
-	if err != nil {
-		likedVideos, err := s.likeDao.GetUserLikes(userID)
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		isLiked, err := s.userCache.IsVideoLiked(s.ctx, userID, videoID)
 		if err != nil {
-			return errno.ServiceErr
+			likedVideos, err := s.likeDao.WithTx(tx).GetUserLikes(s.ctx, userID)
+			if err != nil {
+				return errno.ServiceErr
+			}
+			isLiked = slices.Contains(likedVideos, videoID)
+
+			go func() {
+				if err := s.userCache.SetLikeVideos(context.Background(), userID, likedVideos); err != nil {
+					log.Println("failed to cache liked videos for userID", userID, ":", err)
+				}
+			}()
 		}
-		isLiked = slices.Contains(likedVideos, videoID)
-		if cacheErr := s.userCache.SetLikeVideos(userID, likedVideos); cacheErr != nil {
-			log.Println("failed to cache liked videos for userID", userID, ":", cacheErr)
+
+		if actionType == interaction.LikeActionType_ADD {
+			return s.addVideoLikeTx(tx, userID, videoID, isLiked)
 		}
-		if !errors.Is(err, redis.Nil) {
-			log.Println("failed to check if video is liked for userID", userID, "and videoID", videoID, ":", err)
-		}
+
+		return s.cancelVideoLikeTx(tx, userID, videoID, isLiked)
+	})
+
+	if err != nil {
+		return err
 	}
 
-	switch actionType {
-	case interaction.LikeActionType_ADD:
-		if isLiked {
-			return errno.LikeAlreadyExistErr
-		}
-		if err := s.likeDao.AddVideoLike(userID, videoID); err != nil {
-			return errno.ServiceErr
-		}
-		if err := s.userCache.SetLikeVideo(userID, videoID); err != nil {
-			log.Println("failed to cache like video for userID", userID, "and videoID", videoID, ":", err)
-		}
-		return nil
-	case interaction.LikeActionType_DELETE:
-		if !isLiked {
-			return errno.LikeNotExistErr
-		}
-		if err := s.likeDao.DeleteVideoLike(userID, videoID); err != nil {
-			return errno.ServiceErr
-		}
-		if err := s.userCache.SetUnlikeVideo(userID, videoID); err != nil {
-			log.Println("failed to cache unlike video for userID", userID, "and videoID", videoID, ":", err)
-		}
-		return nil
+	return nil
+}
+
+func (s *InteractionService) addVideoLikeTx(tx *gorm.DB, userID, videoID int64, isLiked bool) error {
+	if isLiked {
+		return errno.LikeAlreadyExistErr
 	}
 
-	return errno.NotSupportActionErr
+	if err := s.likeDao.WithTx(tx).AddVideoLike(s.ctx, userID, videoID); err != nil {
+		return errno.ServiceErr
+	}
+	if err := s.videoDao.WithTx(tx).IncrLikeCount(s.ctx, videoID); err != nil {
+		return errno.ServiceErr
+	}
+
+	if err := s.userCache.SetLikeVideo(s.ctx, userID, videoID); err != nil {
+		log.Println("failed to cache like video for userID", userID, "and videoID", videoID, ":", err)
+	}
+
+	return nil
+}
+
+func (s *InteractionService) cancelVideoLikeTx(tx *gorm.DB, userID, videoID int64, isLiked bool) error {
+	if !isLiked {
+		return errno.LikeNotExistErr
+	}
+
+	if err := s.likeDao.WithTx(tx).DeleteVideoLike(s.ctx, userID, videoID); err != nil {
+		return errno.ServiceErr
+	}
+
+	if err := s.videoDao.WithTx(tx).DecrLikeCount(s.ctx, videoID); err != nil {
+		return errno.ServiceErr
+	}
+
+	if err := s.userCache.SetUnlikeVideo(s.ctx, userID, videoID); err != nil {
+		log.Println("failed to cache unlike video for userID", userID, "and videoID", videoID, ":", err)
+	}
+
+	return nil
 }
 
 func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, actionType interaction.LikeActionType) error {
@@ -91,37 +122,66 @@ func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, 
 		return errno.ParamErr.WithError(err)
 	}
 
-	commentExists, err := s.commentDao.IsCommentExists(commentID)
-	if err != nil {
-		return errno.ServiceErr
-	}
-	if !commentExists {
-		return errno.CommentNotExistErr
+	if actionType != interaction.LikeActionType_ADD && actionType != interaction.LikeActionType_DELETE {
+		return errno.NotSupportActionErr
 	}
 
-	isLiked, err := s.likeDao.IsCommentLikeExists(userID, commentID)
-	if err != nil {
-		return errno.ServiceErr
-	}
-
-	switch actionType {
-	case interaction.LikeActionType_ADD:
-		if isLiked {
-			return errno.LikeAlreadyExistErr
-		}
-		if err := s.likeDao.AddCommentLike(userID, commentID); err != nil {
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		commentExists, err := s.commentDao.WithTx(tx).IsCommentExists(s.ctx, commentID)
+		if err != nil {
 			return errno.ServiceErr
 		}
-		return nil
-	case interaction.LikeActionType_DELETE:
-		if !isLiked {
-			return errno.LikeNotExistErr
+		if !commentExists {
+			return errno.CommentNotExistErr
 		}
-		if err := s.likeDao.DeleteCommentLike(userID, commentID); err != nil {
+
+		isLiked, err := s.likeDao.IsCommentLikeExists(s.ctx, userID, commentID)
+		if err != nil {
 			return errno.ServiceErr
 		}
-		return nil
+
+		if actionType == interaction.LikeActionType_ADD {
+			return s.addCommentLikeTx(tx, userID, commentID, isLiked)
+		}
+
+		return s.cancelCommentLikeTx(tx, userID, commentID, isLiked)
+	})
+
+	if err != nil {
+		return err
 	}
 
-	return errno.NotSupportActionErr
+	return nil
+}
+
+func (s *InteractionService) addCommentLikeTx(tx *gorm.DB, userID, commentID int64, isLiked bool) error {
+	if isLiked {
+		return errno.LikeAlreadyExistErr
+	}
+
+	if err := s.likeDao.WithTx(tx).AddCommentLike(s.ctx, userID, commentID); err != nil {
+		return errno.ServiceErr
+	}
+
+	if err := s.commentDao.WithTx(tx).IncrLikeCount(s.ctx, commentID); err != nil {
+		return errno.ServiceErr
+	}
+
+	return nil
+}
+
+func (s *InteractionService) cancelCommentLikeTx(tx *gorm.DB, userID, commentID int64, isLiked bool) error {
+	if !isLiked {
+		return errno.LikeNotExistErr
+	}
+
+	if err := s.likeDao.WithTx(tx).DeleteCommentLike(s.ctx, userID, commentID); err != nil {
+		return errno.ServiceErr
+	}
+
+	if err := s.commentDao.WithTx(tx).DecrLikeCount(s.ctx, commentID); err != nil {
+		return errno.ServiceErr
+	}
+
+	return nil
 }

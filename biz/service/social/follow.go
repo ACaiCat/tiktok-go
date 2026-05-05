@@ -3,9 +3,13 @@ package service
 import (
 	"strconv"
 
+	"gorm.io/gorm"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/social"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
+	"github.com/ACaiCat/tiktok-go/pkg/db"
+	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
 
@@ -19,7 +23,11 @@ func (s *SocialService) FollowAction(req *social.FollowReq, followerID int64) er
 		return errno.FollowSelfErr
 	}
 
-	exists, err := s.userDao.IsUserExists(userID)
+	if req.ActionType != social.FollowActionType_FOLLOW && req.ActionType != social.FollowActionType_UNFOLLOW {
+		return errno.NotSupportActionErr
+	}
+
+	exists, err := s.userDao.IsUserExists(s.ctx, userID)
 	if err != nil {
 		return errno.ServiceErr
 	}
@@ -27,36 +35,38 @@ func (s *SocialService) FollowAction(req *social.FollowReq, followerID int64) er
 		return errno.UserIsNotExistErr
 	}
 
-	followed, err := s.followerDao.IsExistFollow(userID, followerID)
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		followed, err := s.followerDao.WithTx(tx).IsExistFollow(s.ctx, userID, followerID)
+
+		if err != nil {
+			return errno.ServiceErr.WithError(err)
+		}
+
+		if req.ActionType == social.FollowActionType_FOLLOW {
+			if followed {
+				return errno.FollowAlreadyExistErr
+			}
+
+			if err := s.followerDao.WithTx(tx).AddFollow(s.ctx, userID, followerID); err != nil {
+				return errno.ServiceErr
+			}
+		} else {
+			if !followed {
+				return errno.FollowNotExistErr
+			}
+
+			if err := s.followerDao.WithTx(tx).DeleteFollow(s.ctx, userID, followerID); err != nil {
+				return errno.ServiceErr
+			}
+		}
+		return nil
+	})
 
 	if err != nil {
-		return errno.ServiceErr.WithError(err)
+		return err
 	}
 
-	switch req.ActionType {
-	case social.FollowActionType_FOLLOW:
-		if followed {
-			return errno.FollowAlreadyExistErr
-		}
-
-		err := s.followerDao.AddFollow(userID, followerID)
-		if err != nil {
-			return errno.ServiceErr
-		}
-		return nil
-	case social.FollowActionType_UNFOLLOW:
-		if !followed {
-			return errno.FollowNotExistErr
-		}
-
-		err := s.followerDao.DeleteFollow(userID, followerID)
-		if err != nil {
-			return errno.ServiceErr
-		}
-		return nil
-	}
-
-	return errno.NotSupportActionErr
+	return nil
 }
 
 func (s *SocialService) ListFollowing(req *social.ListFollowingReq) ([]*model.SocialUser, int, error) {
@@ -79,17 +89,28 @@ func (s *SocialService) ListFollowing(req *social.ListFollowingReq) ([]*model.So
 		pageSize = constants.MaxSocialUserPageSize
 	}
 
-	exists, err := s.userDao.IsUserExists(userID)
-	if err != nil {
-		return nil, 0, errno.ServiceErr
-	}
-	if !exists {
-		return nil, 0, errno.UserIsNotExistErr
-	}
+	var users []*modelDao.User
+	var total int
 
-	users, total, err := s.followerDao.GetFollowing(userID, int(pageSize), int(pageNum))
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		exists, err := s.userDao.WithTx(tx).IsUserExists(s.ctx, userID)
+		if err != nil {
+			return errno.ServiceErr
+		}
+		if !exists {
+			return errno.UserIsNotExistErr
+		}
+
+		users, total, err = s.followerDao.WithTx(tx).GetFollowing(s.ctx, userID, int(pageSize), int(pageNum))
+		if err != nil {
+			return errno.ServiceErr
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return nil, 0, errno.ServiceErr
+		return nil, 0, err
 	}
 
 	return UsersToSocialUsers(users), total, nil
@@ -115,19 +136,31 @@ func (s *SocialService) ListFollower(req *social.ListFollowerReq) ([]*model.Soci
 		pageSize = constants.MaxSocialUserPageSize
 	}
 
-	exists, err := s.userDao.IsUserExists(userID)
+	var users []*modelDao.User
+	var total int
+
+	err = db.DB.Transaction(func(tx *gorm.DB) error {
+		exists, err := s.userDao.WithTx(tx).IsUserExists(s.ctx, userID)
+		if err != nil {
+			return errno.ServiceErr
+		}
+
+		if !exists {
+			return errno.UserIsNotExistErr
+		}
+
+		users, total, err = s.followerDao.WithTx(tx).GetFollower(s.ctx, userID, int(pageSize), int(pageNum))
+		if err != nil {
+			return errno.ServiceErr
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return nil, 0, errno.ServiceErr
+		return nil, 0, err
 	}
 
-	if !exists {
-		return nil, 0, errno.UserIsNotExistErr
-	}
-
-	users, total, err := s.followerDao.GetFollower(userID, int(pageSize), int(pageNum))
-	if err != nil {
-		return nil, 0, errno.ServiceErr
-	}
 	return UsersToSocialUsers(users), total, nil
 }
 
@@ -146,18 +179,29 @@ func (s *SocialService) ListFriend(req *social.ListFriendReq, userID int64) ([]*
 		pageSize = constants.MaxSocialUserPageSize
 	}
 
-	exists, err := s.userDao.IsUserExists(userID)
-	if err != nil {
-		return nil, 0, errno.ServiceErr
-	}
+	var users []*modelDao.User
+	var total int
 
-	if !exists {
-		return nil, 0, errno.UserIsNotExistErr
-	}
+	err := db.DB.Transaction(func(tx *gorm.DB) error {
+		exists, err := s.userDao.WithTx(tx).IsUserExists(s.ctx, userID)
+		if err != nil {
+			return errno.ServiceErr
+		}
 
-	users, total, err := s.followerDao.GetFriends(userID, int(pageSize), int(pageNum))
+		if !exists {
+			return errno.UserIsNotExistErr
+		}
+
+		users, total, err = s.followerDao.WithTx(tx).GetFriends(s.ctx, userID, int(pageSize), int(pageNum))
+		if err != nil {
+			return errno.ServiceErr
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return nil, 0, errno.ServiceErr
+		return nil, 0, err
 	}
 
 	return UsersToSocialUsers(users), total, nil

@@ -12,14 +12,14 @@ const TableNameComment = "comments"
 
 // Comment mapped from table <comments>
 type Comment struct {
-	ID         int64     `gorm:"column:id;primaryKey;autoIncrement:true;comment:评论ID" json:"id"`                      // 评论ID
-	UserID     int64     `gorm:"column:user_id;not null;comment:用户ID" json:"user_id"`                                 // 用户ID
-	VideoID    int64     `gorm:"column:video_id;not null;comment:视频ID" json:"video_id"`                               // 视频ID
-	ParentID   int64     `gorm:"column:parent_id;comment:父评论ID" json:"parent_id"`                                     // 父评论ID
-	Content    string    `gorm:"column:content;not null;comment:评论内容" json:"content"`                                 // 评论内容
-	CreatedAt  time.Time `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"created_at"` // 创建时间
-	ChildCount int64     `gorm:"column:child_count;->" json:"child_count"`
-	LikeCount  int64     `gorm:"column:like_count;->" json:"like_count"`
+	ID           int64     `gorm:"column:id;primaryKey;autoIncrement:true;comment:评论ID" json:"id"`                      // 评论ID
+	UserID       int64     `gorm:"column:user_id;not null;comment:用户ID" json:"user_id"`                                 // 用户ID
+	VideoID      int64     `gorm:"column:video_id;not null;comment:视频ID" json:"video_id"`                               // 视频ID
+	ParentID     *int64    `gorm:"column:parent_id;comment:父评论ID" json:"parent_id"`                                     // 父评论ID
+	Content      string    `gorm:"column:content;not null;comment:评论内容" json:"content"`                                 // 评论内容
+	LikeCount    int64     `gorm:"column:like_count;not null;comment:点赞数" json:"like_count"`                            // 点赞数
+	CommentCount int64     `gorm:"column:comment_count;not null;comment:评论数" json:"comment_count"`                      // 评论数
+	CreatedAt    time.Time `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"created_at"` // 创建时间
 }
 
 // TableName Comment's table name

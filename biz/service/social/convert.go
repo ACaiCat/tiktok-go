@@ -8,10 +8,14 @@ import (
 )
 
 func UserToSocialUser(user *modelDao.User) *model.SocialUser {
+	avatarURL := ""
+	if user.AvatarURL != nil {
+		avatarURL = *user.AvatarURL
+	}
 	return &model.SocialUser{
 		ID:        strconv.FormatInt(user.ID, 10),
 		Username:  user.Username,
-		AvatarURL: user.AvatarURL,
+		AvatarURL: avatarURL,
 	}
 }
 

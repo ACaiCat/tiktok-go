@@ -1,6 +1,7 @@
 package userdao
 
 import (
+	"context"
 	"errors"
 	"log"
 
@@ -9,8 +10,8 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func (u *UserDao) GetByID(id int64) (*model.User, error) {
-	user, err := u.q.User.
+func (u *UserDao) GetByID(ctx context.Context, id int64) (*model.User, error) {
+	user, err := u.q.User.WithContext(ctx).
 		Where(u.q.User.ID.Eq(id)).
 		First()
 	if err != nil {
@@ -24,8 +25,8 @@ func (u *UserDao) GetByID(id int64) (*model.User, error) {
 	return user, nil
 }
 
-func (u *UserDao) GetByUsername(username string) (*model.User, error) {
-	user, err := u.q.User.
+func (u *UserDao) GetByUsername(ctx context.Context, username string) (*model.User, error) {
+	user, err := u.q.User.WithContext(ctx).
 		Where(u.q.User.Username.Eq(username)).
 		First()
 	if err != nil {

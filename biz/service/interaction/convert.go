@@ -15,7 +15,7 @@ func CommentDaoToDto(comment *commentDao.Comment) *model.Comment {
 		Content:    comment.Content,
 		CreatedAt:  strconv.FormatInt(comment.CreatedAt.UnixMilli(), 10),
 		LikeCount:  comment.LikeCount,
-		ChildCount: comment.ChildCount,
+		ChildCount: comment.CommentCount,
 	}
 }
 

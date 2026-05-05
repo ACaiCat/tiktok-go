@@ -60,7 +60,7 @@ func (s *VideoService) SearchVideo(req *video.SearchReq) ([]*model.Video, error)
 		username = *req.Username
 	}
 
-	videosDao, err := s.videoDao.SearchVideo(keywords, int(pageSize), int(pageNum), fromDate, toDate, username)
+	videosDao, err := s.videoDao.SearchVideo(s.ctx, keywords, int(pageSize), int(pageNum), fromDate, toDate, username)
 	if err != nil {
 		return nil, errno.ServiceErr
 	}

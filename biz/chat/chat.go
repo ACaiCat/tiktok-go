@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strings"
@@ -33,13 +34,19 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer c.Close()
+
+	ctx, cancel := context.WithCancel(r.Context())
+	defer cancel()
+
 	m.AddOnlineUser(userID, c)
+	defer m.RemoveOnlineUser(userID)
+
+	chatService := service.NewChatService(ctx, m)
 	for {
 		_, message, err := c.ReadMessage()
 		if err != nil {
-			m.RemoveOnlineUser(userID)
 			break
 		}
-		service.NewChatService(m).HandleMessage(userID, string(message))
+		chatService.HandleMessage(userID, string(message))
 	}
 }

@@ -1,6 +1,7 @@
 package commentdao
 
 import (
+	"context"
 	"errors"
 	"log"
 
@@ -9,61 +10,10 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func (c *CommentDao) GetCommentCount(videoID int64) (int64, error) {
+func (c *CommentDao) GetCommentByID(ctx context.Context, commentID int64) (*model.Comment, error) {
 	var err error
 
-	count, err := c.q.Comment.
-		Where(c.q.Comment.VideoID.Eq(videoID)).
-		Count()
-	if err != nil {
-		log.Printf("failed to get comment count for videoID %d: %v", videoID, err)
-		return 0, err
-	}
-
-	return count, nil
-}
-
-func (c *CommentDao) GetCommentCounts(videoIDs []int64) (map[int64]int64, error) {
-	var err error
-
-	type Result struct {
-		VideoID int64 `gorm:"column:video_id"`
-		Count   int64 `gorm:"column:count"`
-	}
-
-	var results []Result
-
-	err = c.q.Comment.
-		Select(c.q.Comment.VideoID, c.q.Comment.ID.Count().As("count")).
-		Where(c.q.Comment.VideoID.In(videoIDs...)).
-		Group(c.q.Comment.VideoID).
-		Scan(&results)
-
-	if err != nil {
-		log.Printf("failed to get comment counts for videoIDs %v: %v", videoIDs, err)
-		return nil, err
-	}
-	commentMap := make(map[int64]int64)
-	for _, r := range results {
-		commentMap[r.VideoID] = r.Count
-	}
-
-	return commentMap, nil
-}
-
-func (c *CommentDao) GetCommentByID(commentID int64) (*model.Comment, error) {
-	var err error
-
-	subComment := c.q.Comment.As("sub_comment")
-
-	comment, err := c.q.Comment.
-		Select(c.q.Comment.ALL,
-			c.q.Like.ID.Count().As("like_count"),
-			c.q.Comment.ID.Count().As("child_count"),
-		).
-		LeftJoin(c.q.Like, c.q.Like.CommentID.EqCol(c.q.Comment.ID)).
-		LeftJoin(subComment, subComment.ParentID.EqCol(c.q.Comment.ID)).
-		Group(c.q.Comment.ID).
+	comment, err := c.q.Comment.WithContext(ctx).
 		Where(c.q.Comment.ID.Eq(commentID)).
 		First()
 
@@ -79,21 +29,11 @@ func (c *CommentDao) GetCommentByID(commentID int64) (*model.Comment, error) {
 	return comment, nil
 }
 
-func (c *CommentDao) GetCommentsByVideoID(videoID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
+func (c *CommentDao) GetCommentsByVideoID(ctx context.Context, videoID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
 	var err error
 
-	subComment := c.q.Comment.As("sub_comment")
-
-	comments, err := c.q.Comment.
-		Select(
-			c.q.Comment.ALL,
-			c.q.Like.ID.Distinct().Count().As("like_count"),
-			subComment.ID.Distinct().Count().As("child_count"),
-		).
-		LeftJoin(c.q.Like, c.q.Like.CommentID.EqCol(c.q.Comment.ID)).
-		LeftJoin(subComment, subComment.ParentID.EqCol(c.q.Comment.ID)).
-		Group(c.q.Comment.ID).
-		Where(c.q.Comment.VideoID.Eq(videoID)).
+	comments, err := c.q.Comment.WithContext(ctx).
+		Where(c.q.Comment.VideoID.Eq(videoID), c.q.Comment.ParentID.IsNull()).
 		Order(c.q.Comment.CreatedAt.Desc()).
 		Offset(pageSize * pageNum).
 		Limit(pageSize).
@@ -107,20 +47,10 @@ func (c *CommentDao) GetCommentsByVideoID(videoID int64, pageSize int, pageNum i
 	return comments, nil
 }
 
-func (c *CommentDao) GetCommentsByCommentID(commentID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
+func (c *CommentDao) GetCommentsByCommentID(ctx context.Context, commentID int64, pageSize int, pageNum int) ([]*model.Comment, error) {
 	var err error
 
-	subComment := c.q.Comment.As("sub_comment")
-
-	comments, err := c.q.Comment.
-		Select(
-			c.q.Comment.ALL,
-			c.q.Like.ID.Distinct().Count().As("like_count"),
-			subComment.ID.Distinct().Count().As("child_count"),
-		).
-		LeftJoin(c.q.Like, c.q.Like.CommentID.EqCol(c.q.Comment.ID)).
-		LeftJoin(subComment, subComment.ParentID.EqCol(c.q.Comment.ID)).
-		Group(c.q.Comment.ID).
+	comments, err := c.q.Comment.WithContext(ctx).
 		Where(c.q.Comment.ParentID.Eq(commentID)).
 		Order(c.q.Comment.CreatedAt.Desc()).
 		Offset(pageSize * pageNum).

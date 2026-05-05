@@ -26,7 +26,7 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 
 	userID := mw.GetUserID(c)
 
-	err = service.NewSocialService().FollowAction(&req, userID)
+	err = service.NewSocialService(ctx).FollowAction(&req, userID)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -48,7 +48,7 @@ func ListFollowing(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	users, total, err := service.NewSocialService().ListFollowing(&req)
+	users, total, err := service.NewSocialService(ctx).ListFollowing(&req)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -69,7 +69,7 @@ func ListFollower(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	users, total, err := service.NewSocialService().ListFollower(&req)
+	users, total, err := service.NewSocialService(ctx).ListFollower(&req)
 
 	if err != nil {
 		pack.RespError(c, err)
@@ -92,7 +92,7 @@ func ListFriend(ctx context.Context, c *app.RequestContext) {
 
 	userID := mw.GetUserID(c)
 
-	users, total, err := service.NewSocialService().ListFriend(&req, userID)
+	users, total, err := service.NewSocialService(ctx).ListFriend(&req, userID)
 
 	if err != nil {
 		pack.RespError(c, err)

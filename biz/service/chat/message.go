@@ -30,7 +30,7 @@ func (s *ChatService) HandleMessage(userID int64, messageText string) {
 			return
 		}
 
-		isFriend, err := s.followerDao.IsExistFriend(userID, chatMessage.ReceiverID)
+		isFriend, err := s.followerDao.IsExistFriend(s.ctx, userID, chatMessage.ReceiverID)
 		if err != nil {
 			s.SendErr(userID, errno.ServiceErr.WithMessage("查询好友关系失败"))
 			return
@@ -51,12 +51,12 @@ func (s *ChatService) HandleMessage(userID int64, messageText string) {
 			if err := receiver.SendMessage(ws.MessageTypeChat, &chatMessage); err != nil {
 				log.Println("failed to forward message to receiver:", err)
 			}
-			if err := s.chatDao.AddMessage(userID, chatMessage.ReceiverID, chatMessage.Content, true); err != nil {
+			if err := s.chatDao.AddMessage(s.ctx, userID, chatMessage.ReceiverID, chatMessage.Content, true); err != nil {
 				s.SendErr(userID, errno.ServiceErr.WithMessage("消息保存失败"))
 				return
 			}
 		} else {
-			if err := s.chatDao.AddMessage(userID, chatMessage.ReceiverID, chatMessage.Content, false); err != nil {
+			if err := s.chatDao.AddMessage(s.ctx, userID, chatMessage.ReceiverID, chatMessage.Content, false); err != nil {
 				s.SendErr(userID, errno.ServiceErr.WithMessage("消息保存失败"))
 				return
 			}
@@ -69,7 +69,7 @@ func (s *ChatService) HandleMessage(userID int64, messageText string) {
 			return
 		}
 
-		unreadMessages, err := s.chatDao.GetUnreadMessages(userID, unreadRequest.Sender)
+		unreadMessages, err := s.chatDao.GetUnreadMessages(s.ctx, userID, unreadRequest.Sender)
 		if err != nil {
 			s.SendErr(userID, errno.ServiceErr.WithMessage("获取未读消息失败："+err.Error()))
 			return
@@ -83,7 +83,7 @@ func (s *ChatService) HandleMessage(userID int64, messageText string) {
 				log.Println("failed to send unread messages to user:", err)
 				return
 			}
-			if err := s.chatDao.MarkMessagesAsRead(userID, unreadRequest.Sender); err != nil {
+			if err := s.chatDao.MarkMessagesAsRead(s.ctx, userID, unreadRequest.Sender); err != nil {
 				s.SendErr(userID, errno.ServiceErr.WithMessage("标记消息已读失败"))
 				return
 			}
@@ -96,7 +96,7 @@ func (s *ChatService) HandleMessage(userID int64, messageText string) {
 			return
 		}
 
-		historyMessages, err := s.chatDao.GetChatHistory(userID, historyRequest.Sender, historyRequest.PageSize, historyRequest.Page)
+		historyMessages, err := s.chatDao.GetChatHistory(s.ctx, userID, historyRequest.Sender, historyRequest.PageSize, historyRequest.Page)
 		if err != nil {
 			s.SendErr(userID, errno.ServiceErr.WithMessage("获取历史消息失败"))
 			return

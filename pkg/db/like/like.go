@@ -13,3 +13,7 @@ type LikeDao struct {
 func NewLikeDao(db *gorm.DB) *LikeDao {
 	return &LikeDao{q: query.Use(db)}
 }
+
+func (l *LikeDao) WithTx(tx *gorm.DB) *LikeDao {
+	return &LikeDao{q: query.Use(tx)}
+}

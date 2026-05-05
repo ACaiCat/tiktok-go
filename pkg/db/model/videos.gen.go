@@ -21,11 +21,11 @@ type Video struct {
 	Title        string         `gorm:"column:title;not null;comment:视频标题" json:"title"`                                     // 视频标题
 	Description  string         `gorm:"column:description;not null;comment:视频描述" json:"description"`                         // 视频描述
 	VisitCount   int64          `gorm:"column:visit_count;not null;comment:访问量" json:"visit_count"`                          // 访问量
+	LikeCount    int64          `gorm:"column:like_count;not null;comment:点赞数" json:"like_count"`                            // 点赞数
+	CommentCount int64          `gorm:"column:comment_count;not null;comment:评论数" json:"comment_count"`                      // 评论数
 	CreatedAt    time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"created_at"` // 创建时间
 	UpdatedAt    time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP;comment:更新时间" json:"updated_at"` // 更新时间
 	DeletedAt    gorm.DeletedAt `gorm:"column:deleted_at;comment:删除时间" json:"deleted_at"`                                    // 删除时间
-	CommentCount int64          `gorm:"column:comment_count;->" json:"comment_count"`
-	LikeCount    int64          `gorm:"column:like_count;->" json:"like_count"`
 }
 
 // TableName Video's table name

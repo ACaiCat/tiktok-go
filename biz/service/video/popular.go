@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"log"
 
@@ -30,25 +31,27 @@ func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, 
 		pageSize = constants.MaxVideoPageSize
 	}
 
-	popularVideos, err := s.cache.GetPopularVideos()
+	popularVideos, err := s.cache.GetPopularVideos(s.ctx)
 	if err != nil {
 		if !errors.Is(err, redis.Nil) {
 			log.Println("failed to get popular videos from cache:", err)
 		}
 
-		popularVideos, err = s.videoDao.GetPopularVideos(constants.PopularVideoCacheCount, 0)
+		popularVideos, err = s.videoDao.GetPopularVideos(s.ctx, constants.PopularVideoCacheCount, 0)
 		if err != nil {
 			return nil, errno.ServiceErr
 		}
 
-		err = s.cache.SetPopularVideos(popularVideos)
-		if err != nil {
-			log.Println("failed to cache popular videos:", err)
-		}
+		go func() {
+			err = s.cache.SetPopularVideos(context.Background(), popularVideos)
+			if err != nil {
+				log.Println("failed to cache popular videos:", err)
+			}
+		}()
 	}
 
 	if pageSize*pageNum > constants.PopularVideoCacheCount {
-		videosDao, err := s.videoDao.GetPopularVideos(int(pageSize), int(pageNum))
+		videosDao, err := s.videoDao.GetPopularVideos(s.ctx, int(pageSize), int(pageNum))
 		if err != nil {
 			return nil, errno.ServiceErr
 		}
