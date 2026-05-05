@@ -5,19 +5,24 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func MessageDaoToDto(message *model.ChatMessage) *ws.ChatMessage {
+func (s *ChatService) MessageDaoToDto(message *model.ChatMessage) *ws.ChatMessage {
+	content := message.Content
+	if message.IsAi {
+		content = s.replaceUserPlaceholders(content)
+	}
+
 	return &ws.ChatMessage{
 		SenderID:   message.SenderID,
 		ReceiverID: message.ReceiverID,
-		Content:    message.Content,
+		Content:    content,
 		Timestamp:  message.CreatedAt.Unix(),
 	}
 }
 
-func MessagesDaoToDto(messages []*model.ChatMessage) []*ws.ChatMessage {
+func (s *ChatService) MessagesDaoToDto(messages []*model.ChatMessage) []*ws.ChatMessage {
 	chatMessages := make([]*ws.ChatMessage, len(messages))
 	for i, message := range messages {
-		chatMessages[i] = MessageDaoToDto(message)
+		chatMessages[i] = s.MessageDaoToDto(message)
 	}
 	return chatMessages
 }

@@ -17,6 +17,7 @@ type ChatMessage struct {
 	ReceiverID int64      `gorm:"column:receiver_id;not null;comment:接收者ID" json:"receiver_id"`                        // 接收者ID
 	Content    string     `gorm:"column:content;not null;comment:消息内容" json:"content"`                                 // 消息内容
 	ReadAt     *time.Time `gorm:"column:read_at;comment:阅读时间" json:"read_at"`                                          // 阅读时间
+	IsAi       bool       `gorm:"column:is_ai;not null;comment:是否为AI的消息" json:"is_ai"`                                 // 是否为AI的消息
 	CreatedAt  time.Time  `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"created_at"` // 创建时间
 }
 

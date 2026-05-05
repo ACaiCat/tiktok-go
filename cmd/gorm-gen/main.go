@@ -20,7 +20,6 @@ func main() {
 	g.UseDB(db.DB)
 
 	videoModel := g.GenerateModel("videos")
-
 	commentModel := g.GenerateModel("comments")
 	userModel := g.GenerateModel("users")
 	likeModel := g.GenerateModel("likes")
@@ -28,6 +27,5 @@ func main() {
 	messageModel := g.GenerateModel("chat_messages")
 
 	g.ApplyBasic(videoModel, userModel, likeModel, commentModel, followerModel, messageModel)
-
 	g.Execute()
 }

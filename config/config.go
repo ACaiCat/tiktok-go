@@ -37,12 +37,19 @@ type minio struct {
 	ExternalUseSSL   bool   `mapstructure:"external_use_ssl"`
 }
 
+type ai struct {
+	BaseURL string `mapstructure:"base_url"`
+	Key     string `mapstructure:"key"`
+	Model   string `mapstructure:"model"`
+}
+
 type config struct {
 	Postgres postgres `mapstructure:"postgres"`
 	Redis    redis    `mapstructure:"redis"`
 	JWT      jwt      `mapstructure:"jwt"`
 	Server   server   `mapstructure:"server"`
 	Minio    minio    `mapstructure:"minio"`
+	AI       ai       `mapstructure:"ai"`
 }
 
 var AppConfig config
