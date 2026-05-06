@@ -84,3 +84,15 @@ func _refreshMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _jwchMw() []app.HandlerFunc {
+	// your code...
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
+}
+
+func _bindjwchMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

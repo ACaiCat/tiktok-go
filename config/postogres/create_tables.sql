@@ -1,13 +1,15 @@
 ﻿CREATE TABLE IF NOT EXISTS users
 (
-    id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    username        TEXT        NOT NULL,
-    password        TEXT        NOT NULL,
-    avatar_url      TEXT,
-    totp_secret     TEXT,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at      TIMESTAMPTZ
+    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    username      TEXT        NOT NULL,
+    password      TEXT        NOT NULL,
+    avatar_url    TEXT,
+    totp_secret   TEXT,
+    jwch_id       TEXT,
+    jwch_password TEXT,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at    TIMESTAMPTZ
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_users_username_active
@@ -20,6 +22,8 @@ COMMENT ON COLUMN users.username IS '用户名';
 COMMENT ON COLUMN users.password IS '密码';
 COMMENT ON COLUMN users.avatar_url IS '头像URL';
 COMMENT ON COLUMN users.totp_secret IS 'TOTP密钥';
+COMMENT ON COLUMN users.jwch_id IS '教务处学号';
+COMMENT ON COLUMN users.jwch_password IS '教务处密码';
 COMMENT ON COLUMN users.created_at IS '创建时间';
 COMMENT ON COLUMN users.updated_at IS '更新时间';
 COMMENT ON COLUMN users.deleted_at IS '删除时间';
@@ -120,9 +124,9 @@ CREATE TABLE IF NOT EXISTS likes
     comment_id BIGINT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_likes_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
-    CONSTRAINT fk_likes_video_id FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE RESTRICT,
-    CONSTRAINT fk_likes_comment_id FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+    CONSTRAINT fk_likes_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_likes_video_id FOREIGN KEY (video_id) REFERENCES videos (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_likes_comment_id FOREIGN KEY (comment_id) REFERENCES comments (id) ON DELETE CASCADE,
     CONSTRAINT chk_likes_target_exactly_one CHECK (
         (video_id IS NOT NULL AND comment_id IS NULL)
             OR
@@ -164,10 +168,10 @@ CREATE TABLE IF NOT EXISTS followers
     created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_followers_user_id
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT,
 
     CONSTRAINT fk_followers_follower_id
-        FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE RESTRICT,
+        FOREIGN KEY (follower_id) REFERENCES users (id) ON DELETE RESTRICT,
 
     CONSTRAINT chk_followers_not_self
         CHECK (user_id <> follower_id)
@@ -190,19 +194,19 @@ COMMENT ON COLUMN followers.created_at IS '创建时间';
 
 CREATE TABLE IF NOT EXISTS chat_messages
 (
-    id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    sender_id    BIGINT      NOT NULL,
-    receiver_id  BIGINT      NOT NULL,
-    content      TEXT        NOT NULL,
-    read_at      TIMESTAMPTZ,
-    is_ai        BOOLEAN  NOT NULL DEFAULT FALSE,
-    created_at   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sender_id   BIGINT      NOT NULL,
+    receiver_id BIGINT      NOT NULL,
+    content     TEXT        NOT NULL,
+    read_at     TIMESTAMPTZ,
+    is_ai       BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_chat_messages_sender_id
-        FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE RESTRICT,
+        FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE RESTRICT,
 
     CONSTRAINT fk_chat_messages_receiver_id
-        FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE RESTRICT
+        FOREIGN KEY (receiver_id) REFERENCES users (id) ON DELETE RESTRICT
 );
 
 CREATE INDEX IF NOT EXISTS idx_chat_messages_receiver_unread_created_at

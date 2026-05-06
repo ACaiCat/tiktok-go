@@ -39,5 +39,9 @@ func Register(r *server.Hertz) {
 			_image := _user.Group("/image", _imageMw()...)
 			_image.POST("/search", append(_searchimageMw(), user.SearchImage)...)
 		}
+		{
+			_jwch := _user.Group("/jwch", _jwchMw()...)
+			_jwch.POST("/bind", append(_bindjwchMw(), user.BindJwch)...)
+		}
 	}
 }

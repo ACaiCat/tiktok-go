@@ -31,4 +31,7 @@ const (
 	ChatMsgParseErrCode           = 17000
 	ChatMsgTypeErrCode            = 17001
 	ChatNotFriendErrCode          = 17002
+	JwchLoginFailedErrCode        = 18000
+	JwchLoginExpiredErrCode       = 18001
+	JwchNotBindErrCode            = 18002
 )

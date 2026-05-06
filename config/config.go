@@ -28,6 +28,10 @@ type server struct {
 	Port int    `mapstructure:"port"`
 }
 
+type security struct {
+	Key string `mapstructure:"key"`
+}
+
 type minio struct {
 	Endpoint         string `mapstructure:"endpoint"`
 	AccessKey        string `mapstructure:"access_key"`
@@ -48,6 +52,7 @@ type config struct {
 	Redis    redis    `mapstructure:"redis"`
 	JWT      jwt      `mapstructure:"jwt"`
 	Server   server   `mapstructure:"server"`
+	Security security `mapstructure:"security"`
 	Minio    minio    `mapstructure:"minio"`
 	AI       ai       `mapstructure:"ai"`
 }

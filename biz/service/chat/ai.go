@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
-	"github.com/ACaiCat/tiktok-go/pkg/ai"
 )
 
 func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
@@ -18,9 +17,9 @@ func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 
 	// 反转使最新的消息在上下文底部
 	slices.Reverse(messages)
-	history := s.buildAIHistory(messages)
+	history := BuildAIHistory(messages, userID, receiverID)
 
-	reply, content, err := ai.ChatAI(s.ctx, history)
+	reply, content, err := s.ChatAI(s.ctx, history)
 	if err != nil {
 		log.Println("failed to AI message:", err)
 		return
@@ -28,7 +27,6 @@ func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 	if !reply {
 		return
 	}
-	content = s.replaceUserPlaceholders(content)
 
 	now := time.Now().UnixMilli()
 	receiverMessage := &ws.ChatMessage{

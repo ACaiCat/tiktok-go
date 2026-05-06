@@ -7,9 +7,6 @@ import (
 
 func (s *ChatService) MessageDaoToDto(message *model.ChatMessage) *ws.ChatMessage {
 	content := message.Content
-	if message.IsAi {
-		content = s.replaceUserPlaceholders(content)
-	}
 
 	return &ws.ChatMessage{
 		SenderID:   message.SenderID,

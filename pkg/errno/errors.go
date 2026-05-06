@@ -40,4 +40,8 @@ var (
 	ChatMsgParseErr  = NewErrNo(ChatMsgParseErrCode, "消息格式错误")
 	ChatMsgTypeErr   = NewErrNo(ChatMsgTypeErrCode, "未知的消息类型")
 	ChatNotFriendErr = NewErrNo(ChatNotFriendErrCode, "你们还不是好友")
+
+	JwchLoginFailedErr  = NewErrNo(JwchLoginFailedErrCode, "教务处登录失败")
+	JwchLoginExpiredErr = NewErrNo(JwchLoginExpiredErrCode, "教务处登录过期")
+	JwchNotBindErr      = NewErrNo(JwchNotBindErrCode, "未绑定教务处账号")
 )

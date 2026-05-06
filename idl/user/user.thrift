@@ -119,6 +119,20 @@ struct BindMFAResp {
   1: required common.Base base;
 }
 
+// 绑定教务处请求
+struct BindJwchReq {
+  // 学号
+  1: required string jwch_id (api.body = 'jwch_id');
+  // 密码
+  2: required string jwch_password (api.body = 'jwch_password');
+}
+
+// 绑定教务处响应
+struct BindJwchResp {
+  // 响应状态
+  1: required common.Base base;
+}
+
 // 以图搜图请求
 struct SearchImageReq {
   // 图片原始数据
@@ -154,6 +168,9 @@ service UserHandler {
 
   // 绑定MFA
   BindMFAResp BindMFA(1: BindMFAReq req) (api.post = "/auth/mfa/bind")
+
+  // 绑定教务处
+  BindJwchResp BindJwch(1: BindJwchReq req) (api.post = "/user/jwch/bind")
 
   // 以图搜图
   SearchImageResp SearchImage(1: SearchImageReq req) (api.post = "/user/image/search")
