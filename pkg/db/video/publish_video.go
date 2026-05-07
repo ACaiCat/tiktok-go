@@ -33,7 +33,7 @@ func (v *VideoDao) PublishVideo(
 			return err
 		}
 		_, err := tx.Video.WithContext(ctx).Where(tx.Video.ID.Eq(video.ID)).
-			Updates(map[string]interface{}{
+			Updates(map[string]any{
 				"video_url": videoURLFn(video.ID),
 				"cover_url": coverURLFn(video.ID),
 			})

@@ -12,7 +12,7 @@ func getLikedVideosKey(userID int64) string {
 }
 
 func (c *UserCache) SetLikeVideos(ctx context.Context, userID int64, videoIDs []int64) error {
-	args := make([]interface{}, len(videoIDs))
+	args := make([]any, len(videoIDs))
 	for i, v := range videoIDs {
 		args[i] = v
 	}

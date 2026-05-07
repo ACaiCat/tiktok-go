@@ -27,3 +27,18 @@ func (u *UserDao) UpdateUserAvatarURL(ctx context.Context, userID int64, avatarU
 	}
 	return nil
 }
+
+func (u *UserDao) UpdateUserJwch(ctx context.Context, userID int64, jwchID string, jwchPassword string) error {
+	_, err := u.q.User.WithContext(ctx).
+		Where(u.q.User.ID.Eq(userID)).
+		Updates(map[string]any{
+			"jwch_password": jwchPassword,
+			"jwch_id":       jwchID,
+		})
+	if err != nil {
+		log.Println("failed to update user mfa secret: ", err)
+		return err
+	}
+
+	return nil
+}

@@ -47,6 +47,12 @@ func RespBindMFA(c *app.RequestContext) {
 	})
 }
 
+func RespBindJwch(c *app.RequestContext) {
+	c.JSON(consts.StatusOK, user.BindJwchResp{
+		Base: SuccessBase,
+	})
+}
+
 func RespUploadAvatar(c *app.RequestContext, usr *model.User) {
 	c.JSON(consts.StatusOK, user.UploadAvatarResp{
 		Base: SuccessBase,

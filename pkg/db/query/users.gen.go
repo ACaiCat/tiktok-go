@@ -36,6 +36,8 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 	_user.CreatedAt = field.NewTime(tableName, "created_at")
 	_user.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_user.DeletedAt = field.NewField(tableName, "deleted_at")
+	_user.JwchID = field.NewString(tableName, "jwch_id")
+	_user.JwchPassword = field.NewString(tableName, "jwch_password")
 
 	_user.fillFieldMap()
 
@@ -45,15 +47,17 @@ func newUser(db *gorm.DB, opts ...gen.DOOption) user {
 type user struct {
 	userDo
 
-	ALL        field.Asterisk
-	ID         field.Int64  // 用户ID
-	Username   field.String // 用户名
-	Password   field.String // 密码
-	AvatarURL  field.String // 头像URL
-	TotpSecret field.String // TOTP密钥
-	CreatedAt  field.Time   // 创建时间
-	UpdatedAt  field.Time   // 更新时间
-	DeletedAt  field.Field  // 删除时间
+	ALL          field.Asterisk
+	ID           field.Int64  // 用户ID
+	Username     field.String // 用户名
+	Password     field.String // 密码
+	AvatarURL    field.String // 头像URL
+	TotpSecret   field.String // TOTP密钥
+	CreatedAt    field.Time   // 创建时间
+	UpdatedAt    field.Time   // 更新时间
+	DeletedAt    field.Field  // 删除时间
+	JwchID       field.String // 教务处学号
+	JwchPassword field.String // 教务处密码
 
 	fieldMap map[string]field.Expr
 }
@@ -78,6 +82,8 @@ func (u *user) updateTableName(table string) *user {
 	u.CreatedAt = field.NewTime(table, "created_at")
 	u.UpdatedAt = field.NewTime(table, "updated_at")
 	u.DeletedAt = field.NewField(table, "deleted_at")
+	u.JwchID = field.NewString(table, "jwch_id")
+	u.JwchPassword = field.NewString(table, "jwch_password")
 
 	u.fillFieldMap()
 
@@ -94,7 +100,7 @@ func (u *user) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *user) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 8)
+	u.fieldMap = make(map[string]field.Expr, 10)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["username"] = u.Username
 	u.fieldMap["password"] = u.Password
@@ -103,6 +109,8 @@ func (u *user) fillFieldMap() {
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
 	u.fieldMap["deleted_at"] = u.DeletedAt
+	u.fieldMap["jwch_id"] = u.JwchID
+	u.fieldMap["jwch_password"] = u.JwchPassword
 }
 
 func (u user) clone(db *gorm.DB) user {

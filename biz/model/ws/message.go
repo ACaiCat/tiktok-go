@@ -22,6 +22,7 @@ type SendMessage struct {
 type ChatMessage struct {
 	SenderID   int64  `json:"sender_id"`
 	ReceiverID int64  `json:"receiver_id"`
+	IsAI       bool   `json:"is_ai"`
 	Content    string `json:"content"`
 	Timestamp  int64  `json:"timestamp"`
 }

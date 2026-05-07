@@ -207,3 +207,25 @@ func SearchImage(ctx context.Context, c *app.RequestContext) {
 
 	c.JSON(consts.StatusOK, resp)
 }
+
+// BindJwch .
+// @router /user/jwch/bind [POST]
+func BindJwch(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.BindJwchReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.RespError(c, errno.ParamErr.WithError(err))
+		return
+	}
+
+	userID := mw.GetUserID(c)
+
+	err = service.NewUserService(ctx).BindJwch(&req, userID)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespBindJwch(c)
+}

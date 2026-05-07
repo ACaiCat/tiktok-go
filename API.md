@@ -1354,6 +1354,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 |-------------|--------|---------------|
 | sender_id   | int64  | 发送方用户 ID      |
 | receiver_id | int64  | 接收方用户 ID      |
+| is_ai       | bool   | 消息是否为AI发送     |
 | content     | string | 消息内容          |
 | timestamp   | int64  | 发送时间戳（Unix 秒） |
 
@@ -1364,6 +1365,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "sender_id": 1,
     "receiver_id": 2,
     "content": "你好，在吗？",
+    "is_ai": false,
     "timestamp": 1741737600
   }
 }
@@ -1407,12 +1409,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "sender_id": 1,
         "receiver_id": 2,
         "content": "你好，在吗？",
+        "is_ai": false,
         "timestamp": 1741737600
       },
       {
         "sender_id": 2,
         "receiver_id": 1,
         "content": "在的！",
+        "is_ai": false,
         "timestamp": 1741737720
       }
     ]
@@ -1450,12 +1454,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "sender_id": 2,
         "receiver_id": 1,
         "content": "有空吗？",
+        "is_ai": false,
         "timestamp": 1741737800
       },
       {
         "sender_id": 2,
         "receiver_id": 1,
         "content": "一起吃饭？",
+        "is_ai": false,
         "timestamp": 1741737860
       }
     ]

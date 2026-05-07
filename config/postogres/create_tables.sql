@@ -1,13 +1,15 @@
 ﻿CREATE TABLE IF NOT EXISTS users
 (
-    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    username    TEXT        NOT NULL,
-    password    TEXT        NOT NULL,
-    avatar_url  TEXT,
-    totp_secret TEXT,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted_at  TIMESTAMPTZ
+    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    username      TEXT        NOT NULL,
+    password      TEXT        NOT NULL,
+    avatar_url    TEXT,
+    totp_secret   TEXT,
+    jwch_id       TEXT,
+    jwch_password TEXT,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at    TIMESTAMPTZ
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_users_username_active
@@ -20,8 +22,8 @@ COMMENT ON COLUMN users.username IS '用户名';
 COMMENT ON COLUMN users.password IS '密码';
 COMMENT ON COLUMN users.avatar_url IS '头像URL';
 COMMENT ON COLUMN users.totp_secret IS 'TOTP密钥';
-COMMENT ON COLUMN users.following_count IS '关注数';
-COMMENT ON COLUMN users.follower_count IS '粉丝数';
+COMMENT ON COLUMN users.jwch_id IS '教务处学号';
+COMMENT ON COLUMN users.jwch_password IS '教务处密码';
 COMMENT ON COLUMN users.created_at IS '创建时间';
 COMMENT ON COLUMN users.updated_at IS '更新时间';
 COMMENT ON COLUMN users.deleted_at IS '删除时间';
@@ -197,6 +199,7 @@ CREATE TABLE IF NOT EXISTS chat_messages
     receiver_id BIGINT      NOT NULL,
     content     TEXT        NOT NULL,
     read_at     TIMESTAMPTZ,
+    is_ai       BOOLEAN     NOT NULL DEFAULT FALSE,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_chat_messages_sender_id
@@ -222,4 +225,5 @@ COMMENT ON COLUMN chat_messages.sender_id IS '发送者ID';
 COMMENT ON COLUMN chat_messages.receiver_id IS '接收者ID';
 COMMENT ON COLUMN chat_messages.content IS '消息内容';
 COMMENT ON COLUMN chat_messages.read_at IS '阅读时间';
+COMMENT ON COLUMN chat_messages.is_ai IS '是否为AI的消息';
 COMMENT ON COLUMN chat_messages.created_at IS '创建时间';

@@ -47,6 +47,7 @@ func (c *ChatDao) GetChatHistory(ctx context.Context, userID int64, otherUserID 
 			c.q.ChatMessage.SenderID.In(userID, otherUserID),
 			c.q.ChatMessage.ReceiverID.In(userID, otherUserID),
 		).
+		Where(c.q.ChatMessage.Or(c.q.ChatMessage.IsAi.Is(false)).Or(c.q.ChatMessage.SenderID.Eq(otherUserID))).
 		Order(c.q.ChatMessage.CreatedAt.Desc()).
 		Offset(pageSize * pageNum).
 		Limit(pageSize).

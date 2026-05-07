@@ -33,6 +33,7 @@ func newChatMessage(db *gorm.DB, opts ...gen.DOOption) chatMessage {
 	_chatMessage.ReceiverID = field.NewInt64(tableName, "receiver_id")
 	_chatMessage.Content = field.NewString(tableName, "content")
 	_chatMessage.ReadAt = field.NewTime(tableName, "read_at")
+	_chatMessage.IsAi = field.NewBool(tableName, "is_ai")
 	_chatMessage.CreatedAt = field.NewTime(tableName, "created_at")
 
 	_chatMessage.fillFieldMap()
@@ -49,6 +50,7 @@ type chatMessage struct {
 	ReceiverID field.Int64  // 接收者ID
 	Content    field.String // 消息内容
 	ReadAt     field.Time   // 阅读时间
+	IsAi       field.Bool   // 是否为AI的消息
 	CreatedAt  field.Time   // 创建时间
 
 	fieldMap map[string]field.Expr
@@ -71,6 +73,7 @@ func (c *chatMessage) updateTableName(table string) *chatMessage {
 	c.ReceiverID = field.NewInt64(table, "receiver_id")
 	c.Content = field.NewString(table, "content")
 	c.ReadAt = field.NewTime(table, "read_at")
+	c.IsAi = field.NewBool(table, "is_ai")
 	c.CreatedAt = field.NewTime(table, "created_at")
 
 	c.fillFieldMap()
@@ -88,12 +91,13 @@ func (c *chatMessage) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *chatMessage) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 6)
+	c.fieldMap = make(map[string]field.Expr, 7)
 	c.fieldMap["id"] = c.ID
 	c.fieldMap["sender_id"] = c.SenderID
 	c.fieldMap["receiver_id"] = c.ReceiverID
 	c.fieldMap["content"] = c.Content
 	c.fieldMap["read_at"] = c.ReadAt
+	c.fieldMap["is_ai"] = c.IsAi
 	c.fieldMap["created_at"] = c.CreatedAt
 }
 
