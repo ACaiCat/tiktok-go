@@ -93,11 +93,6 @@ func chatWithAI(ctx context.Context, history string, userAID int64, userBID int6
 		},
 	}
 
-	log.Println(messages)
-	for _, tool := range tools {
-		log.Println(tool.Function.Name)
-	}
-
 	reply, err := agentLoop(ctx, client, fuuMcp, messages, tools, ai.NewToolCallContext(userAID, userBID))
 
 	if err != nil {
