@@ -1,11 +1,15 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"log"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/ACaiCat/tiktok-go/pkg/crypt"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"github.com/ACaiCat/tiktok-go/pkg/utils"
+	"github.com/redis/go-redis/v9"
 	"github.com/west2-online/jwch"
 )
 
@@ -33,13 +37,32 @@ func (s *UserService) BindJwch(req *user.BindJwchReq, userID int64) error {
 		return errno.ServiceErr
 	}
 
+	go func() {
+		err := s.cache.CleanJwchSession(context.Background(), userID)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}()
+
 	return nil
 }
 
 func (s *UserService) GetJwchIdentifierAndCookies(userID int64) (string, string, error) {
 	var err error
 
-	log.Println(userID)
+	idCache, cookieCache, err := s.cache.GetJwchSession(s.ctx, userID)
+
+	if err == nil {
+		stu := jwch.NewStudent().WithLoginData(idCache, utils.ParseCookies(cookieCache))
+		err := stu.CheckSession()
+		if err == nil {
+			return idCache, cookieCache, nil
+		}
+	} else if !errors.Is(err, redis.Nil) {
+		log.Printf("get jwch session err %v", err)
+	}
+
 	usr, err := s.dao.GetByID(s.ctx, userID)
 	if err != nil {
 		log.Println(err)
@@ -60,10 +83,7 @@ func (s *UserService) GetJwchIdentifierAndCookies(userID int64) (string, string,
 		return "", "", errno.ServiceErr
 	}
 
-	stu := jwch.NewStudent()
-	stu.ID = *usr.JwchID
-	stu.Password = password
-
+	stu := jwch.NewStudent().WithUser(*usr.JwchID, password)
 	err = stu.Login()
 	if err != nil {
 		return "", "", errno.JwchLoginFailedErr.WithError(err)
@@ -74,11 +94,14 @@ func (s *UserService) GetJwchIdentifierAndCookies(userID int64) (string, string,
 		return "", "", err
 	}
 
-	var cookiesStr string
+	cookiesStr := utils.ParseCookiesToString(cookies)
 
-	for _, cookie := range cookies {
-		cookiesStr += cookie.Name + "=" + cookie.Value + ";"
-	}
+	go func() {
+		err := s.cache.SetJwchSession(context.Background(), userID, id, cookiesStr)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	return id, cookiesStr, nil
 }
