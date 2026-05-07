@@ -5,10 +5,11 @@ import (
 	"errors"
 	"log"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"github.com/redis/go-redis/v9"
 )
 
 func (s *ChatService) handleChatMessage(userID int64, chatMessage *ws.ChatMessage) {
@@ -44,7 +45,7 @@ func (s *ChatService) handleUnreadMessage(userID int64, unreadRequest *ws.Unread
 		return
 	}
 
-	go s.invalidateUnreadMessages(userID, unreadRequest.Sender)
+	go s.clearUnreadMessagesCache(userID, unreadRequest.Sender)
 }
 
 func (s *ChatService) getUnreadMessages(userID int64, senderID int64) ([]*model.ChatMessage, error) {
@@ -134,19 +135,19 @@ func (s *ChatService) saveChatMessage(senderID int64, receiverID int64, content 
 		return false
 	}
 
-	go s.invalidateConversationHistory(senderID, receiverID)
-	go s.invalidateUnreadMessages(receiverID, senderID)
+	go s.clearConversationHistoryCache(senderID, receiverID)
+	go s.clearUnreadMessagesCache(receiverID, senderID)
 
 	return true
 }
 
-func (s *ChatService) invalidateConversationHistory(senderID int64, receiverID int64) {
+func (s *ChatService) clearConversationHistoryCache(senderID int64, receiverID int64) {
 	if err := s.cache.ClearChatHistory(context.Background(), senderID, receiverID); err != nil {
 		log.Printf("clear chat history cache err sender=%d receiver=%d: %v", senderID, receiverID, err)
 	}
 }
 
-func (s *ChatService) invalidateUnreadMessages(userID int64, senderID int64) {
+func (s *ChatService) clearUnreadMessagesCache(userID int64, senderID int64) {
 	if err := s.cache.ClearUnreadMessages(context.Background(), userID, senderID); err != nil {
 		log.Printf("clear unread messages cache err user=%d sender=%d: %v", userID, senderID, err)
 	}

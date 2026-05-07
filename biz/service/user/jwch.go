@@ -5,12 +5,13 @@ import (
 	"errors"
 	"log"
 
+	"github.com/redis/go-redis/v9"
+	"github.com/west2-online/jwch"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/ACaiCat/tiktok-go/pkg/crypt"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/utils"
-	"github.com/redis/go-redis/v9"
-	"github.com/west2-online/jwch"
 )
 
 func (s *UserService) BindJwch(req *user.BindJwchReq, userID int64) error {

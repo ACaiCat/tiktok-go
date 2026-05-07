@@ -22,5 +22,6 @@ const (
 - 可以用 {{@用户ID}} 称呼用户
 - 不要解释判断过程，不要重复历史消息
 `
-	NoReplySignal = "noreply"
+	NoReplySignal      = "noreply"
+	AIPullHistoryCount = 20
 )

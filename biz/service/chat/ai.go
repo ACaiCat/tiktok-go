@@ -8,16 +8,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sashabaranov/go-openai"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/ai"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
-	"github.com/sashabaranov/go-openai"
 )
 
 func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
-	messages, err := s.getChatHistory(userID, receiverID, 10, 0)
+	messages, err := s.getChatHistory(userID, receiverID, constants.AIPullHistoryCount, 0)
 	if err != nil {
 		log.Println("failed to get message history:", err)
 		return
@@ -60,10 +61,6 @@ func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 	_ = s.saveChatMessage(receiverID, userID, content, senderOnline, true)
 }
 
-type CallJwchLogin struct {
-	UserID int64 `json:"user_id"`
-}
-
 func chatWithAI(ctx context.Context, history string, userAID int64, userBID int64) (bool, string, error) {
 	cfg := openai.DefaultConfig(config.AppConfig.AI.Key)
 	cfg.BaseURL = config.AppConfig.AI.BaseURL
@@ -104,7 +101,6 @@ func chatWithAI(ctx context.Context, history string, userAID int64, userBID int6
 	}
 
 	return true, reply, nil
-
 }
 
 func agentLoop(ctx context.Context, client *openai.Client, fuuMCP *ai.FuuMCP,
@@ -152,7 +148,12 @@ func agentLoop(ctx context.Context, client *openai.Client, fuuMCP *ai.FuuMCP,
 func buildAIHistory(messages []*model.ChatMessage, userAID int64, userBID int64) string {
 	var history strings.Builder
 
-	history.WriteString(fmt.Sprintf("用户A的ID: %d, 用户B的ID: %d\n", userAID, userBID))
+	_, _ = fmt.Fprintf(
+		&history,
+		"用户A的ID: %d, 用户B的ID: %d\n",
+		min(userAID, userBID),
+		max(userAID, userBID),
+	)
 
 	for _, message := range messages {
 		identity := "{{@AI}}"

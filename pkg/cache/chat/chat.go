@@ -20,8 +20,10 @@ func (c *ChatCache) deleteByPattern(ctx context.Context, pattern string) error {
 		keys   []string
 	)
 
+	var patternScanBatch int64 = 100
+
 	for {
-		batch, nextCursor, err := c.c.Scan(ctx, cursor, pattern, 100).Result()
+		batch, nextCursor, err := c.c.Scan(ctx, cursor, pattern, patternScanBatch).Result()
 		if err != nil {
 			return err
 		}

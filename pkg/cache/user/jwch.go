@@ -23,13 +23,13 @@ func (c *UserCache) SetJwchSession(ctx context.Context, userID int64, jwchID str
 		Cookie: cookie,
 	}
 
-	sessionJson, err := json.Marshal(session)
+	sessionJSON, err := json.Marshal(session)
 	if err != nil {
 		return err
 	}
 
 	pipe := c.c.Pipeline()
-	pipe.Set(ctx, getJwchSessionKey(userID), sessionJson, constants.JwchSessionCacheExpiration)
+	pipe.Set(ctx, getJwchSessionKey(userID), sessionJSON, constants.JwchSessionCacheExpiration)
 	_, err = pipe.Exec(ctx)
 
 	return err

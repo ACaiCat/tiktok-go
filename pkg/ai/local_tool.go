@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/invopop/jsonschema"
 	mcpproto "github.com/mark3labs/mcp-go/mcp"
 	"github.com/sashabaranov/go-openai"
+
+	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
 
 type LocalTool[I, O any] struct {
@@ -90,7 +91,7 @@ func (l LocalTool[I, O]) CallTool(tc openai.ToolCall, callCtx ToolCallContext) (
 		}
 	}
 
-	callToolResultJson, err := json.Marshal(callToolResult)
+	callToolResultJSON, err := json.Marshal(callToolResult)
 
 	if err != nil {
 		return nil, err
@@ -98,7 +99,7 @@ func (l LocalTool[I, O]) CallTool(tc openai.ToolCall, callCtx ToolCallContext) (
 
 	msg := openai.ChatCompletionMessage{
 		Role:       openai.ChatMessageRoleTool,
-		Content:    string(callToolResultJson),
+		Content:    string(callToolResultJSON),
 		ToolCallID: tc.ID,
 	}
 

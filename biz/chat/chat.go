@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/websocket"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
 	service "github.com/ACaiCat/tiktok-go/biz/service/chat"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/jwt"
-	"github.com/gorilla/websocket"
 )
 
 var m = ws.NewOnlineUserManager()
