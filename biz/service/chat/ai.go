@@ -17,7 +17,7 @@ import (
 )
 
 func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
-	messages, err := s.chatDao.GetChatHistory(s.ctx, userID, receiverID, 10, 0)
+	messages, err := s.getChatHistory(userID, receiverID, 10, 0)
 	if err != nil {
 		log.Println("failed to get message history:", err)
 		return

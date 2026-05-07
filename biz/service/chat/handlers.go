@@ -1,10 +1,14 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"log"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"github.com/redis/go-redis/v9"
 )
 
 func (s *ChatService) handleChatMessage(userID int64, chatMessage *ws.ChatMessage) {
@@ -23,13 +27,13 @@ func (s *ChatService) handleChatMessage(userID int64, chatMessage *ws.ChatMessag
 }
 
 func (s *ChatService) handleUnreadMessage(userID int64, unreadRequest *ws.UnreadRequest) {
-	unreadMessages, err := s.chatDao.GetUnreadMessages(s.ctx, userID, unreadRequest.Sender)
+	unreadMessages, err := s.getUnreadMessages(userID, unreadRequest.Sender)
 	if err != nil {
 		s.SendErr(userID, errno.ServiceErr.WithMessage("获取未读消息失败："+err.Error()))
 		return
 	}
 
-	if !s.sendMessageToUser(userID, ws.MessageTypeUnread, &ws.HistoryMessage{
+	if !s.sendMessageToUser(userID, ws.MessageTypeUnread, &ws.UnreadMessage{
 		Messages: s.MessagesDaoToDto(unreadMessages),
 	}, "failed to send unread messages to user") {
 		return
@@ -37,11 +41,35 @@ func (s *ChatService) handleUnreadMessage(userID int64, unreadRequest *ws.Unread
 
 	if err := s.chatDao.MarkMessagesAsRead(s.ctx, userID, unreadRequest.Sender); err != nil {
 		s.SendErr(userID, errno.ServiceErr.WithMessage("标记消息已读失败"))
+		return
 	}
+
+	go s.invalidateUnreadMessages(userID, unreadRequest.Sender)
+}
+
+func (s *ChatService) getUnreadMessages(userID int64, senderID int64) ([]*model.ChatMessage, error) {
+	messages, err := s.cache.GetUnreadMessages(s.ctx, userID, senderID)
+	if err == nil {
+		return messages, nil
+	}
+	if !errors.Is(err, redis.Nil) {
+		log.Printf("get unread messages cache err user=%d sender=%d: %v", userID, senderID, err)
+	}
+
+	messages, err = s.chatDao.GetUnreadMessages(s.ctx, userID, senderID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.cache.SetUnreadMessages(s.ctx, userID, senderID, messages); err != nil {
+		log.Printf("set unread messages cache err user=%d sender=%d: %v", userID, senderID, err)
+	}
+
+	return messages, nil
 }
 
 func (s *ChatService) handleHistoryMessage(userID int64, historyRequest *ws.HistoryRequest) {
-	historyMessages, err := s.chatDao.GetChatHistory(s.ctx, userID, historyRequest.Sender, historyRequest.PageSize, historyRequest.Page)
+	historyMessages, err := s.getChatHistory(userID, historyRequest.Sender, historyRequest.PageSize, historyRequest.Page)
 	if err != nil {
 		s.SendErr(userID, errno.ServiceErr.WithMessage("获取历史消息失败"))
 		return
@@ -50,6 +78,27 @@ func (s *ChatService) handleHistoryMessage(userID int64, historyRequest *ws.Hist
 	s.sendMessageToUser(userID, ws.MessageTypeHistory, &ws.HistoryMessage{
 		Messages: s.MessagesDaoToDto(historyMessages),
 	}, "failed to send chat history to user")
+}
+
+func (s *ChatService) getChatHistory(userID int64, otherUserID int64, pageSize int, pageNum int) ([]*model.ChatMessage, error) {
+	messages, err := s.cache.GetChatHistory(s.ctx, userID, otherUserID, pageSize, pageNum)
+	if err == nil {
+		return messages, nil
+	}
+	if !errors.Is(err, redis.Nil) {
+		log.Printf("get chat history cache err user=%d other=%d: %v", userID, otherUserID, err)
+	}
+
+	messages, err = s.chatDao.GetChatHistory(s.ctx, userID, otherUserID, pageSize, pageNum)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.cache.SetChatHistory(s.ctx, userID, otherUserID, pageSize, pageNum, messages); err != nil {
+		log.Printf("set chat history cache err user=%d other=%d: %v", userID, otherUserID, err)
+	}
+
+	return messages, nil
 }
 
 func (s *ChatService) ensureFriend(userID int64, receiverID int64) bool {
@@ -85,5 +134,20 @@ func (s *ChatService) saveChatMessage(senderID int64, receiverID int64, content 
 		return false
 	}
 
+	go s.invalidateConversationHistory(senderID, receiverID)
+	go s.invalidateUnreadMessages(receiverID, senderID)
+
 	return true
+}
+
+func (s *ChatService) invalidateConversationHistory(senderID int64, receiverID int64) {
+	if err := s.cache.ClearChatHistory(context.Background(), senderID, receiverID); err != nil {
+		log.Printf("clear chat history cache err sender=%d receiver=%d: %v", senderID, receiverID, err)
+	}
+}
+
+func (s *ChatService) invalidateUnreadMessages(userID int64, senderID int64) {
+	if err := s.cache.ClearUnreadMessages(context.Background(), userID, senderID); err != nil {
+		log.Printf("clear unread messages cache err user=%d sender=%d: %v", userID, senderID, err)
+	}
 }
