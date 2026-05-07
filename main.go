@@ -10,6 +10,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/biz/chat"
 	mw "github.com/ACaiCat/tiktok-go/biz/mw/log"
 	"github.com/ACaiCat/tiktok-go/config"
+	"github.com/ACaiCat/tiktok-go/pkg/ai"
 	"github.com/ACaiCat/tiktok-go/pkg/bucket"
 	"github.com/ACaiCat/tiktok-go/pkg/cache"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
@@ -22,6 +23,7 @@ func main() {
 	db.InitPostgres()
 	cache.InitRedis()
 	bucket.InitMinIO(context.Background())
+	ai.InitLocalToolRegistry()
 
 	h := server.Default(
 		server.WithHostPorts(config.AppConfig.Server.Host+":"+strconv.Itoa(config.AppConfig.Server.Port)),
