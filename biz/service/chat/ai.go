@@ -27,7 +27,7 @@ func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 	slices.Reverse(messages)
 	history := buildAIHistory(messages, userID, receiverID)
 
-	reply, content, err := chatWithAI(s.ctx, history)
+	reply, content, err := chatWithAI(s.ctx, history, userID, receiverID)
 	if err != nil {
 		log.Println("failed to AI message:", err)
 		return
@@ -64,7 +64,7 @@ type CallJwchLogin struct {
 	UserID int64 `json:"user_id"`
 }
 
-func chatWithAI(ctx context.Context, history string) (bool, string, error) {
+func chatWithAI(ctx context.Context, history string, userAID int64, userBID int64) (bool, string, error) {
 	cfg := openai.DefaultConfig(config.AppConfig.AI.Key)
 	cfg.BaseURL = config.AppConfig.AI.BaseURL
 	client := openai.NewClientWithConfig(cfg)
@@ -98,7 +98,7 @@ func chatWithAI(ctx context.Context, history string) (bool, string, error) {
 		log.Println(tool.Function.Name)
 	}
 
-	reply, err := agentLoop(ctx, client, fuuMcp, messages, tools)
+	reply, err := agentLoop(ctx, client, fuuMcp, messages, tools, ai.NewToolCallContext(userAID, userBID))
 
 	if err != nil {
 		return false, "", err
@@ -113,7 +113,7 @@ func chatWithAI(ctx context.Context, history string) (bool, string, error) {
 }
 
 func agentLoop(ctx context.Context, client *openai.Client, fuuMCP *ai.FuuMCP,
-	messages []openai.ChatCompletionMessage, tools []openai.Tool) (string, error) {
+	messages []openai.ChatCompletionMessage, tools []openai.Tool, localToolCallCtx ai.ToolCallContext) (string, error) {
 	for {
 		resp, err := client.CreateChatCompletion(
 			ctx,
@@ -138,7 +138,7 @@ func agentLoop(ctx context.Context, client *openai.Client, fuuMCP *ai.FuuMCP,
 		for _, tc := range msg.ToolCalls {
 			var callMsg *openai.ChatCompletionMessage
 			if ai.LocalToolRegistry.ExistTool(tc) {
-				callMsg, err = ai.LocalToolRegistry.CallTool(tc)
+				callMsg, err = ai.LocalToolRegistry.CallTool(tc, localToolCallCtx)
 				if err != nil {
 					return "", err
 				}

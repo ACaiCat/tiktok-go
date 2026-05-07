@@ -29,12 +29,12 @@ func (r *toolRegistry) ExistTool(tc openai.ToolCall) bool {
 	return ok
 }
 
-func (r *toolRegistry) CallTool(tc openai.ToolCall) (*openai.ChatCompletionMessage, error) {
+func (r *toolRegistry) CallTool(tc openai.ToolCall, callCtx ToolCallContext) (*openai.ChatCompletionMessage, error) {
 	tool, ok := r.tools[tc.Function.Name]
 	if !ok {
 		return nil, fmt.Errorf("tool %s not found", tc.Function.Name)
 	}
-	callResult, err := tool.CallTool(tc)
+	callResult, err := tool.CallTool(tc, callCtx)
 	if err != nil {
 		return nil, err
 	}
