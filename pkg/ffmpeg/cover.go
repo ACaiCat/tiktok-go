@@ -3,18 +3,19 @@ package ffmpeg
 import (
 	"bytes"
 
-	ffmpeg_go "github.com/u2takey/ffmpeg-go"
+	"github.com/pkg/errors"
+	ffmpeggo "github.com/u2takey/ffmpeg-go"
 )
 
 func GetVideoCover(filePath string) ([]byte, error) {
 	buf := bytes.NewBuffer(nil)
 
-	err := ffmpeg_go.Input(filePath).
-		Output("pipe:1", ffmpeg_go.KwArgs{"vframes": "1", "format": "mjpeg"}).
+	err := ffmpeggo.Input(filePath).
+		Output("pipe:1", ffmpeggo.KwArgs{"vframes": "1", "format": "mjpeg"}).
 		WithOutput(buf).
 		Run()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "GetVideoCover failed, filePath: %s", filePath)
 	}
 
 	return buf.Bytes(), nil

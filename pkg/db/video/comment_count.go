@@ -2,7 +2,8 @@ package videodao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (v *VideoDao) IncrCommentCount(ctx context.Context, videoID int64) error {
@@ -11,8 +12,7 @@ func (v *VideoDao) IncrCommentCount(ctx context.Context, videoID int64) error {
 		UpdateColumn(v.q.Video.CommentCount, v.q.Video.CommentCount.Add(1))
 
 	if err != nil {
-		log.Printf("failed to increase comment count: %v", err)
-		return err
+		return errors.Wrapf(err, "IncrCommentCount failed, videoID: %d", videoID)
 	}
 
 	return nil
@@ -24,8 +24,7 @@ func (v *VideoDao) DecrCommentCount(ctx context.Context, videoID int64) error {
 		UpdateColumn(v.q.Video.CommentCount, v.q.Video.CommentCount.Add(-1))
 
 	if err != nil {
-		log.Printf("failed to decrease comment count: %v", err)
-		return err
+		return errors.Wrapf(err, "DecrCommentCount failed, videoID: %d", videoID)
 	}
 
 	return nil

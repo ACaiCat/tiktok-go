@@ -2,7 +2,8 @@ package commentdao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (c *CommentDao) DeleteComment(ctx context.Context, commentID int64) error {
@@ -13,8 +14,7 @@ func (c *CommentDao) DeleteComment(ctx context.Context, commentID int64) error {
 		Delete()
 
 	if err != nil {
-		log.Printf("failed to delete video comment: %v", err)
-		return err
+		return errors.Wrapf(err, "DeleteComment failed, commentID: %d", commentID)
 	}
 
 	return nil
@@ -28,8 +28,7 @@ func (c *CommentDao) DeleteCommentReply(ctx context.Context, commentID int64) er
 		Delete()
 
 	if err != nil {
-		log.Printf("failed to delete comment reply: %v", err)
-		return err
+		return errors.Wrapf(err, "DeleteCommentReply failed, commentID: %d", commentID)
 	}
 
 	return nil

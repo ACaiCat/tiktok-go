@@ -2,12 +2,12 @@ package userdao
 
 import (
 	"context"
-	"errors"
-	"log"
 
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+
+	"github.com/pkg/errors"
 )
 
 func (u *UserDao) GetByID(ctx context.Context, id int64) (*model.User, error) {
@@ -18,9 +18,7 @@ func (u *UserDao) GetByID(ctx context.Context, id int64) (*model.User, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-
-		log.Println("failed to get user by id:", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetUserByID failed, userID: %d", id)
 	}
 	return user, nil
 }
@@ -34,8 +32,7 @@ func (u *UserDao) GetByUsername(ctx context.Context, username string) (*model.Us
 			return nil, nil
 		}
 
-		log.Println("failed to get user by username:", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetUserByUsername failed, user: %s", username)
 	}
 	return user, nil
 }

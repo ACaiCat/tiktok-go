@@ -17,7 +17,7 @@ func Auth() app.HandlerFunc {
 
 		userID, err := jwt.ValidateToken(token, constants.TypeAccessToken)
 		if err != nil {
-			pack.RespError(c, err)
+			pack.RespError(ctx, c, err)
 			c.Abort()
 			return
 		}

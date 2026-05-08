@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
@@ -62,7 +64,7 @@ func (s *VideoService) SearchVideo(req *video.SearchReq) ([]*model.Video, error)
 
 	videosDao, err := s.videoDao.SearchVideo(s.ctx, keywords, int(pageSize), int(pageNum), fromDate, toDate, username)
 	if err != nil {
-		return nil, errno.ServiceErr
+		return nil, errors.WithMessagef(err, "service.SearchVideo: db.SearchVideo failed, keywords=%q", keywords)
 	}
 
 	videos := VideosDaoToDto(videosDao)

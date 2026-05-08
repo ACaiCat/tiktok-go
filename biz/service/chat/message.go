@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/common/json"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
@@ -23,35 +24,38 @@ func (s *ChatService) HandleMessage(userID int64, messageText string) {
 	switch message.Type {
 	case ws.MessageTypeChat:
 		var chatMessage ws.ChatMessage
-		if !s.unmarshalBody(userID, message.Body, &chatMessage, "聊天消息格式错误：") {
+		if err := json.Unmarshal(message.Body, &chatMessage); err != nil {
+			s.SendErr(userID, errno.ChatMsgParseErr)
 			return
 		}
-		s.handleChatMessage(userID, &chatMessage)
+		if err := s.handleChatMessage(userID, &chatMessage); err != nil {
+			s.SendErr(userID, errno.ServiceErr)
+			hlog.CtxErrorf(s.ctx, "handleChatMessage: %v", err)
+		}
 
 	case ws.MessageTypeUnread:
 		var unreadRequest ws.UnreadRequest
-		if !s.unmarshalBody(userID, message.Body, &unreadRequest, "未读消息请求格式错误：") {
+		if err := json.Unmarshal(message.Body, &unreadRequest); err != nil {
+			s.SendErr(userID, errno.ChatMsgParseErr)
 			return
 		}
-		s.handleUnreadMessage(userID, &unreadRequest)
+		if err := s.handleUnreadMessage(userID, &unreadRequest); err != nil {
+			s.SendErr(userID, errno.ServiceErr)
+			hlog.CtxErrorf(s.ctx, "handleUnreadMessage: %v", err)
+		}
 
 	case ws.MessageTypeHistory:
 		var historyRequest ws.HistoryRequest
-		if !s.unmarshalBody(userID, message.Body, &historyRequest, "历史消息请求格式错误：") {
+		if err := json.Unmarshal(message.Body, &historyRequest); err != nil {
+			s.SendErr(userID, errno.ChatMsgParseErr)
 			return
 		}
-		s.handleHistoryMessage(userID, &historyRequest)
+		if err := s.handleHistoryMessage(userID, &historyRequest); err != nil {
+			s.SendErr(userID, errno.ServiceErr)
+			hlog.CtxErrorf(s.ctx, "handleHistoryMessage: %v", err)
+		}
 
 	default:
 		s.SendErr(userID, errno.ChatMsgTypeErr)
 	}
-}
-
-func (s *ChatService) unmarshalBody(userID int64, body []byte, target any, errPrefix string) bool {
-	if err := json.Unmarshal(body, target); err != nil {
-		s.SendErr(userID, errno.ChatMsgParseErr.WithMessage(errPrefix+err.Error()))
-		return false
-	}
-
-	return true
 }

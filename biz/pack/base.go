@@ -1,7 +1,10 @@
 package pack
 
 import (
+	"context"
+
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
@@ -16,8 +19,17 @@ var (
 	}
 )
 
-func RespError(c *app.RequestContext, err error) {
+func RespError(ctx context.Context, c *app.RequestContext, err error) {
 	_errno := errno.ConvertErr(err)
+
+	if _errno.ErrCode == errno.ServiceErrCode {
+		hlog.CtxErrorf(ctx,
+			"[%s] %s: %+v",
+			string(c.Method()),
+			string(c.Path()),
+			err,
+		)
+	}
 
 	c.JSON(consts.StatusOK, utils.H{
 		"base": common.Base{

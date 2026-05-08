@@ -2,9 +2,9 @@ package likedao
 
 import (
 	"context"
-	"log"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+	"github.com/pkg/errors"
 )
 
 func (l *LikeDao) AddVideoLike(ctx context.Context, userID, videoID int64) error {
@@ -17,8 +17,7 @@ func (l *LikeDao) AddVideoLike(ctx context.Context, userID, videoID int64) error
 
 	err = l.q.Like.WithContext(ctx).Create(&like)
 	if err != nil {
-		log.Printf("failed to add like: %v", err)
-		return err
+		return errors.Wrapf(err, "AddVideoLike failed, userID: %d", userID)
 	}
 
 	return nil
@@ -34,8 +33,7 @@ func (l *LikeDao) AddCommentLike(ctx context.Context, userID, commentID int64) e
 
 	err = l.q.Like.WithContext(ctx).Create(&like)
 	if err != nil {
-		log.Printf("failed to add like: %v", err)
-		return err
+		return errors.Wrapf(err, "AddCommentLike failed, userID: %d", userID)
 	}
 
 	return nil

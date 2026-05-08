@@ -2,7 +2,8 @@ package commentdao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (c *CommentDao) IsCommentExists(ctx context.Context, commentID int64) (bool, error) {
@@ -14,8 +15,7 @@ func (c *CommentDao) IsCommentExists(ctx context.Context, commentID int64) (bool
 		Count()
 
 	if err != nil {
-		log.Printf("failed to check if comment exists for commentID %d: %v", commentID, err)
-		return false, err
+		return false, errors.Wrapf(err, "IsCommentExists failed, commentID: %d", commentID)
 	}
 
 	return count > 0, nil

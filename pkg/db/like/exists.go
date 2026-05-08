@@ -2,7 +2,8 @@ package likedao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (l *LikeDao) IsCommentLikeExists(ctx context.Context, userID, commentID int64) (bool, error) {
@@ -14,8 +15,7 @@ func (l *LikeDao) IsCommentLikeExists(ctx context.Context, userID, commentID int
 		Count()
 
 	if err != nil {
-		log.Printf("failed to check if comment like exists for userID %d and commentID %d: %v", userID, commentID, err)
-		return false, err
+		return false, errors.Wrapf(err, "IsCommentLikeExists failed, userID: %d, commentID: %d", userID, commentID)
 	}
 
 	return count > 0, nil

@@ -2,7 +2,8 @@ package followerdao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 const mutualFollowCount = 2
@@ -15,8 +16,7 @@ func (f *FollowerDao) IsExistFollow(ctx context.Context, userID int64, followerI
 		Count()
 
 	if err != nil {
-		log.Println("failed to check exist follow:", err)
-		return false, err
+		return false, errors.Wrapf(err, "IsExistFollow failed, count: %d, userID: %d", count, userID)
 	}
 	return count > 0, nil
 }
@@ -30,8 +30,7 @@ func (f *FollowerDao) IsExistFriend(ctx context.Context, userID int64, friendID 
 	).Count()
 
 	if err != nil {
-		log.Println("failed to check exist friend:", err)
-		return false, err
+		return false, errors.Wrapf(err, "IsExistFriend failed, count: %d, userID: %d", count, userID)
 	}
 
 	return count == mutualFollowCount, nil

@@ -20,7 +20,7 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 	var req social.FollowReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -29,7 +29,7 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 	err = service.NewSocialService(ctx).FollowAction(&req, userID)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -44,14 +44,14 @@ func ListFollowing(ctx context.Context, c *app.RequestContext) {
 	var req social.ListFollowingReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	users, total, err := service.NewSocialService(ctx).ListFollowing(&req)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -65,14 +65,14 @@ func ListFollower(ctx context.Context, c *app.RequestContext) {
 	var req social.ListFollowerReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	users, total, err := service.NewSocialService(ctx).ListFollower(&req)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -86,7 +86,7 @@ func ListFriend(ctx context.Context, c *app.RequestContext) {
 	var req social.ListFriendReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -95,7 +95,7 @@ func ListFriend(ctx context.Context, c *app.RequestContext) {
 	users, total, err := service.NewSocialService(ctx).ListFriend(&req, userID)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 

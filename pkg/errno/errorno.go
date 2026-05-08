@@ -1,6 +1,8 @@
 package errno
 
-import "errors"
+import (
+	"errors"
+)
 
 type ErrNo struct {
 	ErrCode int32  `json:"code"`
@@ -29,12 +31,11 @@ func ConvertErr(err error) ErrNo {
 	if err == nil {
 		return Success
 	}
-	errno := ErrNo{}
-	if errors.As(err, &errno) {
+	if errno, ok := errors.AsType[ErrNo](err); ok {
 		return errno
 	}
 
 	serviceErr := ServiceErr
-	serviceErr.ErrMsg = err.Error()
+	serviceErr.ErrMsg = ServiceErr.ErrMsg
 	return serviceErr
 }

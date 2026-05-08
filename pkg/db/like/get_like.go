@@ -2,7 +2,8 @@ package likedao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (l *LikeDao) GetLikeCounts(ctx context.Context, videoIDs []int64) (map[int64]int64, error) {
@@ -22,8 +23,7 @@ func (l *LikeDao) GetLikeCounts(ctx context.Context, videoIDs []int64) (map[int6
 		Scan(&results)
 
 	if err != nil {
-		log.Printf("failed to get like counts for videoIDs %v: %v", videoIDs, err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetLikeCount failed, videoID: %v, count: %v", videoIDs, l.q.Like.VideoID)
 	}
 
 	likeMap := make(map[int64]int64)
@@ -45,8 +45,7 @@ func (l *LikeDao) GetUserLikes(ctx context.Context, userID int64) ([]int64, erro
 		Scan(&videoIDs)
 
 	if err != nil {
-		log.Printf("failed to get user likes for userID %d: %v", userID, err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetUserLikes failed, userID: %d", userID)
 	}
 
 	return videoIDs, nil

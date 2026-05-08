@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -46,7 +45,6 @@ func CreateToken(tokenType int8, userID int64) (string, error) {
 	tokenObject := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := tokenObject.SignedString([]byte(secret))
 	if err != nil {
-		log.Println("Error signing token:", err)
 		return "", errno.AuthErr.WithMessage("令牌签名失败")
 	}
 

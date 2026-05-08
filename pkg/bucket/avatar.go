@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/minio/minio-go/v7"
+	"github.com/pkg/errors"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
@@ -19,7 +20,7 @@ func UploadAvatar(ctx context.Context, userID int64, data []byte) error {
 		bytes.NewReader(data), int64(len(data)),
 		minio.PutObjectOptions{ContentType: "image/jpeg"},
 	)
-	return err
+	return errors.Wrapf(err, "UploadAvatar failed, bucket=%s, object=%s", constants.AvatarBucketName, avatarObject(userID))
 }
 
 func GetAvatarURL(userID int64) string {

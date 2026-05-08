@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
@@ -29,7 +31,7 @@ func getHistoryKeyPattern(userID int64, otherUserID int64) string {
 func (c *ChatCache) SetChatHistory(ctx context.Context, userID int64, otherUserID int64, pageSize int, pageNum int, messages []*model.ChatMessage) error {
 	data, err := json.Marshal(messages)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "SetChatHistory failed, marshal message failed, userID=%d, otherUserID=%d", userID, otherUserID)
 	}
 
 	return c.c.Set(ctx, getHistoryKey(userID, otherUserID, pageSize, pageNum), data, constants.ChatHistoryCacheExpiration).Err()
@@ -38,7 +40,7 @@ func (c *ChatCache) SetChatHistory(ctx context.Context, userID int64, otherUserI
 func (c *ChatCache) GetChatHistory(ctx context.Context, userID int64, otherUserID int64, pageSize int, pageNum int) ([]*model.ChatMessage, error) {
 	data, err := c.c.Get(ctx, getHistoryKey(userID, otherUserID, pageSize, pageNum)).Bytes()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "GetChatHistory failed, userID=%d, otherUserID=%d", userID, otherUserID)
 	}
 
 	var messages []*model.ChatMessage
