@@ -21,9 +21,10 @@ func AccessLog() app.HandlerFunc {
 		method := string(c.Request.Header.Method())
 		path := string(c.Request.URI().PathOriginal())
 
-		hlog.CtxInfof(ctx, "[HERTZ] %3d | %8v | %12s | %-4s %s",
+		hlog.CtxInfof(ctx,
+			"HERTZ access status=%d latency=%s client_ip=%s method=%s path=%s",
 			statusCode,
-			latency,
+			latency.String(),
 			clientIP,
 			method,
 			path,
