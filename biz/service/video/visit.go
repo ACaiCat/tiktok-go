@@ -3,6 +3,8 @@ package service
 import (
 	"strconv"
 
+	"github.com/pkg/errors"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
@@ -18,7 +20,7 @@ func (s *VideoService) VisitVideo(req *video.VisitVideoReq) error {
 
 	err = s.videoDao.IncrVisitCount(s.ctx, videoID)
 	if err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.VisitVideo: db.IncrVisitCount failed, videoID=%d", videoID)
 	}
 
 	return nil

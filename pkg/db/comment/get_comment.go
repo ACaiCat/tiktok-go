@@ -2,9 +2,8 @@ package commentdao
 
 import (
 	"context"
-	"errors"
-	"log"
 
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
@@ -22,8 +21,7 @@ func (c *CommentDao) GetCommentByID(ctx context.Context, commentID int64) (*mode
 			return nil, nil
 		}
 
-		log.Printf("failed to get comment by ID %d: %v", commentID, err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetCommentByID failed, commentID: %d", commentID)
 	}
 
 	return comment, nil
@@ -40,8 +38,7 @@ func (c *CommentDao) GetCommentsByVideoID(ctx context.Context, videoID int64, pa
 		Find()
 
 	if err != nil {
-		log.Printf("failed to get comments by video ID %d: %v", videoID, err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetCommentsByVideoID failed, videoID: %d", videoID)
 	}
 
 	return comments, nil
@@ -58,8 +55,7 @@ func (c *CommentDao) GetCommentsByCommentID(ctx context.Context, commentID int64
 		Find()
 
 	if err != nil {
-		log.Printf("failed to get comments by comment ID %d: %v", commentID, err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetCommentsByCommentID failed, commentID: %d", commentID)
 	}
 
 	return comments, nil

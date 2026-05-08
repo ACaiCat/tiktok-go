@@ -2,7 +2,8 @@ package likedao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (l *LikeDao) DeleteVideoLike(ctx context.Context, userID, videoID int64) error {
@@ -13,8 +14,7 @@ func (l *LikeDao) DeleteVideoLike(ctx context.Context, userID, videoID int64) er
 		Delete()
 
 	if err != nil {
-		log.Printf("failed to delete like: %v", err)
-		return err
+		return errors.Wrapf(err, "DeleteVideoLike failed, userID: %d, videoID: %d", userID, videoID)
 	}
 
 	return nil
@@ -28,8 +28,7 @@ func (l *LikeDao) DeleteCommentLike(ctx context.Context, userID, commentID int64
 		Delete()
 
 	if err != nil {
-		log.Printf("failed to delete like: %v", err)
-		return err
+		return errors.Wrapf(err, "DeleteCommentLike failed, userID: %d, commentID: %d", userID, commentID)
 	}
 
 	return nil

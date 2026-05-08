@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/minio/minio-go/v7"
+	"github.com/pkg/errors"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
@@ -19,7 +20,7 @@ func UploadCover(ctx context.Context, videoID int64, data []byte) error {
 		bytes.NewReader(data), int64(len(data)),
 		minio.PutObjectOptions{ContentType: "image/jpeg"},
 	)
-	return err
+	return errors.Wrapf(err, "UploadCover failed, bucket=%s, object=%d", constants.CoverBucketName, videoID)
 }
 
 func GetCoverURL(videoID int64) string {

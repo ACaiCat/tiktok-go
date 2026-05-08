@@ -66,11 +66,11 @@ tiktok-go/
 
 ## API文档
 
-[文档](./API.md)
+[文档](docs/API.md)
 
 ## 总结文档
 
-[总结](./Summary.md)
+[总结](docs/Summary.md)
 
 ## 快速开始
 

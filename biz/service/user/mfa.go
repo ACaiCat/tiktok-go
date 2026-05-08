@@ -2,8 +2,8 @@ package service
 
 import (
 	"encoding/base64"
-	"log"
 
+	"github.com/pkg/errors"
 	"github.com/skip2/go-qrcode"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/user"
@@ -17,7 +17,7 @@ func (s *UserService) GetMFA(userID int64) (string, string, error) {
 
 	usr, err := s.dao.GetByID(s.ctx, userID)
 	if err != nil {
-		return "", "", errno.ServiceErr
+		return "", "", err
 	}
 
 	if usr == nil {
@@ -26,13 +26,12 @@ func (s *UserService) GetMFA(userID int64) (string, string, error) {
 
 	key, err := totp.CreateKey(usr.Username)
 	if err != nil {
-		return "", "", errno.ServiceErr
+		return "", "", errors.WithMessagef(err, "service.GetMFA: totp.CreateKey failed, userID=%d", userID)
 	}
 
 	rawQrcode, err := qrcode.Encode(key.String(), qrcode.Low, constants.TotpQRCodeSize)
 	if err != nil {
-		log.Println("failed to generate QR code for user", usr.Username, ":", err)
-		return "", "", errno.ServiceErr
+		return "", "", errors.WithMessagef(err, "service.GetMFA: qrcode.Encode failed, userID=%d", userID)
 	}
 
 	base64Qrcode := "data:image/png;base64," + base64.StdEncoding.EncodeToString(rawQrcode)
@@ -46,7 +45,7 @@ func (s *UserService) BindMFA(req *user.BindMFAReq, userID int64) error {
 	ok, err := totp.ValidateCode(req.Secret, req.Code)
 
 	if err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.BindMFA: totp.ValidateCode failed, userID=%d", userID)
 	}
 
 	if !ok {
@@ -55,7 +54,7 @@ func (s *UserService) BindMFA(req *user.BindMFAReq, userID int64) error {
 
 	err = s.dao.UpdateUserMFA(s.ctx, userID, req.Secret)
 	if err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.BindMFA: db.UpdateUserMFA failed, userID=%d", userID)
 	}
 
 	return nil

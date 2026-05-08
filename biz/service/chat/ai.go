@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
-	"log"
 	"slices"
 	"strings"
 	"time"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/sashabaranov/go-openai"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
@@ -20,7 +20,7 @@ import (
 func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 	messages, err := s.getChatHistory(userID, receiverID, constants.AIPullHistoryCount, 0)
 	if err != nil {
-		log.Println("failed to get message history:", err)
+		hlog.Errorf("failed to get message history: %v", err)
 		return
 	}
 
@@ -30,7 +30,7 @@ func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 
 	reply, content, err := chatWithAI(s.ctx, history, userID, receiverID)
 	if err != nil {
-		log.Println("failed to AI message:", err)
+		hlog.Errorf("failed to send AI message: %v", err)
 		return
 	}
 	if !reply {
@@ -45,7 +45,10 @@ func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 		Content:    content,
 		Timestamp:  now,
 	}
-	receiverOnline := s.sendMessageToUser(receiverID, ws.MessageTypeChat, receiverMessage, "failed to forward message to receiver")
+	receiverOnline, err := s.sendMessageToUser(receiverID, ws.MessageTypeChat, receiverMessage)
+	if err != nil {
+		hlog.Errorf("failed to forward message to receiver: %v", err)
+	}
 	if !s.saveChatMessage(userID, receiverID, content, receiverOnline, true) {
 		return
 	}
@@ -57,7 +60,10 @@ func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 		Content:    content,
 		Timestamp:  now,
 	}
-	senderOnline := s.sendMessageToUser(userID, ws.MessageTypeChat, senderMessage, "failed to forward message to sender")
+	senderOnline, err := s.sendMessageToUser(userID, ws.MessageTypeChat, senderMessage)
+	if err != nil {
+		hlog.Errorf("failed to forward message to sender: %v", err)
+	}
 	_ = s.saveChatMessage(receiverID, userID, content, senderOnline, true)
 }
 

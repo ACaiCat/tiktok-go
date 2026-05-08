@@ -2,16 +2,15 @@ package service
 
 import (
 	"context"
-	"errors"
-	"log"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
 
 func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, error) {
@@ -34,18 +33,18 @@ func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, 
 	popularVideos, err := s.cache.GetPopularVideos(s.ctx)
 	if err != nil {
 		if !errors.Is(err, redis.Nil) {
-			log.Println("failed to get popular videos from cache:", err)
+			hlog.CtxErrorf(s.ctx, "service.GetPopularVideos cache read failed: %v", err)
 		}
 
 		popularVideos, err = s.videoDao.GetPopularVideos(s.ctx, constants.PopularVideoCacheCount, 0)
 		if err != nil {
-			return nil, errno.ServiceErr
+			return nil, errors.WithMessage(err, "service.GetPopularVideos: db.GetPopularVideos failed")
 		}
 
 		go func() {
 			err = s.cache.SetPopularVideos(context.Background(), popularVideos)
 			if err != nil {
-				log.Println("failed to cache popular videos:", err)
+				hlog.Errorf("service.GetPopularVideos cache write failed: %v", err)
 			}
 		}()
 	}
@@ -53,7 +52,7 @@ func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, 
 	if pageSize*pageNum > constants.PopularVideoCacheCount {
 		videosDao, err := s.videoDao.GetPopularVideos(s.ctx, int(pageSize), int(pageNum))
 		if err != nil {
-			return nil, errno.ServiceErr
+			return nil, errors.WithMessagef(err, "service.GetPopularVideos: db.GetPopularVideos failed, page=%d, pageSize=%d", pageNum, pageSize)
 		}
 		videos := VideosDaoToDto(videosDao)
 		return videos, nil

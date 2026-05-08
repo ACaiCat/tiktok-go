@@ -2,8 +2,9 @@ package chatdao
 
 import (
 	"context"
-	"log"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
@@ -18,8 +19,7 @@ func (c *ChatDao) GetUnreadMessages(ctx context.Context, userID int64, senderID 
 		Find()
 
 	if err != nil {
-		log.Println("failed to get unread messages for userID", userID, "from senderID", senderID, ":", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetUnreadMessages failed, senderID: %d, receiverID: %d", userID, senderID)
 	}
 
 	return messages, nil
@@ -35,8 +35,7 @@ func (c *ChatDao) MarkMessagesAsRead(ctx context.Context, userID int64, senderID
 		Update(c.q.ChatMessage.ReadAt, time.Now())
 
 	if err != nil {
-		log.Println("failed to mark messages as read for userID", userID, "from senderID", senderID, ":", err)
-		return err
+		return errors.Wrapf(err, "MarkMessagesAsRead failed, senderID: %d, receiverID: %d", userID, senderID)
 	}
 	return nil
 }
@@ -54,8 +53,7 @@ func (c *ChatDao) GetChatHistory(ctx context.Context, userID int64, otherUserID 
 		Find()
 
 	if err != nil {
-		log.Println("failed to get chat history between userID", userID, "and otherUserID", otherUserID, ":", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetChatHistory failed, senderID: %d, receiverID: %d", userID, otherUserID)
 	}
 
 	return messages, nil

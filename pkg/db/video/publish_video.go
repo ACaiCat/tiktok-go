@@ -2,7 +2,8 @@ package videodao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/db/query"
@@ -25,12 +26,10 @@ func (v *VideoDao) PublishVideo(
 			VisitCount:  0,
 		}
 		if err := tx.Video.WithContext(ctx).Create(&video); err != nil {
-			log.Printf("failed to publish video in tx: %v\n", err)
-			return err
+			return errors.Wrapf(err, "PublishVideo failed, videoID: %d", video.ID)
 		}
 		if err := uploadFn(video.ID); err != nil {
-			log.Printf("failed to upload files in tx: %v\n", err)
-			return err
+			return errors.Wrapf(err, "PublishVideo failed, videoID: %d", video.ID)
 		}
 		_, err := tx.Video.WithContext(ctx).Where(tx.Video.ID.Eq(video.ID)).
 			Updates(map[string]any{
@@ -38,8 +37,7 @@ func (v *VideoDao) PublishVideo(
 				"cover_url": coverURLFn(video.ID),
 			})
 		if err != nil {
-			log.Printf("failed to update video url and cover url in tx: %v\n", err)
-			return err
+			return errors.Wrapf(err, "PublishVideo failed, videoID: %d", video.ID)
 		}
 		return nil
 	})

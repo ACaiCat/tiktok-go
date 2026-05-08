@@ -1,10 +1,9 @@
 package totp
 
 import (
-	"errors"
-	"log"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 
@@ -20,8 +19,7 @@ func CreateKey(accountName string) (*otp.Key, error) {
 	})
 
 	if err != nil {
-		log.Println("failed to generate totp secret:", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "CreateKey failed, accountName: %s", accountName)
 	}
 
 	return key, err
@@ -37,8 +35,7 @@ func ValidateCode(secret string, code string) (bool, error) {
 			return false, nil
 		}
 
-		log.Println("failed to validate totp code:", err)
-		return false, err
+		return false, errors.Wrapf(err, "ValidateCode failed, code: %s", code)
 	}
 	return ok, nil
 }

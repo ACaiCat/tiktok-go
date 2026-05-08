@@ -56,6 +56,8 @@ linters:
         - "0666"
         - "0755"
         - "42"
+        - "24"
+        - "7"
       ignored-files:
         - magic1_.+\.go$
       ignored-functions:

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
 
@@ -25,7 +27,7 @@ func (c *UserCache) SetJwchSession(ctx context.Context, userID int64, jwchID str
 
 	sessionJSON, err := json.Marshal(session)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "SetJwchSession failed, userID=%d, cookie=%s", userID, session.Cookie)
 	}
 
 	pipe := c.c.Pipeline()
@@ -38,13 +40,13 @@ func (c *UserCache) SetJwchSession(ctx context.Context, userID int64, jwchID str
 func (c *UserCache) GetJwchSession(ctx context.Context, userID int64) (string, string, error) {
 	data, err := c.c.Get(ctx, getJwchSessionKey(userID)).Result()
 	if err != nil {
-		return "", "", err
+		return "", "", errors.Wrapf(err, "GetJwchSession failed, userID=%d", userID)
 	}
 
 	var session jwchSession
 	err = json.Unmarshal([]byte(data), &session)
 	if err != nil {
-		return "", "", err
+		return "", "", errors.Wrapf(err, "GetJwchSession failed, userID=%d", userID)
 	}
 
 	return session.ID, session.Cookie, nil
@@ -53,7 +55,7 @@ func (c *UserCache) GetJwchSession(ctx context.Context, userID int64) (string, s
 func (c *UserCache) CleanJwchSession(ctx context.Context, userID int64) error {
 	err := c.c.Del(ctx, getJwchSessionKey(userID)).Err()
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "CleanJwchSession failed, userID=%d", userID)
 	}
 
 	return nil

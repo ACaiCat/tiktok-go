@@ -21,7 +21,7 @@ func Like(ctx context.Context, c *app.RequestContext) {
 	var req interaction.LikeReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -30,7 +30,7 @@ func Like(ctx context.Context, c *app.RequestContext) {
 	err = service.NewInteractionService(ctx).LikeVideo(&req, userID)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -44,14 +44,14 @@ func ListLike(ctx context.Context, c *app.RequestContext) {
 	var req interaction.ListLikeReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	videos, err := videoService.NewVideoService(ctx).GetLikedVideos(&req)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -66,7 +66,7 @@ func Comment(ctx context.Context, c *app.RequestContext) {
 	var req interaction.CommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -74,7 +74,7 @@ func Comment(ctx context.Context, c *app.RequestContext) {
 
 	err = service.NewInteractionService(ctx).CommentAction(&req, userID)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 	pack.RespComment(c)
@@ -87,14 +87,14 @@ func ListComment(ctx context.Context, c *app.RequestContext) {
 	var req interaction.ListCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	comments, err := service.NewInteractionService(ctx).ListComment(&req)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -108,7 +108,7 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 	var req interaction.DeleteCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -117,7 +117,7 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 	err = service.NewInteractionService(ctx).DeleteComment(&req, userID)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 

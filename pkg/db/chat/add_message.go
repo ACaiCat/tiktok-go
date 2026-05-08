@@ -2,8 +2,9 @@ package chatdao
 
 import (
 	"context"
-	"log"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
@@ -27,8 +28,7 @@ func (c *ChatDao) AddMessage(ctx context.Context, senderID int64, receiverID int
 
 	err = c.q.ChatMessage.WithContext(ctx).Create(&message)
 	if err != nil {
-		log.Println("failed to add message from userID", senderID, "to userID", receiverID, ":", err)
-		return err
+		return errors.Wrapf(err, "AddMessage failed, senderID: %d, receiverID: %d", message.SenderID, message.ReceiverID)
 	}
 
 	return nil

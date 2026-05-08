@@ -2,11 +2,10 @@ package videodao
 
 import (
 	"context"
-	"errors"
-	"log"
 	"math/rand/v2"
 	"time"
 
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
@@ -24,7 +23,7 @@ func (v *VideoDao) GetVideoByID(ctx context.Context, videoID int64) (*model.Vide
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		return nil, err
+		return nil, errors.Wrapf(err, "GetVideoByID failed, videoID: %d", videoID)
 	}
 	return video, nil
 }
@@ -44,8 +43,7 @@ func (v *VideoDao) GetFeedByLatestTime(ctx context.Context, latestTime time.Time
 		Find()
 
 	if err != nil {
-		log.Printf("failed to get feed by latest time: %v", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetFeedByLatestTime failed, latestTime=%s, limit=%d", latestTime, limit)
 	}
 
 	rand.Shuffle(len(videos), func(i, j int) {
@@ -69,8 +67,7 @@ func (v *VideoDao) GetVideosByUserID(ctx context.Context, userID int64, pageSize
 		Find()
 
 	if err != nil {
-		log.Printf("failed to get videos by user id: %v", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetVideosByUserID failed, userID: %d", userID)
 	}
 	return videos, nil
 }
@@ -85,8 +82,7 @@ func (v *VideoDao) GetPopularVideos(ctx context.Context, pageSize int, pageNum i
 		Find()
 
 	if err != nil {
-		log.Printf("failed to get popular videos: %v", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetPopularVideos failed")
 	}
 	return videos, nil
 }
@@ -99,8 +95,7 @@ func (v *VideoDao) GetVideoCountByUserID(ctx context.Context, userID int64) (int
 		Count()
 
 	if err != nil {
-		log.Printf("failed to get video count by user id: %v", err)
-		return 0, err
+		return 0, errors.Wrapf(err, "GetVideoCountByUserID failed, userID: %d", userID)
 	}
 	return count, nil
 }
@@ -112,12 +107,11 @@ func (v *VideoDao) GetUserLikeList(ctx context.Context, userID int64, pageSize i
 
 	err = v.q.Like.WithContext(ctx).
 		Select(v.q.Like.VideoID).
-		Where(v.q.Like.UserID.Eq(userID)).
+		Where(v.q.Like.UserID.Eq(userID), v.q.Like.VideoID.IsNotNull()).
 		Scan(&videoIDs)
 
 	if err != nil {
-		log.Printf("failed to get user likes for userID %d: %v", userID, err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetUserLikeList failed, userID: %d", userID)
 	}
 
 	videos, err := v.q.Video.WithContext(ctx).
@@ -127,8 +121,7 @@ func (v *VideoDao) GetUserLikeList(ctx context.Context, userID int64, pageSize i
 		Find()
 
 	if err != nil {
-		log.Printf("failed to get user like list: %v\n", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "GetUserLikeList failed, userID: %d", userID)
 	}
 
 	return videos, nil

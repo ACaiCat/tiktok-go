@@ -1,11 +1,11 @@
 package service
 
 import (
-	"log"
 	"mime/multipart"
 
+	"github.com/pkg/errors"
+
 	"github.com/ACaiCat/tiktok-go/pkg/bucket"
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/img"
 	"github.com/ACaiCat/tiktok-go/pkg/utils"
 )
@@ -15,8 +15,7 @@ func (s *UserService) UploadAvatar(fileHeader *multipart.FileHeader, userID int6
 
 	data, err := utils.FileHeaderToBytes(fileHeader)
 	if err != nil {
-		log.Printf("failed to read file header: %v\n", err)
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.UploadAvatar: read file failed, userID=%d", userID)
 	}
 
 	format, err := img.CheckAvatar(data)
@@ -27,22 +26,20 @@ func (s *UserService) UploadAvatar(fileHeader *multipart.FileHeader, userID int6
 	if format == "png" {
 		data, err = img.ConvertToJPEG(data)
 		if err != nil {
-			log.Printf("failed to convert PNG to JPEG: %v\n", err)
-			return errno.ServiceErr
+			return errors.WithMessage(err, "service.UploadAvatar failed")
 		}
 	}
 
 	err = bucket.UploadAvatar(s.ctx, userID, data)
 	if err != nil {
-		log.Printf("failed to upload avatar: %v\n", err)
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.UploadAvatar: bucket.UploadAvatar failed, userID=%d", userID)
 	}
 
 	avatarURL := bucket.GetAvatarURL(userID)
 
 	err = s.dao.UpdateUserAvatarURL(s.ctx, userID, avatarURL)
 	if err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.UploadAvatar: db.UpdateUserAvatarURL failed, userID=%d", userID)
 	}
 
 	return nil

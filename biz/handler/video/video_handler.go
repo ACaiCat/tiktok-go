@@ -20,14 +20,14 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 	var req video.FeedReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	videos, err := service.NewVideoService(ctx).GetFeed(&req)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -41,21 +41,21 @@ func Publish(ctx context.Context, c *app.RequestContext) {
 	var req video.PublishReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	userID := mw.GetUserID(c)
 	fileHeader, err := c.FormFile("data")
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	err = service.NewVideoService(ctx).PublishVideo(userID, req.Title, req.Description, fileHeader)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -69,13 +69,13 @@ func List(ctx context.Context, c *app.RequestContext) {
 	var req video.ListReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	videos, total, err := service.NewVideoService(ctx).GetVideoList(&req)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -89,13 +89,13 @@ func Popular(ctx context.Context, c *app.RequestContext) {
 	var req video.PopularReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	videos, err := service.NewVideoService(ctx).GetPopularVideos(&req)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -110,14 +110,14 @@ func Search(ctx context.Context, c *app.RequestContext) {
 	var req video.SearchReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	videos, err := service.NewVideoService(ctx).SearchVideo(&req)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -131,14 +131,14 @@ func VisitVideo(ctx context.Context, c *app.RequestContext) {
 	var req video.VisitVideoReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	err = service.NewVideoService(ctx).VisitVideo(&req)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 

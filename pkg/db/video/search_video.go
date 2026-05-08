@@ -2,9 +2,10 @@ package videodao
 
 import (
 	"context"
-	"log"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
@@ -46,8 +47,8 @@ func (v *VideoDao) SearchVideo(
 		Offset(pageSize * pageNum).Limit(pageSize).Find()
 
 	if err != nil {
-		log.Println("failed to search videos:", err)
-		return nil, err
+		return nil, errors.Wrapf(err, "SearchVideo failed, keywords: %s, fromDate: %s, username: %s",
+			strings.Join(keywords, ","), toDate.Format(time.RFC3339), username)
 	}
 
 	return videos, nil

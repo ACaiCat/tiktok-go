@@ -23,13 +23,13 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req user.RegisterReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	err = service.NewUserService(ctx).UserRegister(&req)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 	pack.RespRegister(c)
@@ -42,13 +42,13 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	var req user.LoginReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	usr, accessToken, refreshToken, err := service.NewUserService(ctx).UserLogin(&req)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -65,13 +65,13 @@ func Refresh(ctx context.Context, c *app.RequestContext) {
 	var req user.RefreshReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	accessToken, refreshToken, err := service.NewUserService(ctx).RefreshToken(&req)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -85,7 +85,7 @@ func Info(ctx context.Context, c *app.RequestContext) {
 	var req user.InfoReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -97,7 +97,7 @@ func Info(ctx context.Context, c *app.RequestContext) {
 		userID, err = strconv.ParseInt(*req.UserID, 10, 64)
 
 		if err != nil {
-			pack.RespError(c, errno.ParamErr.WithError(err))
+			pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 			return
 		}
 	}
@@ -105,7 +105,7 @@ func Info(ctx context.Context, c *app.RequestContext) {
 	usr, err := service.NewUserService(ctx).GetUserInfo(userID)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -120,13 +120,13 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 	var req user.UploadAvatarReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
 	fileHeader, err := c.FormFile("data")
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -135,14 +135,14 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 
 	err = userService.UploadAvatar(fileHeader, userID)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
 	usr, err := userService.GetUserInfo(userID)
 
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -156,14 +156,14 @@ func MFAQRCode(ctx context.Context, c *app.RequestContext) {
 	var req user.MFAQRCodeReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 	userID := mw.GetUserID(c)
 
 	secret, base64Qrcode, err := service.NewUserService(ctx).GetMFA(userID)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -177,7 +177,7 @@ func BindMFA(ctx context.Context, c *app.RequestContext) {
 	var req user.BindMFAReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -185,7 +185,7 @@ func BindMFA(ctx context.Context, c *app.RequestContext) {
 
 	err = service.NewUserService(ctx).BindMFA(&req, userID)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 
@@ -199,7 +199,7 @@ func SearchImage(ctx context.Context, c *app.RequestContext) {
 	var req user.SearchImageReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -215,7 +215,7 @@ func BindJwch(ctx context.Context, c *app.RequestContext) {
 	var req user.BindJwchReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.RespError(c, errno.ParamErr.WithError(err))
+		pack.RespError(ctx, c, errno.ParamErr.WithError(err))
 		return
 	}
 
@@ -223,7 +223,7 @@ func BindJwch(ctx context.Context, c *app.RequestContext) {
 
 	err = service.NewUserService(ctx).BindJwch(&req, userID)
 	if err != nil {
-		pack.RespError(c, err)
+		pack.RespError(ctx, c, err)
 		return
 	}
 

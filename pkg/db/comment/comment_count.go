@@ -2,7 +2,8 @@ package commentdao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (c *CommentDao) IncrCommentCount(ctx context.Context, commentID int64) error {
@@ -11,8 +12,7 @@ func (c *CommentDao) IncrCommentCount(ctx context.Context, commentID int64) erro
 		UpdateColumn(c.q.Comment.CommentCount, c.q.Comment.CommentCount.Add(1))
 
 	if err != nil {
-		log.Printf("failed to increase comment count: %v", err)
-		return err
+		return errors.Wrapf(err, "IncrCommentCount failed, commentID: %d", commentID)
 	}
 
 	return nil
@@ -24,8 +24,7 @@ func (c *CommentDao) DecrCommentCount(ctx context.Context, commentID int64) erro
 		UpdateColumn(c.q.Comment.CommentCount, c.q.Comment.CommentCount.Add(-1))
 
 	if err != nil {
-		log.Printf("failed to decrease comment count: %v", err)
-		return err
+		return errors.Wrapf(err, "DecrCommentCount failed, commentID: %d, err: %v", commentID, err)
 	}
 
 	return nil

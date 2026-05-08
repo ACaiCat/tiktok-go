@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
-	"log"
 	"slices"
 	"strconv"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
@@ -23,10 +24,16 @@ func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) e
 	}
 
 	if req.VideoID != nil {
-		return s.likeVideoByID(*req.VideoID, userID, req.ActionType)
+		if err := s.likeVideoByID(*req.VideoID, userID, req.ActionType); err != nil {
+			return errors.WithMessagef(err, "service.LikeVideo: likeVideoByID failed, videoID=%q, userID=%d", *req.VideoID, userID)
+		}
 	}
 
-	return s.likeCommentByID(*req.CommentID, userID, req.ActionType)
+	if err := s.likeCommentByID(*req.CommentID, userID, req.ActionType); err != nil {
+		return errors.WithMessagef(err, "service.LikeVideo: likeCommentByID failed, commentID=%q, userID=%d", *req.CommentID, userID)
+	}
+
+	return nil
 }
 
 func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, actionType interaction.LikeActionType) error {
@@ -41,7 +48,7 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 
 	videoExists, err := s.videoDao.IsVideoExists(s.ctx, videoID)
 	if err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.likeVideoByID: check video exists failed, videoID=%d, userID=%d", videoID, userID)
 	}
 	if !videoExists {
 		return errno.VideoNotExistErr
@@ -52,26 +59,33 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 		if err != nil {
 			likedVideos, err := s.likeDao.WithTx(tx).GetUserLikes(s.ctx, userID)
 			if err != nil {
-				return errno.ServiceErr
+				return errors.WithMessagef(err, "service.likeVideoByID: db.GetUserLikes failed, userID=%d", userID)
 			}
 			isLiked = slices.Contains(likedVideos, videoID)
 
 			go func() {
 				if err := s.userCache.SetLikeVideos(context.Background(), userID, likedVideos); err != nil {
-					log.Println("failed to cache liked videos for userID", userID, ":", err)
+					hlog.Errorf("service.likeVideoByID.SetLikeVideos failed: %v", err)
 				}
 			}()
 		}
 
 		if actionType == interaction.LikeActionType_ADD {
-			return s.addVideoLikeTx(tx, userID, videoID, isLiked)
+			if err := s.addVideoLikeTx(tx, userID, videoID, isLiked); err != nil {
+				return errors.WithMessagef(err, "service.likeVideoByID: addVideoLikeTx failed, videoID=%d, userID=%d", videoID, userID)
+			}
+			return nil
 		}
 
-		return s.cancelVideoLikeTx(tx, userID, videoID, isLiked)
+		if err := s.cancelVideoLikeTx(tx, userID, videoID, isLiked); err != nil {
+			return errors.WithMessagef(err, "service.likeVideoByID: cancelVideoLikeTx failed, videoID=%d, userID=%d", videoID, userID)
+		}
+
+		return nil
 	})
 
 	if err != nil {
-		return err
+		return errors.WithMessagef(err, "service.likeVideoByID: tx failed, videoID=%d, userID=%d", videoID, userID)
 	}
 
 	return nil
@@ -83,14 +97,14 @@ func (s *InteractionService) addVideoLikeTx(tx *gorm.DB, userID, videoID int64, 
 	}
 
 	if err := s.likeDao.WithTx(tx).AddVideoLike(s.ctx, userID, videoID); err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.addVideoLikeTx: db.AddVideoLike failed, videoID=%d, userID=%d", videoID, userID)
 	}
 	if err := s.videoDao.WithTx(tx).IncrLikeCount(s.ctx, videoID); err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.addVideoLikeTx: db.IncrLikeCount failed, videoID=%d", videoID)
 	}
 
 	if err := s.userCache.SetLikeVideo(s.ctx, userID, videoID); err != nil {
-		log.Println("failed to cache like video for userID", userID, "and videoID", videoID, ":", err)
+		hlog.CtxErrorf(s.ctx, "service.addVideoLikeTx cache update failed: %v", err)
 	}
 
 	return nil
@@ -102,15 +116,15 @@ func (s *InteractionService) cancelVideoLikeTx(tx *gorm.DB, userID, videoID int6
 	}
 
 	if err := s.likeDao.WithTx(tx).DeleteVideoLike(s.ctx, userID, videoID); err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.cancelVideoLikeTx: db.DeleteVideoLike failed, videoID=%d, userID=%d", videoID, userID)
 	}
 
 	if err := s.videoDao.WithTx(tx).DecrLikeCount(s.ctx, videoID); err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.cancelVideoLikeTx: db.DecrLikeCount failed, videoID=%d", videoID)
 	}
 
 	if err := s.userCache.SetUnlikeVideo(s.ctx, userID, videoID); err != nil {
-		log.Println("failed to cache unlike video for userID", userID, "and videoID", videoID, ":", err)
+		hlog.CtxErrorf(s.ctx, "service.cancelVideoLikeTx cache update failed: %v", err)
 	}
 
 	return nil
@@ -129,7 +143,7 @@ func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, 
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
 		commentExists, err := s.commentDao.WithTx(tx).IsCommentExists(s.ctx, commentID)
 		if err != nil {
-			return errno.ServiceErr
+			return errors.WithMessagef(err, "service.likeCommentByID: check comment exists failed, commentID=%d, userID=%d", commentID, userID)
 		}
 		if !commentExists {
 			return errno.CommentNotExistErr
@@ -137,7 +151,7 @@ func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, 
 
 		isLiked, err := s.likeDao.IsCommentLikeExists(s.ctx, userID, commentID)
 		if err != nil {
-			return errno.ServiceErr
+			return errors.WithMessagef(err, "service.likeCommentByID: check like exists failed, commentID=%d, userID=%d", commentID, userID)
 		}
 
 		if actionType == interaction.LikeActionType_ADD {
@@ -160,11 +174,11 @@ func (s *InteractionService) addCommentLikeTx(tx *gorm.DB, userID, commentID int
 	}
 
 	if err := s.likeDao.WithTx(tx).AddCommentLike(s.ctx, userID, commentID); err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.addCommentLikeTx: db.AddCommentLike failed, commentID=%d, userID=%d", commentID, userID)
 	}
 
 	if err := s.commentDao.WithTx(tx).IncrLikeCount(s.ctx, commentID); err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.addCommentLikeTx: db.IncrLikeCount failed, commentID=%d", commentID)
 	}
 
 	return nil
@@ -176,11 +190,11 @@ func (s *InteractionService) cancelCommentLikeTx(tx *gorm.DB, userID, commentID 
 	}
 
 	if err := s.likeDao.WithTx(tx).DeleteCommentLike(s.ctx, userID, commentID); err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.cancelCommentLikeTx: db.DeleteCommentLike failed, commentID=%d, userID=%d", commentID, userID)
 	}
 
 	if err := s.commentDao.WithTx(tx).DecrLikeCount(s.ctx, commentID); err != nil {
-		return errno.ServiceErr
+		return errors.WithMessagef(err, "service.cancelCommentLikeTx: db.DecrLikeCount failed, commentID=%d", commentID)
 	}
 
 	return nil

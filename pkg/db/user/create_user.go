@@ -2,7 +2,8 @@ package userdao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
@@ -15,8 +16,7 @@ func (u *UserDao) CreateUser(ctx context.Context, username string, password stri
 
 	err := u.q.User.WithContext(ctx).Create(user)
 	if err != nil {
-		log.Println("failed to create user: ", err)
-		return 0, err
+		return 0, errors.Wrapf(err, "CreateUser failed, user: %s", username)
 	}
 
 	return user.ID, nil

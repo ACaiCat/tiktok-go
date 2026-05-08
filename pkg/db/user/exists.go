@@ -2,7 +2,8 @@ package userdao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (u *UserDao) IsUserExists(ctx context.Context, userID int64) (bool, error) {
@@ -15,8 +16,7 @@ func (u *UserDao) IsUserExists(ctx context.Context, userID int64) (bool, error) 
 		Count()
 
 	if err != nil {
-		log.Println("failed to check if user exists for userID", userID, ":", err)
-		return false, err
+		return false, errors.Wrapf(err, "IsUserExists failed, userID: %d", userID)
 	}
 
 	return count > 0, nil

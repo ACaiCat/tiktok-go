@@ -3,6 +3,7 @@ package service
 import (
 	"strconv"
 
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
@@ -41,12 +42,12 @@ func (s *VideoService) GetVideoList(req *video.ListReq) ([]*model.Video, int64, 
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
 		videosDao, err = s.videoDao.WithTx(tx).GetVideosByUserID(s.ctx, userID, int(pageSize), int(pageNum))
 		if err != nil {
-			return errno.ServiceErr
+			return errors.WithMessagef(err, "service.GetVideoList: db.GetVideosByUserID failed, userID=%d", userID)
 		}
 
 		total, err = s.videoDao.WithTx(tx).GetVideoCountByUserID(s.ctx, userID)
 		if err != nil {
-			return errno.ServiceErr
+			return errors.WithMessagef(err, "service.GetVideoList: db.GetVideoCountByUserID failed, userID=%d", userID)
 		}
 
 		return nil
@@ -81,7 +82,7 @@ func (s *VideoService) GetLikedVideos(req *interaction.ListLikeReq) ([]*model.Vi
 
 	likedVideos, err := s.videoDao.GetUserLikeList(s.ctx, userID, int(pageSize), int(pageNum))
 	if err != nil {
-		return nil, errno.ServiceErr
+		return nil, errors.WithMessagef(err, "service.GetLikedVideos: db.GetUserLikeList failed, userID=%d", userID)
 	}
 
 	videos := VideosDaoToDto(likedVideos)

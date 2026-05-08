@@ -2,7 +2,8 @@ package followerdao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/db/query"
@@ -21,8 +22,7 @@ func (f *FollowerDao) GetFollower(ctx context.Context, userID int64, pageSize in
 			Scan(&userIDs)
 
 		if err != nil {
-			log.Println("failed to get follower IDs for userID", userID, ":", err)
-			return err
+			return errors.Wrapf(err, "GetFollower failed, userID: %d", userID)
 		}
 
 		users, err = tx.User.WithContext(ctx).
@@ -32,8 +32,7 @@ func (f *FollowerDao) GetFollower(ctx context.Context, userID int64, pageSize in
 			Find()
 
 		if err != nil {
-			log.Println("failed to get followers for userID", userID, ":", err)
-			return err
+			return errors.Wrapf(err, "GetFollower failed, userID: %d", userID)
 		}
 		return nil
 	})
@@ -58,8 +57,7 @@ func (f *FollowerDao) GetFollowing(ctx context.Context, userID int64, pageSize i
 			Scan(&userIDs)
 
 		if err != nil {
-			log.Println("failed to get following userIDs for userID", userID, ":", err)
-			return err
+			return errors.Wrapf(err, "GetFollowing failed, userID: %d", userID)
 		}
 
 		users, err = tx.User.WithContext(ctx).
@@ -69,8 +67,7 @@ func (f *FollowerDao) GetFollowing(ctx context.Context, userID int64, pageSize i
 			Find()
 
 		if err != nil {
-			log.Println("failed to get followings for userID", userID, ":", err)
-			return err
+			return errors.Wrapf(err, "GetFollowing failed, userID: %d", userID)
 		}
 
 		return nil
@@ -97,8 +94,7 @@ func (f *FollowerDao) GetFriends(ctx context.Context, userID int64, pageSize int
 			Scan(&followerIDs)
 
 		if err != nil {
-			log.Println("failed to get following userIDs for userID", userID, ":", err)
-			return err
+			return errors.Wrapf(err, "GetFriend failed, userID: %d", userID)
 		}
 
 		err = tx.Follower.WithContext(ctx).
@@ -107,8 +103,7 @@ func (f *FollowerDao) GetFriends(ctx context.Context, userID int64, pageSize int
 			Scan(&friendIDs)
 
 		if err != nil {
-			log.Println("failed to get friend userIDs for userID", userID, ":", err)
-			return err
+			return errors.Wrapf(err, "GetFriend failed, userID: %d", userID)
 		}
 
 		users, err = tx.User.WithContext(ctx).
@@ -118,8 +113,7 @@ func (f *FollowerDao) GetFriends(ctx context.Context, userID int64, pageSize int
 			Find()
 
 		if err != nil {
-			log.Println("failed to get friends for userID", userID, ":", err)
-			return err
+			return errors.Wrapf(err, "GetFriend failed, userID: %d", userID)
 		}
 		return nil
 	})

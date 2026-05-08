@@ -2,7 +2,8 @@ package videodao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (v *VideoDao) IsVideoExists(ctx context.Context, videoID int64) (bool, error) {
@@ -15,8 +16,7 @@ func (v *VideoDao) IsVideoExists(ctx context.Context, videoID int64) (bool, erro
 		Count()
 
 	if err != nil {
-		log.Printf("failed to check if video exists for videoID %d: %v", videoID, err)
-		return false, err
+		return false, errors.Wrapf(err, "IsVideoExists failed, videoID: %d", videoID)
 	}
 
 	return count > 0, nil

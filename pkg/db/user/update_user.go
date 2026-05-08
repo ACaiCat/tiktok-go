@@ -2,7 +2,8 @@ package userdao
 
 import (
 	"context"
-	"log"
+
+	"github.com/pkg/errors"
 )
 
 func (u *UserDao) UpdateUserMFA(ctx context.Context, userID int64, secrete string) error {
@@ -10,8 +11,7 @@ func (u *UserDao) UpdateUserMFA(ctx context.Context, userID int64, secrete strin
 		Where(u.q.User.ID.Eq(userID)).
 		Update(u.q.User.TotpSecret, secrete)
 	if err != nil {
-		log.Println("failed to update user mfa secret: ", err)
-		return err
+		return errors.Wrapf(err, "UpdateUserMFA failed, userID: %d", userID)
 	}
 
 	return nil
@@ -22,8 +22,7 @@ func (u *UserDao) UpdateUserAvatarURL(ctx context.Context, userID int64, avatarU
 		Where(u.q.User.ID.Eq(userID)).
 		Update(u.q.User.AvatarURL, avatarURL)
 	if err != nil {
-		log.Println("failed to update user avatar url: ", err)
-		return err
+		return errors.Wrapf(err, "UpdateUserAvatarURL failed, userID: %d", userID)
 	}
 	return nil
 }
@@ -36,8 +35,7 @@ func (u *UserDao) UpdateUserJwch(ctx context.Context, userID int64, jwchID strin
 			"jwch_id":       jwchID,
 		})
 	if err != nil {
-		log.Println("failed to update user mfa secret: ", err)
-		return err
+		return errors.Wrapf(err, "UpdateUserJwch failed, userID: %d", userID)
 	}
 
 	return nil
