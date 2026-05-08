@@ -14,12 +14,14 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/bucket"
 	"github.com/ACaiCat/tiktok-go/pkg/cache"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
+	"github.com/ACaiCat/tiktok-go/pkg/logger"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/adaptor"
 )
 
 func main() {
 	config.Init()
+	logger.InitLogger()
 	db.InitPostgres()
 	cache.InitRedis()
 	bucket.InitMinIO(context.Background())
