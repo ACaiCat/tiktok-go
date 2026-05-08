@@ -167,4 +167,25 @@ flowchart TD
 
 ### 安全机制
 
-通过`ToolCallContext`的安全机制来确保模型只能访问私聊两个人的教务处账号
+通过工具的`Authorize`方法传入`ToolCallContext`来限制模型只能访问私聊两个人的教务处账号
+
+## 错误处理
+
+参考[Go 项目分层下的最佳 error 处理方式](https://juejin.cn/post/7246777406387306553)的错误处理方式，使用`errors.Wrap`包裹`err`，然后逐层包裹`errors.WithMessage`，最后在`pack.RespError`中将非预期的内部错误通过hlog处理
+```mermaid
+flowchart TD
+    A[发生err]
+    B[errors.Wrap包裹原始错误]
+    C[errors.WithMessage逐层追加上下文]
+    D{预期业务错误}
+    E[pack.RespError返回业务错误]
+    F[hlog记录内部错误]
+    G[pack.RespError返回通用错误]
+
+    A --> B
+    B --> C
+    C --> D
+    D -->|是| E
+    D -->|否| F
+    F --> G
+```
