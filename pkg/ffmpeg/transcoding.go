@@ -4,7 +4,6 @@ import (
 	"bytes"
 
 	"github.com/pkg/errors"
-
 	ffmpeggo "github.com/u2takey/ffmpeg-go"
 )
 

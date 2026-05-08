@@ -5,12 +5,11 @@ import (
 	"math/rand/v2"
 	"time"
 
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
-
-	"github.com/pkg/errors"
 )
 
 func (v *VideoDao) GetVideoByID(ctx context.Context, videoID int64) (*model.Video, error) {

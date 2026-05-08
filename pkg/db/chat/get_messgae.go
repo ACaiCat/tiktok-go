@@ -4,8 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/pkg/errors"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func (c *ChatDao) GetUnreadMessages(ctx context.Context, userID int64, senderID int64) ([]*model.ChatMessage, error) {

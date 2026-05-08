@@ -3,10 +3,10 @@ package commentdao
 import (
 	"context"
 
-	"github.com/ACaiCat/tiktok-go/pkg/db/model"
-
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func (c *CommentDao) GetCommentByID(ctx context.Context, commentID int64) (*model.Comment, error) {

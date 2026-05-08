@@ -47,7 +47,7 @@ func (v *VideoDao) SearchVideo(
 		Offset(pageSize * pageNum).Limit(pageSize).Find()
 
 	if err != nil {
-		return nil, errors.Wrapf(err, "SearchVideo failed, keywords: %s, fromDate: %s, toDate: %s, userID: %s",
+		return nil, errors.Wrapf(err, "SearchVideo failed, keywords: %s, fromDate: %s, username: %s",
 			strings.Join(keywords, ","), toDate.Format(time.RFC3339), username)
 	}
 

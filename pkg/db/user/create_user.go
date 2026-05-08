@@ -3,8 +3,9 @@ package userdao
 import (
 	"context"
 
-	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/pkg/errors"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func (u *UserDao) CreateUser(ctx context.Context, username string, password string) (int64, error) {

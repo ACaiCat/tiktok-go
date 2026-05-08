@@ -4,8 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/pkg/errors"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func (c *ChatDao) AddMessage(ctx context.Context, senderID int64, receiverID int64, content string, isRead bool, isAi bool) error {

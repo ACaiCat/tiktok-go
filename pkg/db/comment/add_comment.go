@@ -3,8 +3,9 @@ package commentdao
 import (
 	"context"
 
-	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/pkg/errors"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func (c *CommentDao) AddVideoComment(ctx context.Context, userID int64, videoID int64, content string) error {

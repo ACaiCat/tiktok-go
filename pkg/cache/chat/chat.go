@@ -3,9 +3,10 @@ package chatcache
 import (
 	"context"
 
-	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
 
 type ChatCache struct {

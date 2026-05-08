@@ -5,9 +5,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/minio/minio-go/v7"
 	"github.com/pkg/errors"
+
+	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
 
 func coverObject(videoID int64) string {

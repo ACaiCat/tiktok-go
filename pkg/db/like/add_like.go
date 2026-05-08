@@ -3,8 +3,9 @@ package likedao
 import (
 	"context"
 
-	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/pkg/errors"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func (l *LikeDao) AddVideoLike(ctx context.Context, userID, videoID int64) error {

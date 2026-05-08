@@ -3,10 +3,10 @@ package followerdao
 import (
 	"context"
 
+	"github.com/pkg/errors"
+
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/db/query"
-
-	"github.com/pkg/errors"
 )
 
 func (f *FollowerDao) GetFollower(ctx context.Context, userID int64, pageSize int, pageNum int) ([]*model.User, int, error) {

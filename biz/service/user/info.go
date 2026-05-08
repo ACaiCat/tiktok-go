@@ -1,9 +1,10 @@
 package service
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
-	"github.com/pkg/errors"
 )
 
 func (s *UserService) GetUserInfo(userID int64) (*model.User, error) {
