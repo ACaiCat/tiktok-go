@@ -67,16 +67,16 @@ tiktok-go/
 ## API文档
 
 [文档](docs/API.md)
-> ApiFox生成的
+> ApiFox生成的，Chat是自己搓的
 
-## 总结文档
+## 报告
 
-[总结](docs/Report.md)
+[报告](docs/Report.md)
 > Work4的，Work5的还没写
 
-## 设计文档
+## 设计
 
-[总结](docs/Design.md)
+[设计](docs/Design.md)
 > 石山随笔
 
 ## 快速开始

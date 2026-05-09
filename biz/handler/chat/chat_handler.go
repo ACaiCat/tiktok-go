@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/gorilla/websocket"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
 	service "github.com/ACaiCat/tiktok-go/biz/service/chat"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
+	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/jwt"
 )
 
