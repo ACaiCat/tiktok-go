@@ -319,6 +319,47 @@ secret: ""
 
 ---
 
+## POST 绑定教务处账号
+
+`POST /user/jwch/bind`
+
+> Body 请求参数
+
+```yaml
+jwch_id: ""
+jwch_password: ""
+```
+
+### 请求参数
+
+| 名称            | 位置   | 类型     | 必选 | 说明    |
+|---------------|------|--------|----|-------|
+| jwch_id       | body | string | 否  | 教务处学号 |
+| jwch_password | body | string | 否  | 教务处密码 |
+
+> 返回示例
+
+```json
+{
+  "base": {
+    "code": 10000,
+    "msg": "success"
+  }
+}
+```
+
+### 返回数据结构
+
+状态码 200
+
+| 名称      | 类型            | 说明 |
+|---------|---------------|----|
+| » base  | [响应状态](#响应状态) | -  |
+| »» code | integer       | -  |
+| »» msg  | string        | -  |
+
+---
+
 ## POST 以图搜图
 
 `POST /user/image/search`
