@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ACaiCat/tiktok-go/biz/chat"
+	"github.com/ACaiCat/tiktok-go/biz/handler/chat"
 	mw "github.com/ACaiCat/tiktok-go/biz/mw/log"
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/ai"

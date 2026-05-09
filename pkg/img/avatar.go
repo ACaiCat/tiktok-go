@@ -2,7 +2,6 @@ package img
 
 import (
 	"fmt"
-	"log"
 	"slices"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
@@ -18,7 +17,6 @@ func CheckAvatar(data []byte) (string, error) {
 
 	format, err := GetImageFormat(data)
 	if err != nil {
-		log.Println("failed to get image format:", err)
 		return "", errno.AvatarFormatErr
 	}
 

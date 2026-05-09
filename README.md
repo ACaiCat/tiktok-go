@@ -1,23 +1,26 @@
 ﻿# tiktok-go
 
-@west2-online go组work4
+@west2-online go组work5
 一个基于[Hertz](https://github.com/cloudwego/hertz)框架构建的乞丐版石山TikTok
 
 ## 技术栈
 
 - 框架：Hertz
-- 数据库：PostgreSQL (GORM Gen)  
-  "构式Gen，下辈子不用了，子查询都写不了，何意味？"
+- 数据库：PostgreSQL (GORM Gen)
 - 缓存：Redis
-- 认证：JWT (Access Token + Refresh Token)
+- 认证：JWT (双Token)
+- 存储: Minio
 - 配置：Viper
 
 ## 项目结构
 
 ```
 tiktok-go/
-├── main.go                        # 入口点
-├── router_gen.go
+├── cmd/
+│   ├── api/                       # APP入口点
+│   ├── chat/                      # 聊天客户端 (100 %AI)
+│   └── gorm-gen/                  # GORM Gen
+│
 ├── config/                        # 配置模块
 ├── idl/                           # 接口定义
 ├── biz/                           # 业务逻辑层
@@ -32,45 +35,49 @@ tiktok-go/
 │   ├── router/                    # 路由
 │   ├── model/                     # 请求和响应数据模型
 │   ├── pack/                      # 响应数据打包方法
-│   ├── mw/                        # 中间件
-│   │   └── auth/                  # JWT认证中间件
-│   │
-│   └── chat/                      # WebSocket聊天处理
-│
-├── pkg/                           # 通用工具包
-│   ├── db/                        # 数据库访问
-│   │   ├── postgres.go            # 数据库连接初始化
-│   │   ├── model/                 # 数据库模型
-│   │   ├── query/                 # Gen查询
-│   │   └── ...
-│   │
-│   ├── cache/                     # 缓存
-│   │   ├── redis.go               # Redis连接初始化
-│   │   └── ...
-│   │
-│   ├── bucket/                    # 对象存储
-│   │   ├── minio.go               # MinIO客户端初始化
-│   │   └── ...
-│   │
-│   ├── jwt/                       # JWT工具包
-│   ├── ffmpeg/                    # 媒体处理
-│   ├── img/                       # 图片处理
-│   ├── errno/                     # 错误码定义
-│   ├── constants/                 # 全局常量
-│   ├── totp/                      # TOTP多因素认证
-│   └── utils/                     # 工具函数          
-│
-└── cmd/
-    └── gorm-gen/                  # GORM Gen
+│   └── mw/                        # 中间件、
+│       ├── log/                   # 日志中间件
+│       └── auth/                  # JWT认证中间件
+│   
+└── pkg/                           # 通用工具包
+    ├── db/                        # 数据库访问
+    │   ├── postgres.go            # 数据库连接初始化
+    │   ├── model/                 # 数据库模型
+    │   ├── query/                 # Gen查询
+    │   └── ...
+    │
+    ├── cache/                     # 缓存
+    │   ├── redis.go               # Redis连接初始化
+    │   └── ...
+    │
+    ├── bucket/                    # 对象存储
+    │   ├── minio.go               # MinIO客户端初始化
+    │   └── ...
+    │
+    ├── ai/                        # AI聊天
+    ├── jwt/                       # JWT工具包
+    ├── ffmpeg/                    # 媒体处理
+    ├── img/                       # 图片处理
+    ├── errno/                     # 错误码定义
+    ├── constants/                 # 全局常量
+    ├── totp/                      # TOTP多因素认证
+    └── utils/                     # 工具函数          
 ```
 
 ## API文档
 
 [文档](docs/API.md)
+> ApiFox生成的，Chat是自己搓的
 
-## 总结文档
+## 报告
 
-[总结](docs/Summary.md)
+[报告](docs/Report.md)
+> Work4的，Work5的还没写
+
+## 设计
+
+[设计](docs/Design.md)
+> 石山随笔
 
 ## 快速开始
 
@@ -97,44 +104,4 @@ tiktok-go/
     ```bash
     docker restart tiktok-go
     ```
-
----
-
-## TODO List
-
-### 用户模块 (User)
-
-- [x] `POST /user/register` — 用户注册
-- [x] `POST /user/login` — 用户登录
-- [x] `POST /auth/refresh` — 刷新 Token
-- [X] `GET  /user/info` — 获取用户信息
-- [X] `PUT  /user/avatar/upload` — 上传头像
-- [x] `GET  /auth/mfa/qrcode` — 获取 MFA 二维码
-- [x] `POST /auth/mfa/bind` — 绑定 MFA
-- [ ] `POST /user/image/search` — 以图搜图 (没看懂，何意味)
-
-### 视频模块 (Video)
-
-- [X] `GET  /video/feed` — 视频流
-- [X] `POST /video/publish` — 发布视频
-- [X] `GET  /video/list` — 用户视频列表
-- [X] `GET  /video/popular` — 热门视频
-- [X] `POST /video/search` — 搜索视频
-- [X] `GET  /video/visit` — 访问视频
-
-### 互动模块 (Interaction)
-
-- [X] `POST   /like/action` — 点赞 / 取消点赞
-- [X] `GET    /like/list` — 点赞列表
-- [X] `POST   /comment/publish` — 发布评论
-- [X] `GET    /comment/list` — 评论列表
-- [X] `DELETE /comment/delete` — 删除评论
-
-### 社交模块 (Social)
-
-- [X] `POST /relation/action` — 关注 / 取消关注
-- [X] `GET  /following/list` — 关注列表
-- [X] `GET  /follower/list` — 粉丝列表
-- [x] `GET  /friends/list` — 好友列表
-- [X] `GET  /ws` — WebSocket 聊天
 

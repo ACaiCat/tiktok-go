@@ -45,7 +45,7 @@ func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 		Content:    content,
 		Timestamp:  now,
 	}
-	receiverOnline, err := s.sendMessageToUser(receiverID, ws.MessageTypeChat, receiverMessage)
+	receiverOnline, err := s.sendMessage(receiverID, ws.MessageTypeChat, receiverMessage)
 	if err != nil {
 		hlog.Errorf("failed to forward message to receiver: %v", err)
 	}
@@ -60,7 +60,7 @@ func (s *ChatService) replyWithAI(userID int64, receiverID int64) {
 		Content:    content,
 		Timestamp:  now,
 	}
-	senderOnline, err := s.sendMessageToUser(userID, ws.MessageTypeChat, senderMessage)
+	senderOnline, err := s.sendMessage(userID, ws.MessageTypeChat, senderMessage)
 	if err != nil {
 		hlog.Errorf("failed to forward message to sender: %v", err)
 	}

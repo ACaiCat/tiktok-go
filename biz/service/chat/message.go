@@ -1,61 +1,64 @@
 package service
 
 import (
+	"context"
+
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/hertz/pkg/common/json"
+	"github.com/pkg/errors"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
 
-func (s *ChatService) SendErr(userID int64, err errno.ErrNo) {
-	if u, online := s.manager.GetOnlineUser(userID); online {
-		u.SendError(int(err.ErrCode), err.ErrMsg)
+func (s *ChatService) HandleChatMessage(userID int64, chatMessage *ws.ChatMessage) error {
+	if !s.ensureFriend(userID, chatMessage.ReceiverID) {
+		return nil
 	}
+
+	if _, err := s.sendMessage(userID, ws.MessageTypeChat, chatMessage); err != nil {
+		return errors.Wrapf(err, "sendMessageToUser failed, userID=%d", userID)
+	}
+
+	receiverOnline, err := s.sendMessage(chatMessage.ReceiverID, ws.MessageTypeChat, chatMessage)
+	if err != nil {
+		return errors.Wrapf(err, "sendMessageToUser failed, userID=%d", chatMessage.ReceiverID)
+	}
+	if !s.saveChatMessage(userID, chatMessage.ReceiverID, chatMessage.Content, receiverOnline, chatMessage.IsAI) {
+		return nil
+	}
+
+	go s.replyWithAI(userID, chatMessage.ReceiverID)
+	return nil
 }
 
-func (s *ChatService) HandleMessage(userID int64, messageText string) {
-	var message ws.Message
-	if err := json.Unmarshal([]byte(messageText), &message); err != nil {
-		s.SendErr(userID, errno.ChatMsgParseErr.WithMessage("消息格式错误："+err.Error()))
-		return
+func (s *ChatService) ensureFriend(userID int64, receiverID int64) bool {
+	isFriend, err := s.followerDao.IsExistFriend(s.ctx, userID, receiverID)
+	if err != nil {
+		s.SendErr(userID, errno.ServiceErr)
+		return false
+	}
+	if !isFriend {
+		s.SendErr(userID, errno.ChatNotFriendErr)
+		return false
 	}
 
-	switch message.Type {
-	case ws.MessageTypeChat:
-		var chatMessage ws.ChatMessage
-		if err := json.Unmarshal(message.Body, &chatMessage); err != nil {
-			s.SendErr(userID, errno.ChatMsgParseErr)
-			return
-		}
-		if err := s.handleChatMessage(userID, &chatMessage); err != nil {
-			s.SendErr(userID, errno.ServiceErr)
-			hlog.CtxErrorf(s.ctx, "handleChatMessage: %v", err)
-		}
+	return true
+}
 
-	case ws.MessageTypeUnread:
-		var unreadRequest ws.UnreadRequest
-		if err := json.Unmarshal(message.Body, &unreadRequest); err != nil {
-			s.SendErr(userID, errno.ChatMsgParseErr)
-			return
-		}
-		if err := s.handleUnreadMessage(userID, &unreadRequest); err != nil {
-			s.SendErr(userID, errno.ServiceErr)
-			hlog.CtxErrorf(s.ctx, "handleUnreadMessage: %v", err)
-		}
+func (s *ChatService) saveChatMessage(senderID int64, receiverID int64, content string, isRead bool, isAI bool) bool {
+	if err := s.chatDao.AddMessage(s.ctx, senderID, receiverID, content, isRead, isAI); err != nil {
+		s.SendErr(senderID, errno.ServiceErr)
+		return false
+	}
 
-	case ws.MessageTypeHistory:
-		var historyRequest ws.HistoryRequest
-		if err := json.Unmarshal(message.Body, &historyRequest); err != nil {
-			s.SendErr(userID, errno.ChatMsgParseErr)
-			return
-		}
-		if err := s.handleHistoryMessage(userID, &historyRequest); err != nil {
-			s.SendErr(userID, errno.ServiceErr)
-			hlog.CtxErrorf(s.ctx, "handleHistoryMessage: %v", err)
-		}
+	go s.clearConversationHistoryCache(senderID, receiverID)
+	go s.clearUnreadMessagesCache(receiverID, senderID)
 
-	default:
-		s.SendErr(userID, errno.ChatMsgTypeErr)
+	return true
+}
+
+func (s *ChatService) clearConversationHistoryCache(senderID int64, receiverID int64) {
+	if err := s.cache.ClearChatHistory(context.Background(), senderID, receiverID); err != nil {
+		hlog.Errorf("ClearChatHistory failed, sender=%d receiver=%d: %v", senderID, receiverID, err)
 	}
 }
