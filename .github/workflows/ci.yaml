@@ -28,7 +28,7 @@ jobs:
 
       - name: Build
         shell: bash
-        run: go build -v -o publish/main${{ matrix.platform == 'win-x64' && '.exe' || '' }} .
+        run: go build -v -o publish/main${{ matrix.platform == 'win-x64' && '.exe' || '' }} ./cmd/api
 
       - name: Copy example config
         shell: bash
