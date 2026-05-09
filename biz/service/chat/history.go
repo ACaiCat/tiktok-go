@@ -9,13 +9,13 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func (s *ChatService) handleHistoryMessage(userID int64, historyRequest *ws.HistoryRequest) error {
+func (s *ChatService) HandleHistoryMessage(userID int64, historyRequest *ws.HistoryRequest) error {
 	historyMessages, err := s.getChatHistory(userID, historyRequest.Sender, historyRequest.PageSize, historyRequest.Page)
 	if err != nil {
 		return errors.Wrapf(err, "getChatHistory failed, userID=%d, sender=%d", userID, historyRequest.Sender)
 	}
 
-	if _, err := s.sendMessageToUser(userID, ws.MessageTypeHistory, &ws.HistoryMessage{
+	if _, err := s.sendMessage(userID, ws.MessageTypeHistory, &ws.HistoryMessage{
 		Messages: s.MessagesDaoToDto(historyMessages),
 	}); err != nil {
 		return errors.Wrapf(err, "sendMessageToUser failed, userID=%d", userID)

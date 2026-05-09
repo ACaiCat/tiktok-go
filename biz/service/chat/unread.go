@@ -11,13 +11,13 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func (s *ChatService) handleUnreadMessage(userID int64, unreadRequest *ws.UnreadRequest) error {
+func (s *ChatService) HandleUnreadMessage(userID int64, unreadRequest *ws.UnreadRequest) error {
 	unreadMessages, err := s.getUnreadMessages(userID, unreadRequest.Sender)
 	if err != nil {
 		return errors.Wrapf(err, "getUnreadMessages failed, userID=%d, sender=%d", userID, unreadRequest.Sender)
 	}
 
-	online, err := s.sendMessageToUser(userID, ws.MessageTypeUnread, &ws.UnreadMessage{
+	online, err := s.sendMessage(userID, ws.MessageTypeUnread, &ws.UnreadMessage{
 		Messages: s.MessagesDaoToDto(unreadMessages),
 	})
 	if err != nil {

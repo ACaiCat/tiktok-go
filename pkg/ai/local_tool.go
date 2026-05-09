@@ -2,6 +2,7 @@ package ai
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 
@@ -55,10 +56,9 @@ func (l LocalTool[I, O]) CallTool(tc openai.ToolCall, callCtx ToolCallContext) (
 	if l.Authorize != nil {
 		err = l.Authorize(callCtx, input)
 		if err != nil {
-			if _, ok := any(err).(errno.ErrNo); !ok {
+			if _, ok := errors.AsType[errno.ErrNo](err); !ok {
 				err = errno.AuthErr.WithError(err)
 			}
-
 			return nil, err
 		}
 	}
