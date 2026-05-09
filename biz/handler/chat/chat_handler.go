@@ -3,7 +3,6 @@ package chat
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 
@@ -29,7 +28,6 @@ func Chat(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := jwt.ValidateToken(token, constants.TypeAccessToken)
 	if err != nil {
-		log.Println(err)
 		return
 	}
 	c, err := upgrader.Upgrade(w, r, nil)

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/invopop/jsonschema"
 	mcpproto "github.com/mark3labs/mcp-go/mcp"
 	"github.com/sashabaranov/go-openai"
@@ -75,7 +75,7 @@ func (l LocalTool[I, O]) CallTool(tc openai.ToolCall, callCtx ToolCallContext) (
 			},
 			IsError: true,
 		}
-		log.Printf("CallTool failed, tool=%s, err=%v\n", l.GetName(), err)
+		hlog.Error("CallTool failed, tool=%s, err=%v\n", l.GetName(), err)
 	} else {
 		jsonResult, err := json.Marshal(result)
 

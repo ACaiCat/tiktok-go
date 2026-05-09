@@ -23,6 +23,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/gorilla/websocket"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
@@ -106,7 +107,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	log.Printf("connected to %s", wsURL)
+	hlog.Error("connected to %s", wsURL)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
@@ -230,7 +231,7 @@ func login(conf cliConfig) (string, error) {
 		return "", fmt.Errorf("login returned code=%d msg=%s", parsed.Base.Code, parsed.Base.Msg)
 	}
 
-	log.Printf("login ok, user_id=%s", parsed.Data.ID)
+	hlog.Error("login ok, user_id=%s", parsed.Data.ID)
 	return accessToken, nil
 }
 
