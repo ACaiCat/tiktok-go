@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_ "time/tzdata"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -24,6 +25,6 @@ func InitPostgres() {
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 }

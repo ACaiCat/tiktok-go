@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/ACaiCat/tiktok-go/config"
@@ -21,6 +22,6 @@ func InitRedis() {
 
 	err = Cache.Ping(context.Background()).Err()
 	if err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 }

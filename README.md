@@ -37,6 +37,7 @@ tiktok-go/
 │   ├── pack/                      # 响应数据打包方法
 │   └── mw/                        # 中间件、
 │       ├── log/                   # 日志中间件
+│       ├── sentinel/              # Sentinel中间件
 │       └── auth/                  # JWT认证中间件
 │   
 └── pkg/                           # 通用工具包
