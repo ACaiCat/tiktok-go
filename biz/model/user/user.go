@@ -13,9 +13,9 @@ import (
 // 用户注册请求
 type RegisterReq struct {
 	// 用户名
-	Username string `thrift:"username,1,required" form:"username,required" json:"username,required"`
+	Username string `thrift:"username,1,required" form:"username,required" json:"username,required" vd:"len($) > 0"`
 	// 密码
-	Password string `thrift:"password,2,required" form:"password,required" json:"password,required"`
+	Password string `thrift:"password,2,required" form:"password,required" json:"password,required" vd:"len($) > 0"`
 }
 
 func NewRegisterReq() *RegisterReq {

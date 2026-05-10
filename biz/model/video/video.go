@@ -1193,9 +1193,9 @@ type ListReq struct {
 	// 用户ID
 	UserID string `thrift:"user_id,1,required" json:"user_id,required" query:"user_id,required"`
 	// 页码
-	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required" vd:"$ >= 0"`
 	// 单页尺寸
-	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required" vd:"$ >= 1 && $ <= 100"`
 }
 
 func NewListReq() *ListReq {
@@ -1665,9 +1665,9 @@ func (p *ListResp) String() string {
 // 热门排行榜请求
 type PopularReq struct {
 	// 页码
-	PageNum int32 `thrift:"page_num,1,required" json:"page_num,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,1,required" json:"page_num,required" query:"page_num,required" vd:"$ >= 0"`
 	// 单页尺寸
-	PageSize int32 `thrift:"page_size,2,required" json:"page_size,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,2,required" json:"page_size,required" query:"page_size,required" vd:"$ >= 1 && $ <= 100"`
 }
 
 func NewPopularReq() *PopularReq {
@@ -2087,9 +2087,9 @@ type SearchReq struct {
 	// 关键词
 	Keywords string `thrift:"keywords,1,required" form:"keywords,required" json:"keywords,required"`
 	// 页码
-	PageNum int32 `thrift:"page_num,2,required" form:"page_num,required" json:"page_num,required"`
+	PageNum int32 `thrift:"page_num,2,required" form:"page_num,required" json:"page_num,required" vd:"$ >= 1 && $ <= 100"`
 	// 单页尺寸
-	PageSize int32 `thrift:"page_size,3,required" form:"page_size,required" json:"page_size,required"`
+	PageSize int32 `thrift:"page_size,3,required" form:"page_size,required" json:"page_size,required" vd:"$ >= 0"`
 	// 起始时间
 	FromDate *string `thrift:"from_date,4,optional" form:"from_date" json:"from_date,omitempty"`
 	// 结束时间

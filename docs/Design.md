@@ -6,22 +6,22 @@
 
 ```go
 type Comment struct {
-// 评论ID
-ID           int64
-// 用户ID
-UserID       int64
-// 视频ID
-VideoID      int64
-// 父评论ID
-ParentID     *int64
-// 评论内容
-Content      string
-// 点赞数
-LikeCount    int64
-// 评论数
-CommentCount int64
-// 创建时间
-CreatedAt    time.Time
+    // 评论ID
+    ID           int64
+    // 用户ID
+    UserID       int64
+    // 视频ID
+    VideoID      int64
+    // 父评论ID
+    ParentID     *int64
+    // 评论内容
+    Content      string
+    // 点赞数
+    LikeCount    int64
+    // 评论数
+    CommentCount int64
+    // 创建时间
+    CreatedAt    time.Time
 }
 ```
 

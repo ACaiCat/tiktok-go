@@ -61,7 +61,7 @@ type LikeReq struct {
 	// 评论ID
 	CommentID *string `thrift:"comment_id,2,optional" form:"comment_id" json:"comment_id,omitempty"`
 	// 操作类型
-	ActionType LikeActionType `thrift:"action_type,3,required,LikeActionType" form:"action_type,required" json:"action_type,required"`
+	ActionType LikeActionType `thrift:"action_type,3,required,LikeActionType" form:"action_type,required" json:"action_type,required" vd:"in($, 1, 2)"`
 }
 
 func NewLikeReq() *LikeReq {
@@ -651,9 +651,9 @@ type ListLikeReq struct {
 	// 用户ID
 	UserID string `thrift:"user_id,1,required" json:"user_id,required" query:"user_id,required"`
 	// 页码
-	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required" vd:"$ >= 0"`
 	// 单页尺寸
-	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required" vd:"$ >= 1 && $ <= 100"`
 }
 
 func NewListLikeReq() *ListLikeReq {
@@ -1122,7 +1122,7 @@ type CommentReq struct {
 	// 评论ID
 	CommentID *string `thrift:"comment_id,2,optional" form:"comment_id" json:"comment_id,omitempty"`
 	// 评论内容
-	Content string `thrift:"content,3,required" form:"content,required" json:"content,required"`
+	Content string `thrift:"content,3,required" form:"content,required" json:"content,required" vd:"len($) > 0"`
 }
 
 func NewCommentReq() *CommentReq {
@@ -1714,9 +1714,9 @@ type ListCommentReq struct {
 	// 评论ID
 	CommentID *string `thrift:"comment_id,2,optional" json:"comment_id,omitempty" query:"comment_id"`
 	// 页码
-	PageNum int32 `thrift:"page_num,3,required" json:"page_num,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,3,required" json:"page_num,required" query:"page_num,required" vd:"$ >= 0"`
 	// 单页尺寸
-	PageSize int32 `thrift:"page_size,4,required" json:"page_size,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,4,required" json:"page_size,required" query:"page_size,required" vd:"$ >= 1 && $ <= 100"`
 }
 
 func NewListCommentReq() *ListCommentReq {

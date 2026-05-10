@@ -6,9 +6,9 @@ include "common.thrift"
 // 用户注册请求
 struct RegisterReq {
     // 用户名
-    1: required string username (api.form = 'username');
+    1: required string username (api.form = 'username', api.vd="len($) > 0");
     // 密码
-    2: required string password (api.form = 'password');
+    2: required string password (api.form = 'password', api.vd="len($) > 0");
 }
 
 // 用户注册响应
