@@ -3,7 +3,7 @@ module github.com/ACaiCat/tiktok-go
 go 1.26.0
 
 require (
-	github.com/apache/thrift v0.0.0-00010101000000-000000000000
+	github.com/apache/thrift v0.13.0
 	github.com/cloudwego/hertz v0.10.4
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/google/uuid v1.6.0
@@ -24,6 +24,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.2.0 // indirect
+	github.com/alibaba/sentinel-golang v1.0.4 // indirect
 	github.com/antchfx/htmlquery v1.3.3 // indirect
 	github.com/antchfx/xpath v1.3.2 // indirect
 	github.com/aws/aws-sdk-go v1.55.8 // indirect
@@ -47,6 +48,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/jsonschema-go v0.4.2 // indirect
 	github.com/hertz-contrib/logger/logrus v1.0.1 // indirect
+	github.com/hertz-contrib/opensergo v0.0.1 // indirect
 	github.com/invopop/jsonschema v0.14.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
@@ -88,7 +90,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.2 // indirect
-	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
+	golang.org/x/arch v0.0.0-20220412001346-fc48f9fe4c15 // indirect
 	golang.org/x/mod v0.34.0 // indirect
 	golang.org/x/net v0.52.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect

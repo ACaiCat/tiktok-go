@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
@@ -21,12 +22,12 @@ func InitMinIO(ctx context.Context) {
 		Secure: bucketConfig.UseSSL,
 	})
 	if err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 
 	cancel, err := Bucket.HealthCheck(constants.HealthCheckTime)
 	if err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 	defer cancel()
 
@@ -38,16 +39,16 @@ func InitMinIO(ctx context.Context) {
 func initBucket(ctx context.Context, name, policy string) {
 	exist, err := Bucket.BucketExists(ctx, name)
 	if err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 	if exist {
 		return
 	}
 	if err = Bucket.MakeBucket(ctx, name, minio.MakeBucketOptions{}); err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 	if err = Bucket.SetBucketPolicy(ctx, name, policy); err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 }
 

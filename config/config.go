@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/spf13/viper"
 )
 
@@ -65,10 +66,10 @@ func Init() {
 	viper.AddConfigPath("./config")
 
 	if err := viper.ReadInConfig(); err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 
 	if err := viper.Unmarshal(&AppConfig); err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 }

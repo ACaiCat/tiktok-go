@@ -20,7 +20,7 @@ func InitLogger() {
 	)
 
 	if err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 
 	logger := hertzlogrus.NewLogger()
