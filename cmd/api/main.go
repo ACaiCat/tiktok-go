@@ -8,7 +8,8 @@ import (
 	"strconv"
 
 	"github.com/ACaiCat/tiktok-go/biz/handler/chat"
-	mw "github.com/ACaiCat/tiktok-go/biz/mw/log"
+	logMw "github.com/ACaiCat/tiktok-go/biz/mw/log"
+	sentinelMw "github.com/ACaiCat/tiktok-go/biz/mw/sentinel"
 	"github.com/ACaiCat/tiktok-go/config"
 	"github.com/ACaiCat/tiktok-go/pkg/ai"
 	"github.com/ACaiCat/tiktok-go/pkg/bucket"
@@ -16,25 +17,28 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"github.com/ACaiCat/tiktok-go/pkg/logger"
 	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/cloudwego/hertz/pkg/common/adaptor"
+	hertzWebsocket "github.com/cloudwego/hertz/pkg/common/adaptor"
 )
 
-func main() {
+func init() {
 	config.Init()
 	logger.InitLogger()
 	db.InitPostgres()
 	cache.InitRedis()
 	bucket.InitMinIO(context.Background())
 	ai.InitLocalToolRegistry()
+}
 
+func main() {
 	h := server.Default(
 		server.WithHostPorts(config.AppConfig.Server.Host+":"+strconv.Itoa(config.AppConfig.Server.Port)),
 		server.WithMaxRequestBodySize(10*1024*1024*1024), // 10GB
 	)
 
-	h.Use(mw.AccessLog())
+	h.Use(logMw.AccessLog())
+	h.Use(sentinelMw.Sentinel())
 
-	h.GET("/ws", adaptor.HertzHandler(http.HandlerFunc(chat.Chat)))
+	h.GET("/ws", hertzWebsocket.HertzHandler(http.HandlerFunc(chat.Chat)))
 	register(h)
 
 	h.Spin()

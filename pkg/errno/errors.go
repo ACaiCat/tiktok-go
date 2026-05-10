@@ -12,6 +12,7 @@ var (
 	AuthMissingErr        = NewErrNo(AuthMissingErrCode, "认证信息缺失")
 	AuthAccessExpiredErr  = NewErrNo(AuthAccessExpiredErrCode, "访问令牌过期")
 	AuthRefreshExpiredErr = NewErrNo(AuthRefreshExpiredErrCode, "刷新令牌过期")
+	TooManyRequestsErr    = NewErrNo(TooManyRequestsErrCode, "服务器过载，请稍后重试")
 
 	UserAlreadyExistErr   = NewErrNo(UserAlreadyExistErrCode, "用户已存在")
 	UserIsNotExistErr     = NewErrNo(UserIsNotExistErrCode, "用户不存在")

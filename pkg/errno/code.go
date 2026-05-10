@@ -8,6 +8,7 @@ const (
 	AuthMissingErrCode            = 10005
 	AuthAccessExpiredErrCode      = 10006
 	AuthRefreshExpiredErrCode     = 10007
+	TooManyRequestsErrCode        = 10008
 	UserAlreadyExistErrCode       = 11000
 	UserIsNotExistErrCode         = 11001
 	PasswordIsNotVerifiedErrCode  = 11002
