@@ -15,7 +15,7 @@ struct LikeReq {
     // 评论ID
     2: optional string comment_id (api.form = 'comment_id');
     // 操作类型
-    3: required LikeActionType action_type (api.form = 'action_type');
+    3: required LikeActionType action_type (api.form = 'action_type', api.vd="in($, 1, 2)");
 }
 
 // 点赞响应
@@ -35,9 +35,9 @@ struct ListLikeReq {
     // 用户ID
     1: required string user_id (api.query = 'user_id');
     // 页码
-    2: required i32 page_num (api.query = 'page_num');
+    2: required i32 page_num (api.query = 'page_num', api.vd="$ >= 0");
     // 单页尺寸
-    3: required i32 page_size (api.query = 'page_size');
+    3: required i32 page_size (api.query = 'page_size', api.vd="$ >= 1 && $ <= 100");
 }
 
 // 点赞列表响应
@@ -55,7 +55,7 @@ struct CommentReq {
     // 评论ID
     2: optional string comment_id (api.form = 'comment_id');
     // 评论内容
-    3: required string content (api.form = 'content');
+    3: required string content (api.form = 'content', api.vd="len($) > 0");
 }
 
 // 评论响应
@@ -77,9 +77,9 @@ struct ListCommentReq {
     // 评论ID
     2: optional string comment_id (api.query = 'comment_id');
     // 页码
-    3: required i32 page_num (api.query = 'page_num');
+    3: required i32 page_num (api.query = 'page_num', api.vd="$ >= 0");
     // 单页尺寸
-    4: required i32 page_size (api.query = 'page_size');
+    4: required i32 page_size (api.query = 'page_size', api.vd="$ >= 1 && $ <= 100");
 }
 
 // 评论列表响应

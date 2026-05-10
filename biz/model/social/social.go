@@ -62,7 +62,7 @@ type FollowReq struct {
 	// 操作对象ID
 	ToUserID string `thrift:"to_user_id,1,required" form:"to_user_id,required" json:"to_user_id,required"`
 	// 操作类型
-	ActionType FollowActionType `thrift:"action_type,2,required,FollowActionType" form:"action_type,required" json:"action_type,required"`
+	ActionType FollowActionType `thrift:"action_type,2,required,FollowActionType" form:"action_type,required" json:"action_type,required" vd:"in($, 1, 2)"`
 }
 
 func NewFollowReq() *FollowReq {
@@ -646,9 +646,9 @@ type ListFollowingReq struct {
 	// 用户ID
 	UserID string `thrift:"user_id,1,required" json:"user_id,required" query:"user_id,required"`
 	// 页码
-	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required" vd:"$ >= 0"`
 	// 单页尺寸
-	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required" vd:"$ >= 1 && $ <= 100"`
 }
 
 func NewListFollowingReq() *ListFollowingReq {
@@ -1115,9 +1115,9 @@ type ListFollowerReq struct {
 	// 用户ID
 	UserID string `thrift:"user_id,1,required" json:"user_id,required" query:"user_id,required"`
 	// 页码
-	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,2,required" json:"page_num,required" query:"page_num,required" vd:"$ >= 0"`
 	// 单页尺寸
-	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,3,required" json:"page_size,required" query:"page_size,required" vd:"$ >= 1 && $ <= 100"`
 }
 
 func NewListFollowerReq() *ListFollowerReq {
@@ -1582,9 +1582,9 @@ func (p *ListFollowerResp) String() string {
 // 好友列表请求
 type ListFriendReq struct {
 	// 页码
-	PageNum int32 `thrift:"page_num,1,required" json:"page_num,required" query:"page_num,required"`
+	PageNum int32 `thrift:"page_num,1,required" json:"page_num,required" query:"page_num,required" vd:"$ >= 0"`
 	// 单页尺寸
-	PageSize int32 `thrift:"page_size,2,required" json:"page_size,required" query:"page_size,required"`
+	PageSize int32 `thrift:"page_size,2,required" json:"page_size,required" query:"page_size,required" vd:"$ >= 1 && $ <= 100"`
 }
 
 func NewListFriendReq() *ListFriendReq {
