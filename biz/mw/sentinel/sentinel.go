@@ -4,13 +4,14 @@ import (
 	"context"
 	"sync"
 
-	"github.com/ACaiCat/tiktok-go/biz/pack"
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	sentinel "github.com/alibaba/sentinel-golang/api"
 	"github.com/alibaba/sentinel-golang/core/flow"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	hertzSentinel "github.com/hertz-contrib/opensergo/sentinel/adapter"
+
+	"github.com/ACaiCat/tiktok-go/biz/pack"
+	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
 
 var once sync.Once
@@ -35,11 +36,11 @@ func initSentinel() {
 		hlog.Fatal(err)
 	}
 
+	qps := 80.0
 	_, err = flow.LoadRules([]*flow.Rule{
-		// QPS 80
 		&flow.Rule{
 			Resource:               "api",
-			Threshold:              80,
+			Threshold:              qps,
 			TokenCalculateStrategy: flow.Direct,
 			ControlBehavior:        flow.Reject,
 		},
