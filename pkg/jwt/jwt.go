@@ -68,10 +68,6 @@ func ValidateToken(token string, tokenType int8) (int64, error) {
 		}
 	})
 
-	if claims.TokenType != tokenType {
-		return 0, errno.AuthErr.WithMessage("令牌类型不匹配")
-	}
-
 	if err != nil || !parsedToken.Valid {
 		if errors.Is(err, jwt.ErrTokenExpired) {
 			if tokenType == constants.TypeAccessToken {
@@ -81,6 +77,10 @@ func ValidateToken(token string, tokenType int8) (int64, error) {
 		}
 
 		return 0, errno.AuthErr.WithMessage("令牌无效")
+	}
+
+	if claims.TokenType != tokenType {
+		return 0, errno.AuthErr.WithMessage("令牌类型不匹配")
 	}
 
 	return claims.UserID, nil

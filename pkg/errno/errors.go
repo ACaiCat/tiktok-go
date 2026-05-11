@@ -6,7 +6,7 @@ var (
 
 var (
 	Success               = NewErrNo(SuccessCode, "成功")
-	ServiceErr            = NewErrNo(ServiceErrCode, "服务内部错误")
+	ServiceErr            = NewErrNo(ServiceErrCode, "服务器内部错误")
 	ParamErr              = NewErrNo(ParamErrCode, "参数错误")
 	AuthErr               = NewErrNo(AuthErrCode, "认证失败")
 	AuthMissingErr        = NewErrNo(AuthMissingErrCode, "认证信息缺失")
