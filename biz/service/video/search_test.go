@@ -59,7 +59,7 @@ func TestVideoService_SearchVideo(t *testing.T) {
 				return &VideoService{}
 			}).Build()
 
-			result, err := NewVideoService(t.Context()).SearchVideo(tc.req)
+			result, err := NewVideoService(context.Background()).SearchVideo(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

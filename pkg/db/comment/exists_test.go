@@ -6,6 +6,8 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestCommentDao_IsCommentExists(t *testing.T) {
@@ -26,12 +28,18 @@ func TestCommentDao_IsCommentExists(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).IsCommentExists).Return(tc.mockRet, tc.mockErr).Build()
+			count := int64(0)
+			if tc.mockRet {
+				count = 1
+			}
+			dbtestutil.MockCount(count, tc.mockErr)
 
 			ok, err := dao.IsCommentExists(context.Background(), tc.commentID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "IsCommentExists failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, ok)

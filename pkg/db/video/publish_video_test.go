@@ -6,6 +6,9 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestVideoDao_PublishVideo(t *testing.T) {
@@ -26,8 +29,19 @@ func TestVideoDao_PublishVideo(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*VideoDao).PublishVideo).Return(tc.mockErr).Build()
+			dbtestutil.MockTransaction(nil)
+			dbtestutil.MockCreateWithHook(func(value interface{}) {
+				if tc.wantErr {
+					return
+				}
+				video, ok := value.(*model.Video)
+				if ok {
+					video.ID = 99
+				}
+			}, tc.mockErr)
+			dbtestutil.MockUpdates(tc.mockErr)
 
 			err := dao.PublishVideo(
 				context.Background(),
@@ -40,6 +54,7 @@ func TestVideoDao_PublishVideo(t *testing.T) {
 			)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "PublishVideo failed")
 			} else {
 				assert.NoError(t, err)
 			}

@@ -6,6 +6,8 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestLikeDao_DeleteVideoLike(t *testing.T) {
@@ -25,12 +27,14 @@ func TestLikeDao_DeleteVideoLike(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockLikeQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*LikeDao).DeleteVideoLike).Return(tc.mockErr).Build()
+			dbtestutil.MockDelete(tc.mockErr)
 
 			err := dao.DeleteVideoLike(context.Background(), tc.userID, tc.videoID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "DeleteVideoLike failed")
 			} else {
 				assert.NoError(t, err)
 			}
@@ -55,12 +59,14 @@ func TestLikeDao_DeleteCommentLike(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockLikeQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*LikeDao).DeleteCommentLike).Return(tc.mockErr).Build()
+			dbtestutil.MockDelete(tc.mockErr)
 
 			err := dao.DeleteCommentLike(context.Background(), tc.userID, tc.commentID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "DeleteCommentLike failed")
 			} else {
 				assert.NoError(t, err)
 			}

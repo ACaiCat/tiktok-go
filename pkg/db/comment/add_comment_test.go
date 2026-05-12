@@ -6,6 +6,8 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestCommentDao_AddVideoComment(t *testing.T) {
@@ -26,12 +28,14 @@ func TestCommentDao_AddVideoComment(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).AddVideoComment).Return(tc.mockErr).Build()
+			dbtestutil.MockCreate(tc.mockErr)
 
 			err := dao.AddVideoComment(context.Background(), tc.userID, tc.videoID, tc.content)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "AddVideoComment failed")
 			} else {
 				assert.NoError(t, err)
 			}
@@ -58,12 +62,14 @@ func TestCommentDao_AddCommentReply(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).AddCommentReply).Return(tc.mockErr).Build()
+			dbtestutil.MockCreate(tc.mockErr)
 
 			err := dao.AddCommentReply(context.Background(), tc.userID, tc.videoID, tc.commentID, tc.content)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "AddCommentReply failed")
 			} else {
 				assert.NoError(t, err)
 			}

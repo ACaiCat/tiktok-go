@@ -54,7 +54,7 @@ func TestUserService_RefreshToken(t *testing.T) {
 			}).Build()
 
 			_ = constants.TypeRefreshToken // ensure import used
-			access, refresh, err := NewUserService(t.Context()).RefreshToken(tc.req)
+			access, refresh, err := NewUserService(context.Background()).RefreshToken(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

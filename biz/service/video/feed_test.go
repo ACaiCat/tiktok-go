@@ -86,7 +86,7 @@ func TestVideoService_GetFeed(t *testing.T) {
 				return &VideoService{}
 			}).Build()
 
-			result, err := NewVideoService(t.Context()).GetFeed(tc.req)
+			result, err := NewVideoService(context.Background()).GetFeed(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

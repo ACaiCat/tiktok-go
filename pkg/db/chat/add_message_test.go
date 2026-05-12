@@ -6,6 +6,8 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestChatDao_AddMessage(t *testing.T) {
@@ -29,12 +31,14 @@ func TestChatDao_AddMessage(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockChatQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*ChatDao).AddMessage).Return(tc.mockErr).Build()
+			dbtestutil.MockCreate(tc.mockErr)
 
 			err := dao.AddMessage(context.Background(), tc.senderID, tc.receiverID, tc.content, tc.isRead, tc.isAi)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "AddMessage failed")
 			} else {
 				assert.NoError(t, err)
 			}

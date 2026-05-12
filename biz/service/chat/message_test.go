@@ -49,7 +49,7 @@ func TestChatService_HandleChatMessage(t *testing.T) {
 				return &ChatService{}
 			}).Build()
 
-			err := NewChatService(t.Context(), ws.NewOnlineUserManager()).HandleChatMessage(1, &ws.ChatMessage{ReceiverID: 2, Content: "hello"})
+			err := NewChatService(context.Background(), ws.NewOnlineUserManager()).HandleChatMessage(1, &ws.ChatMessage{ReceiverID: 2, Content: "hello"})
 			if tc.expectError != "" {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.expectError)
@@ -87,7 +87,7 @@ func TestChatService_SendErr(t *testing.T) {
 				return &ChatService{manager: manager}
 			}).Build()
 
-			NewChatService(t.Context(), manager).SendErr(1, errno.ServiceErr)
+			NewChatService(context.Background(), manager).SendErr(1, errno.ServiceErr)
 
 			assert.Equal(t, tc.wantSendError, called)
 		})

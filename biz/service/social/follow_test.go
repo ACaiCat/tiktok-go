@@ -75,7 +75,7 @@ func TestSocialService_FollowAction(t *testing.T) {
 				return &SocialService{}
 			}).Build()
 
-			err := NewSocialService(t.Context()).FollowAction(tc.req, 1)
+			err := NewSocialService(context.Background()).FollowAction(tc.req, 1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)
@@ -116,7 +116,7 @@ func TestSocialService_ListFollowing(t *testing.T) {
 				return tc.mockUsers, tc.mockTotal, nil
 			}).Build()
 			mockey.Mock(NewSocialService).To(func(_ context.Context) *SocialService { return &SocialService{} }).Build()
-			result, total, err := NewSocialService(t.Context()).ListFollowing(tc.req)
+			result, total, err := NewSocialService(context.Background()).ListFollowing(tc.req)
 			if tc.expectError != "" {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.expectError)
@@ -157,7 +157,7 @@ func TestSocialService_ListFollower(t *testing.T) {
 				return tc.mockUsers, tc.mockTotal, nil
 			}).Build()
 			mockey.Mock(NewSocialService).To(func(_ context.Context) *SocialService { return &SocialService{} }).Build()
-			result, total, err := NewSocialService(t.Context()).ListFollower(tc.req)
+			result, total, err := NewSocialService(context.Background()).ListFollower(tc.req)
 			if tc.expectError != "" {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.expectError)
@@ -197,7 +197,7 @@ func TestSocialService_ListFriend(t *testing.T) {
 				return tc.mockUsers, tc.mockTotal, nil
 			}).Build()
 			mockey.Mock(NewSocialService).To(func(_ context.Context) *SocialService { return &SocialService{} }).Build()
-			result, total, err := NewSocialService(t.Context()).ListFriend(tc.req, 1)
+			result, total, err := NewSocialService(context.Background()).ListFriend(tc.req, 1)
 			if tc.expectError != "" {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.expectError)

@@ -78,7 +78,7 @@ func TestUserService_GetMFA(t *testing.T) {
 				return &UserService{}
 			}).Build()
 
-			secret, rawQRCode, err := NewUserService(t.Context()).GetMFA(1)
+			secret, rawQRCode, err := NewUserService(context.Background()).GetMFA(1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)
@@ -142,7 +142,7 @@ func TestUserService_BindMFA(t *testing.T) {
 				return &UserService{}
 			}).Build()
 
-			err := NewUserService(t.Context()).BindMFA(tc.req, 1)
+			err := NewUserService(context.Background()).BindMFA(tc.req, 1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

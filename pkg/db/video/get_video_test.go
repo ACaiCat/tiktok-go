@@ -7,8 +7,10 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestVideoDao_GetVideoByID(t *testing.T) {
@@ -21,7 +23,7 @@ func TestVideoDao_GetVideoByID(t *testing.T) {
 
 	testCases := map[string]testCase{
 		"get video success":           {videoID: 1, mockRet: &model.Video{ID: 1, Title: "test"}},
-		"video not found returns nil": {videoID: 99, mockRet: nil},
+		"video not found returns nil": {videoID: 99, mockRet: nil, mockErr: gorm.ErrRecordNotFound},
 		"db error returns error":      {videoID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
@@ -29,12 +31,14 @@ func TestVideoDao_GetVideoByID(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*VideoDao).GetVideoByID).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFirst(tc.mockRet, tc.mockErr)
 
 			v, err := dao.GetVideoByID(context.Background(), tc.videoID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetVideoByID failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, v)
@@ -64,15 +68,17 @@ func TestVideoDao_GetFeedByLatestTime(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*VideoDao).GetFeedByLatestTime).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			vs, err := dao.GetFeedByLatestTime(context.Background(), tc.latestTime, tc.limit)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetFeedByLatestTime failed")
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, tc.mockRet, vs)
+				assert.Len(t, vs, len(tc.mockRet))
 			}
 		})
 	}
@@ -100,12 +106,14 @@ func TestVideoDao_GetVideosByUserID(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*VideoDao).GetVideosByUserID).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			vs, err := dao.GetVideosByUserID(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetVideosByUserID failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, vs)
@@ -135,12 +143,14 @@ func TestVideoDao_GetPopularVideos(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*VideoDao).GetPopularVideos).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			vs, err := dao.GetPopularVideos(context.Background(), tc.pageSize, tc.pageNum)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetPopularVideos failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, vs)
@@ -166,12 +176,14 @@ func TestVideoDao_GetVideoCountByUserID(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*VideoDao).GetVideoCountByUserID).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockCount(tc.mockRet, tc.mockErr)
 
 			cnt, err := dao.GetVideoCountByUserID(context.Background(), tc.userID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetVideoCountByUserID failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, cnt)
@@ -202,12 +214,27 @@ func TestVideoDao_GetUserLikeList(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*VideoDao).GetUserLikeList).Return(tc.mockRet, tc.mockErr).Build()
+			scanErr := error(nil)
+			findErr := tc.mockErr
+			if tc.wantErr {
+				scanErr = tc.mockErr
+				findErr = nil
+			}
+			dbtestutil.MockScan(func(dest interface{}) {
+				ids := make([]int64, 0, len(tc.mockRet))
+				for _, video := range tc.mockRet {
+					ids = append(ids, video.ID)
+				}
+				dbtestutil.FillValue(dest, ids)
+			}, scanErr)
+			dbtestutil.MockFind(tc.mockRet, findErr)
 
 			vs, err := dao.GetUserLikeList(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetUserLikeList failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, vs)

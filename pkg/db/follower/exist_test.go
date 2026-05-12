@@ -6,6 +6,8 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestFollowerDao_IsExistFollow(t *testing.T) {
@@ -27,12 +29,18 @@ func TestFollowerDao_IsExistFollow(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockFollowerQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*FollowerDao).IsExistFollow).Return(tc.mockRet, tc.mockErr).Build()
+			count := int64(0)
+			if tc.mockRet {
+				count = 1
+			}
+			dbtestutil.MockCount(count, tc.mockErr)
 
 			ok, err := dao.IsExistFollow(context.Background(), tc.userID, tc.followerID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "IsExistFollow failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, ok)
@@ -60,12 +68,18 @@ func TestFollowerDao_IsExistFriend(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockFollowerQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*FollowerDao).IsExistFriend).Return(tc.mockRet, tc.mockErr).Build()
+			count := int64(0)
+			if tc.mockRet {
+				count = 2
+			}
+			dbtestutil.MockCount(count, tc.mockErr)
 
 			ok, err := dao.IsExistFriend(context.Background(), tc.userID, tc.friendID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "IsExistFriend failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, ok)

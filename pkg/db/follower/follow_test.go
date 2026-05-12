@@ -6,6 +6,8 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestFollowerDao_AddFollow(t *testing.T) {
@@ -25,12 +27,14 @@ func TestFollowerDao_AddFollow(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockFollowerQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*FollowerDao).AddFollow).Return(tc.mockErr).Build()
+			dbtestutil.MockCreate(tc.mockErr)
 
 			err := dao.AddFollow(context.Background(), tc.userID, tc.followerID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "AddFollow failed")
 			} else {
 				assert.NoError(t, err)
 			}
@@ -55,12 +59,14 @@ func TestFollowerDao_DeleteFollow(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockFollowerQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*FollowerDao).DeleteFollow).Return(tc.mockErr).Build()
+			dbtestutil.MockDelete(tc.mockErr)
 
 			err := dao.DeleteFollow(context.Background(), tc.userID, tc.followerID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "DeleteFollow failed")
 			} else {
 				assert.NoError(t, err)
 			}

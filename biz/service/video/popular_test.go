@@ -54,7 +54,7 @@ func TestVideoService_GetPopularVideos(t *testing.T) {
 				return &VideoService{}
 			}).Build()
 
-			result, err := NewVideoService(t.Context()).GetPopularVideos(tc.req)
+			result, err := NewVideoService(context.Background()).GetPopularVideos(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

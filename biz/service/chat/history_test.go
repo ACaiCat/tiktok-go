@@ -38,7 +38,7 @@ func TestChatService_HandleHistoryMessage(t *testing.T) {
 				return true, tc.mockSendErr
 			}).Build()
 			mockey.Mock(NewChatService).To(func(_ context.Context, manager *ws.OnlineUserManager) *ChatService { return &ChatService{} }).Build()
-			err := NewChatService(t.Context(), ws.NewOnlineUserManager()).HandleHistoryMessage(1, &ws.HistoryRequest{Sender: 2})
+			err := NewChatService(context.Background(), ws.NewOnlineUserManager()).HandleHistoryMessage(1, &ws.HistoryRequest{Sender: 2})
 			if tc.expectError != "" {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.expectError)
@@ -79,7 +79,7 @@ func TestChatService_getChatHistory(t *testing.T) {
 			mockey.Mock(NewChatService).To(func(_ context.Context, manager *ws.OnlineUserManager) *ChatService {
 				return &ChatService{cache: &chatCache.ChatCache{}, chatDao: &chatDao.ChatDao{}}
 			}).Build()
-			result, err := NewChatService(t.Context(), ws.NewOnlineUserManager()).
+			result, err := NewChatService(context.Background(), ws.NewOnlineUserManager()).
 				getChatHistory(1, 2, 10, 0)
 			if tc.expectError != "" {
 				assert.Error(t, err)

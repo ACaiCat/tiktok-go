@@ -66,7 +66,7 @@ func TestVideoService_GetVideoList(t *testing.T) {
 				return &VideoService{}
 			}).Build()
 
-			result, total, err := NewVideoService(t.Context()).GetVideoList(tc.req)
+			result, total, err := NewVideoService(context.Background()).GetVideoList(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)
@@ -118,7 +118,7 @@ func TestVideoService_GetLikedVideos(t *testing.T) {
 				return &VideoService{}
 			}).Build()
 
-			result, err := NewVideoService(t.Context()).GetLikedVideos(tc.req)
+			result, err := NewVideoService(context.Background()).GetLikedVideos(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

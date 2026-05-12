@@ -70,7 +70,7 @@ func TestUserService_BindJwch(t *testing.T) {
 				return &UserService{cache: userCache.NewUserCache(redis.NewClient(&redis.Options{Addr: "127.0.0.1:0"}))}
 			}).Build()
 
-			err := NewUserService(t.Context()).BindJwch(tc.req, 1)
+			err := NewUserService(context.Background()).BindJwch(tc.req, 1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)
@@ -183,7 +183,7 @@ func TestUserService_GetJwchIdentifierAndCookies(t *testing.T) {
 				return &UserService{cache: userCache.NewUserCache(redis.NewClient(&redis.Options{Addr: "127.0.0.1:0"}))}
 			}).Build()
 
-			identifier, cookies, err := NewUserService(t.Context()).GetJwchIdentifierAndCookies(1)
+			identifier, cookies, err := NewUserService(context.Background()).GetJwchIdentifierAndCookies(1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

@@ -73,7 +73,7 @@ func TestUserService_UploadAvatar(t *testing.T) {
 			}).Build()
 
 			fh := &multipart.FileHeader{Filename: "avatar.jpg"}
-			err := NewUserService(t.Context()).UploadAvatar(fh, 1)
+			err := NewUserService(context.Background()).UploadAvatar(fh, 1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

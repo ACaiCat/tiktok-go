@@ -6,6 +6,9 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gen"
+
+	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
 func TestUserDao_CreateUser(t *testing.T) {
@@ -22,16 +25,22 @@ func TestUserDao_CreateUser(t *testing.T) {
 		"db error returns error": {username: "alice", password: "hash", mockErr: assert.AnError, wantErr: true},
 	}
 
-	defer mockey.UnPatchAll()
-
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockUserQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*UserDao).CreateUser).Return(tc.mockID, tc.mockErr).Build()
+
+			mockey.Mock((*gen.DO).Create).To(func(_ *gen.DO, value interface{}) error {
+				if users, ok := value.([]*model.User); ok && len(users) > 0 && !tc.wantErr {
+					users[0].ID = tc.mockID
+				}
+				return tc.mockErr
+			}).Build()
 
 			id, err := dao.CreateUser(context.Background(), tc.username, tc.password)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "CreateUser failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockID, id)

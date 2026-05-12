@@ -6,8 +6,10 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestCommentDao_GetCommentByID(t *testing.T) {
@@ -20,7 +22,7 @@ func TestCommentDao_GetCommentByID(t *testing.T) {
 
 	testCases := map[string]testCase{
 		"get comment success":           {commentID: 1, mockRet: &model.Comment{ID: 1, Content: "nice"}},
-		"comment not found returns nil": {commentID: 99, mockRet: nil},
+		"comment not found returns nil": {commentID: 99, mockRet: nil, mockErr: gorm.ErrRecordNotFound},
 		"db error returns error":        {commentID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
@@ -28,12 +30,14 @@ func TestCommentDao_GetCommentByID(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).GetCommentByID).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFirst(tc.mockRet, tc.mockErr)
 
 			c, err := dao.GetCommentByID(context.Background(), tc.commentID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetCommentByID failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, c)
@@ -64,12 +68,14 @@ func TestCommentDao_GetCommentsByVideoID(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).GetCommentsByVideoID).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			cs, err := dao.GetCommentsByVideoID(context.Background(), tc.videoID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetCommentsByVideoID failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, cs)
@@ -100,12 +106,14 @@ func TestCommentDao_GetCommentsByCommentID(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).GetCommentsByCommentID).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			cs, err := dao.GetCommentsByCommentID(context.Background(), tc.commentID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetCommentsByCommentID failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, cs)

@@ -22,6 +22,7 @@ ignore:
   - "**/pack/**"
   - "**/model/**"
   - "**/query/**"
+  - "**/testutil/**"
 
   - "*.pb.go"
   - "*.pb.validate.go"
