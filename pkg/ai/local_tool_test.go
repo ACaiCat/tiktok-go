@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/assert"
 
@@ -29,7 +29,7 @@ func newAddTool(authorize func(ToolCallContext, addInput) error, fn func(addInpu
 	}
 }
 
-func TestLocalToolGetName(t *testing.T) {
+func TestLocalTool_GetName(t *testing.T) {
 	type testCase struct {
 		name string
 	}
@@ -39,15 +39,17 @@ func TestLocalToolGetName(t *testing.T) {
 		"returns empty name":   {name: ""},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			tool := LocalTool[addInput, addOutput]{Name: tc.name}
 			assert.Equal(t, tc.name, tool.GetName())
 		})
 	}
 }
 
-func TestLocalToolGetDescription(t *testing.T) {
+func TestLocalTool_GetDescription(t *testing.T) {
 	type testCase struct {
 		description string
 	}
@@ -57,23 +59,27 @@ func TestLocalToolGetDescription(t *testing.T) {
 		"returns empty description":   {description: ""},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			tool := LocalTool[addInput, addOutput]{Description: tc.description}
 			assert.Equal(t, tc.description, tool.GetDescription())
 		})
 	}
 }
 
-func TestLocalToolGetParametersDef(t *testing.T) {
-	PatchConvey("reflects schema from input type", t, func() {
+func TestLocalTool_GetParametersDef(t *testing.T) {
+	defer mockey.UnPatchAll()
+
+	mockey.PatchConvey("reflects schema from input type", t, func() {
 		tool := LocalTool[addInput, addOutput]{}
 		params := tool.GetParametersDef()
 		assert.NotNil(t, params)
 	})
 }
 
-func TestLocalToolCallTool(t *testing.T) {
+func TestLocalTool_CallTool(t *testing.T) {
 	type testCase struct {
 		args      string
 		authorize func(ToolCallContext, addInput) error
@@ -132,8 +138,11 @@ func TestLocalToolCallTool(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+
+		mockey.PatchConvey(name, t, func() {
 			tool := newAddTool(tc.authorize, tc.fn)
 			call := openai.ToolCall{
 				ID:       "call_1",

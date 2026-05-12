@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/config"
@@ -61,11 +61,13 @@ func TestEncrypt(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			config.AppConfig.Security.Key = tc.key
 			if tc.mockRand {
-				Mock(io.ReadFull).To(func(_ io.Reader, _ []byte) (int, error) {
+				mockey.Mock(io.ReadFull).To(func(_ io.Reader, _ []byte) (int, error) {
 					return 0, assert.AnError
 				}).Build()
 			}
@@ -128,13 +130,15 @@ func TestDecrypt(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			config.AppConfig.Security.Key = tc.key
 
 			ciphertext := tc.ciphertext
 			if tc.mockNonce {
-				Mock(rand.Reader.Read).To(func(p []byte) (int, error) {
+				mockey.Mock(rand.Reader.Read).To(func(p []byte) (int, error) {
 					clear(p)
 					return len(p), nil
 				}).Build()

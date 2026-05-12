@@ -8,13 +8,13 @@ import (
 	"image/png"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
 func makeJPEGBytes() []byte {
 	img := image.NewRGBA(image.Rect(0, 0, 10, 10))
-	img.Set(0, 0, color.RGBA{255, 0, 0, 255})
+	img.Set(0, 0, color.RGBA{R: 255, A: 255})
 	var buf bytes.Buffer
 	_ = jpeg.Encode(&buf, img, nil)
 	return buf.Bytes()
@@ -22,7 +22,7 @@ func makeJPEGBytes() []byte {
 
 func makePNGBytes() []byte {
 	img := image.NewRGBA(image.Rect(0, 0, 10, 10))
-	img.Set(0, 0, color.RGBA{0, 255, 0, 255})
+	img.Set(0, 0, color.RGBA{G: 255, A: 255})
 	var buf bytes.Buffer
 	_ = png.Encode(&buf, img)
 	return buf.Bytes()
@@ -56,8 +56,10 @@ func TestGetImageFormat(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			format, err := GetImageFormat(tc.data)
 			if tc.wantErr {
 				assert.Error(t, err)
@@ -90,8 +92,10 @@ func TestConvertToJPEG(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			result, err := ConvertToJPEG(tc.data)
 			if tc.wantErr {
 				assert.Error(t, err)
@@ -99,7 +103,7 @@ func TestConvertToJPEG(t *testing.T) {
 			}
 			assert.NoError(t, err)
 			assert.NotEmpty(t, result)
-			// Verify output is valid JPEG
+
 			format, err := GetImageFormat(result)
 			assert.NoError(t, err)
 			assert.Equal(t, "jpeg", format)

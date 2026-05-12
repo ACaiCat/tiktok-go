@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPublishVideo(t *testing.T) {
+func TestVideoDao_PublishVideo(t *testing.T) {
 	type testCase struct {
 		userID      int64
 		title       string
@@ -22,10 +22,12 @@ func TestPublishVideo(t *testing.T) {
 		"db error":        {userID: 1, title: "my video", mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).PublishVideo).Return(tc.mockErr).Build()
+			mockey.Mock((*VideoDao).PublishVideo).Return(tc.mockErr).Build()
 
 			err := dao.PublishVideo(
 				context.Background(),

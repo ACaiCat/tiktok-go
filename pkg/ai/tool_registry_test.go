@@ -3,12 +3,12 @@ package ai
 import (
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestExistTool(t *testing.T) {
+func TestToolRegistry_ExistTool(t *testing.T) {
 	type testCase struct {
 		tools      []string
 		queryName  string
@@ -33,8 +33,10 @@ func TestExistTool(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			r := toolRegistry{tools: make(map[string]Tool)}
 			for _, toolName := range tc.tools {
 				r.RegisterTool(newMock(toolName))
@@ -45,7 +47,7 @@ func TestExistTool(t *testing.T) {
 	}
 }
 
-func TestCallTool(t *testing.T) {
+func TestToolRegistry_CallTool(t *testing.T) {
 	type testCase struct {
 		registeredTools []string
 		callName        string
@@ -74,8 +76,10 @@ func TestCallTool(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			r := toolRegistry{tools: make(map[string]Tool)}
 			for _, toolName := range tc.registeredTools {
 				m := newMock(toolName)
@@ -95,7 +99,7 @@ func TestCallTool(t *testing.T) {
 	}
 }
 
-func TestListTools(t *testing.T) {
+func TestToolRegistry_ListTools(t *testing.T) {
 	type testCase struct {
 		tools     []string
 		wantCount int
@@ -116,8 +120,10 @@ func TestListTools(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			r := toolRegistry{tools: make(map[string]Tool)}
 			for _, toolName := range tc.tools {
 				r.RegisterTool(newMock(toolName))

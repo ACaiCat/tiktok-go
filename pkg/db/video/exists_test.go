@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIsVideoExists(t *testing.T) {
+func TestVideoDao_IsVideoExists(t *testing.T) {
 	type testCase struct {
 		videoID int64
 		mockRet bool
@@ -22,10 +22,12 @@ func TestIsVideoExists(t *testing.T) {
 		"db error":        {videoID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).IsVideoExists).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*VideoDao).IsVideoExists).Return(tc.mockRet, tc.mockErr).Build()
 
 			ok, err := dao.IsVideoExists(context.Background(), tc.videoID)
 			if tc.wantErr {

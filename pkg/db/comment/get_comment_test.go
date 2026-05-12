@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func TestGetCommentByID(t *testing.T) {
+func TestCommentDao_GetCommentByID(t *testing.T) {
 	type testCase struct {
 		commentID int64
 		mockRet   *model.Comment
@@ -24,10 +24,12 @@ func TestGetCommentByID(t *testing.T) {
 		"db error returns error":        {commentID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*CommentDao).GetCommentByID).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*CommentDao).GetCommentByID).Return(tc.mockRet, tc.mockErr).Build()
 
 			c, err := dao.GetCommentByID(context.Background(), tc.commentID)
 			if tc.wantErr {
@@ -40,7 +42,7 @@ func TestGetCommentByID(t *testing.T) {
 	}
 }
 
-func TestGetCommentsByVideoID(t *testing.T) {
+func TestCommentDao_GetCommentsByVideoID(t *testing.T) {
 	type testCase struct {
 		videoID  int64
 		pageSize int
@@ -58,10 +60,12 @@ func TestGetCommentsByVideoID(t *testing.T) {
 		"db error":             {videoID: 10, pageSize: 10, pageNum: 0, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*CommentDao).GetCommentsByVideoID).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*CommentDao).GetCommentsByVideoID).Return(tc.mockRet, tc.mockErr).Build()
 
 			cs, err := dao.GetCommentsByVideoID(context.Background(), tc.videoID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
@@ -74,7 +78,7 @@ func TestGetCommentsByVideoID(t *testing.T) {
 	}
 }
 
-func TestGetCommentsByCommentID(t *testing.T) {
+func TestCommentDao_GetCommentsByCommentID(t *testing.T) {
 	type testCase struct {
 		commentID int64
 		pageSize  int
@@ -92,10 +96,12 @@ func TestGetCommentsByCommentID(t *testing.T) {
 		"db error":            {commentID: 1, pageSize: 10, pageNum: 0, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*CommentDao).GetCommentsByCommentID).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*CommentDao).GetCommentsByCommentID).Return(tc.mockRet, tc.mockErr).Build()
 
 			cs, err := dao.GetCommentsByCommentID(context.Background(), tc.commentID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {

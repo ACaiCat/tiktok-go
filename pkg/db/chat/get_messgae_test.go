@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func TestGetUnreadMessages(t *testing.T) {
+func TestChatDao_GetUnreadMessages(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		senderID int64
@@ -27,10 +27,12 @@ func TestGetUnreadMessages(t *testing.T) {
 		"db error returns error":      {userID: 2, senderID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*ChatDao).GetUnreadMessages).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*ChatDao).GetUnreadMessages).Return(tc.mockRet, tc.mockErr).Build()
 
 			got, err := dao.GetUnreadMessages(context.Background(), tc.userID, tc.senderID)
 			if tc.wantErr {
@@ -43,7 +45,7 @@ func TestGetUnreadMessages(t *testing.T) {
 	}
 }
 
-func TestMarkMessagesAsRead(t *testing.T) {
+func TestChatDao_MarkMessagesAsRead(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		senderID int64
@@ -56,10 +58,12 @@ func TestMarkMessagesAsRead(t *testing.T) {
 		"db error returns error": {userID: 2, senderID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*ChatDao).MarkMessagesAsRead).Return(tc.mockErr).Build()
+			mockey.Mock((*ChatDao).MarkMessagesAsRead).Return(tc.mockErr).Build()
 
 			err := dao.MarkMessagesAsRead(context.Background(), tc.userID, tc.senderID)
 			if tc.wantErr {
@@ -71,7 +75,7 @@ func TestMarkMessagesAsRead(t *testing.T) {
 	}
 }
 
-func TestGetChatHistory(t *testing.T) {
+func TestChatDao_GetChatHistory(t *testing.T) {
 	type testCase struct {
 		userID      int64
 		otherUserID int64
@@ -90,10 +94,12 @@ func TestGetChatHistory(t *testing.T) {
 		"db error returns error": {userID: 1, otherUserID: 2, pageSize: 10, pageNum: 0, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*ChatDao).GetChatHistory).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*ChatDao).GetChatHistory).Return(tc.mockRet, tc.mockErr).Build()
 
 			got, err := dao.GetChatHistory(context.Background(), tc.userID, tc.otherUserID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {

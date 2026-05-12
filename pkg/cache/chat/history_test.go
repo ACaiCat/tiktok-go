@@ -12,7 +12,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func TestSetChatHistory(t *testing.T) {
+func TestChatCache_SetChatHistory(t *testing.T) {
 	type testCase struct {
 		userID      int64
 		otherUserID int64
@@ -75,7 +75,7 @@ func TestSetChatHistory(t *testing.T) {
 	}
 }
 
-func TestGetChatHistory(t *testing.T) {
+func TestChatCache_GetChatHistory(t *testing.T) {
 	type testCase struct {
 		userID      int64
 		otherUserID int64

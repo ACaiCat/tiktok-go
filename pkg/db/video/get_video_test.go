@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func TestGetVideoByID(t *testing.T) {
+func TestVideoDao_GetVideoByID(t *testing.T) {
 	type testCase struct {
 		videoID int64
 		mockRet *model.Video
@@ -25,10 +25,12 @@ func TestGetVideoByID(t *testing.T) {
 		"db error returns error":      {videoID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).GetVideoByID).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*VideoDao).GetVideoByID).Return(tc.mockRet, tc.mockErr).Build()
 
 			v, err := dao.GetVideoByID(context.Background(), tc.videoID)
 			if tc.wantErr {
@@ -41,7 +43,7 @@ func TestGetVideoByID(t *testing.T) {
 	}
 }
 
-func TestGetFeedByLatestTime(t *testing.T) {
+func TestVideoDao_GetFeedByLatestTime(t *testing.T) {
 	type testCase struct {
 		latestTime time.Time
 		limit      int
@@ -58,10 +60,12 @@ func TestGetFeedByLatestTime(t *testing.T) {
 		"db error returns error": {limit: 10, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).GetFeedByLatestTime).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*VideoDao).GetFeedByLatestTime).Return(tc.mockRet, tc.mockErr).Build()
 
 			vs, err := dao.GetFeedByLatestTime(context.Background(), tc.latestTime, tc.limit)
 			if tc.wantErr {
@@ -74,7 +78,7 @@ func TestGetFeedByLatestTime(t *testing.T) {
 	}
 }
 
-func TestGetVideosByUserID(t *testing.T) {
+func TestVideoDao_GetVideosByUserID(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		pageSize int
@@ -92,10 +96,12 @@ func TestGetVideosByUserID(t *testing.T) {
 		"db error":                   {userID: 1, pageSize: 10, pageNum: 0, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).GetVideosByUserID).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*VideoDao).GetVideosByUserID).Return(tc.mockRet, tc.mockErr).Build()
 
 			vs, err := dao.GetVideosByUserID(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
@@ -108,7 +114,7 @@ func TestGetVideosByUserID(t *testing.T) {
 	}
 }
 
-func TestGetPopularVideos(t *testing.T) {
+func TestVideoDao_GetPopularVideos(t *testing.T) {
 	type testCase struct {
 		pageSize int
 		pageNum  int
@@ -125,10 +131,12 @@ func TestGetPopularVideos(t *testing.T) {
 		"db error":                   {pageSize: 10, pageNum: 0, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).GetPopularVideos).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*VideoDao).GetPopularVideos).Return(tc.mockRet, tc.mockErr).Build()
 
 			vs, err := dao.GetPopularVideos(context.Background(), tc.pageSize, tc.pageNum)
 			if tc.wantErr {
@@ -141,7 +149,7 @@ func TestGetPopularVideos(t *testing.T) {
 	}
 }
 
-func TestGetVideoCountByUserID(t *testing.T) {
+func TestVideoDao_GetVideoCountByUserID(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		mockRet int64
@@ -154,10 +162,12 @@ func TestGetVideoCountByUserID(t *testing.T) {
 		"db error returns error": {userID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).GetVideoCountByUserID).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*VideoDao).GetVideoCountByUserID).Return(tc.mockRet, tc.mockErr).Build()
 
 			cnt, err := dao.GetVideoCountByUserID(context.Background(), tc.userID)
 			if tc.wantErr {
@@ -170,7 +180,7 @@ func TestGetVideoCountByUserID(t *testing.T) {
 	}
 }
 
-func TestGetUserLikeList(t *testing.T) {
+func TestVideoDao_GetUserLikeList(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		pageSize int
@@ -188,10 +198,12 @@ func TestGetUserLikeList(t *testing.T) {
 		"db error":              {userID: 1, pageSize: 10, pageNum: 0, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).GetUserLikeList).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*VideoDao).GetUserLikeList).Return(tc.mockRet, tc.mockErr).Build()
 
 			vs, err := dao.GetUserLikeList(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {

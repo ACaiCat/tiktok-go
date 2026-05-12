@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetLikeCounts(t *testing.T) {
+func TestLikeDao_GetLikeCounts(t *testing.T) {
 	type testCase struct {
 		videoIDs []int64
 		mockRet  map[int64]int64
@@ -22,10 +22,12 @@ func TestGetLikeCounts(t *testing.T) {
 		"db error returns error":  {videoIDs: []int64{1}, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*LikeDao).GetLikeCounts).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*LikeDao).GetLikeCounts).Return(tc.mockRet, tc.mockErr).Build()
 
 			m, err := dao.GetLikeCounts(context.Background(), tc.videoIDs)
 			if tc.wantErr {
@@ -38,7 +40,7 @@ func TestGetLikeCounts(t *testing.T) {
 	}
 }
 
-func TestGetUserLikes(t *testing.T) {
+func TestLikeDao_GetUserLikes(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		mockRet []int64
@@ -52,10 +54,12 @@ func TestGetUserLikes(t *testing.T) {
 		"db error returns error": {userID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*LikeDao).GetUserLikes).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*LikeDao).GetUserLikes).Return(tc.mockRet, tc.mockErr).Build()
 
 			ids, err := dao.GetUserLikes(context.Background(), tc.userID)
 			if tc.wantErr {

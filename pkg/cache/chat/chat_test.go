@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestClearChatHistory(t *testing.T) {
+func TestChatCache_ClearChatHistory(t *testing.T) {
 	type testCase struct {
 		userID      int64
 		otherUserID int64

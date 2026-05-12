@@ -3,7 +3,7 @@ package img
 import (
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
@@ -39,8 +39,10 @@ func TestCheckAvatar(t *testing.T) {
 		},
 	}
 
+	mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			format, err := CheckAvatar(tc.data)
 			if tc.wantErr != nil {
 				assert.ErrorIs(t, err, tc.wantErr)

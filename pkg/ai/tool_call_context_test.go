@@ -3,7 +3,7 @@ package ai
 import (
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,15 +28,17 @@ func TestNewToolCallContext(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			ctx := NewToolCallContext(tc.userIDs...)
 			assert.Equal(t, tc.wantLen, len(ctx.AllowedUserIDs))
 		})
 	}
 }
 
-func TestCanAccessUser(t *testing.T) {
+func TestToolCallContext_CanAccessUser(t *testing.T) {
 	type testCase struct {
 		allowedUsers []int64
 		checkUser    int64
@@ -61,8 +63,10 @@ func TestCanAccessUser(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			ctx := NewToolCallContext(tc.allowedUsers...)
 			assert.Equal(t, tc.wantAccess, ctx.CanAccessUser(tc.checkUser))
 		})

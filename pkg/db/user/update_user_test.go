@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUpdateUserMFA(t *testing.T) {
+func TestUserDao_UpdateUserMFA(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		secret  string
@@ -21,10 +21,12 @@ func TestUpdateUserMFA(t *testing.T) {
 		"db error returns error": {userID: 1, secret: "x", mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*UserDao).UpdateUserMFA).Return(tc.mockErr).Build()
+			mockey.Mock((*UserDao).UpdateUserMFA).Return(tc.mockErr).Build()
 
 			err := dao.UpdateUserMFA(context.Background(), tc.userID, tc.secret)
 			if tc.wantErr {
@@ -36,7 +38,7 @@ func TestUpdateUserMFA(t *testing.T) {
 	}
 }
 
-func TestUpdateUserAvatarURL(t *testing.T) {
+func TestUserDao_UpdateUserAvatarURL(t *testing.T) {
 	type testCase struct {
 		userID    int64
 		avatarURL string
@@ -49,10 +51,12 @@ func TestUpdateUserAvatarURL(t *testing.T) {
 		"db error returns error":    {userID: 1, avatarURL: "x", mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*UserDao).UpdateUserAvatarURL).Return(tc.mockErr).Build()
+			mockey.Mock((*UserDao).UpdateUserAvatarURL).Return(tc.mockErr).Build()
 
 			err := dao.UpdateUserAvatarURL(context.Background(), tc.userID, tc.avatarURL)
 			if tc.wantErr {
@@ -64,7 +68,7 @@ func TestUpdateUserAvatarURL(t *testing.T) {
 	}
 }
 
-func TestUpdateUserJwch(t *testing.T) {
+func TestUserDao_UpdateUserJwch(t *testing.T) {
 	type testCase struct {
 		userID       int64
 		jwchID       string
@@ -78,10 +82,12 @@ func TestUpdateUserJwch(t *testing.T) {
 		"db error returns error": {userID: 1, jwchID: "x", jwchPassword: "y", mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*UserDao).UpdateUserJwch).Return(tc.mockErr).Build()
+			mockey.Mock((*UserDao).UpdateUserJwch).Return(tc.mockErr).Build()
 
 			err := dao.UpdateUserJwch(context.Background(), tc.userID, tc.jwchID, tc.jwchPassword)
 			if tc.wantErr {

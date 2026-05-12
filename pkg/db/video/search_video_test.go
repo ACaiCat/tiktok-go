@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func TestSearchVideo(t *testing.T) {
+func TestVideoDao_SearchVideo(t *testing.T) {
 	type testCase struct {
 		keywords []string
 		pageSize int
@@ -33,10 +33,12 @@ func TestSearchVideo(t *testing.T) {
 		"with date filter": {keywords: []string{"go"}, pageSize: 10, pageNum: 0, fromDate: time.Now().Add(-24 * time.Hour), toDate: time.Now(), mockRet: videos},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).SearchVideo).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*VideoDao).SearchVideo).Return(tc.mockRet, tc.mockErr).Build()
 
 			vs, err := dao.SearchVideo(context.Background(), tc.keywords, tc.pageSize, tc.pageNum, tc.fromDate, tc.toDate, tc.username)
 			if tc.wantErr {

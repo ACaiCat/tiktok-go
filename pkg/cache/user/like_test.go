@@ -10,7 +10,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
 
-func TestSetLikeVideos(t *testing.T) {
+func TestUserCache_SetLikeVideos(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		videoIDs []int64
@@ -65,7 +65,7 @@ func TestSetLikeVideos(t *testing.T) {
 	}
 }
 
-func TestGetLikedVideos(t *testing.T) {
+func TestUserCache_GetLikedVideos(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		stored  []string
@@ -118,7 +118,7 @@ func TestGetLikedVideos(t *testing.T) {
 	}
 }
 
-func TestSetLikeVideo(t *testing.T) {
+func TestUserCache_SetLikeVideo(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		videoID int64
@@ -164,7 +164,7 @@ func TestSetLikeVideo(t *testing.T) {
 	}
 }
 
-func TestSetUnlikeVideo(t *testing.T) {
+func TestUserCache_SetUnlikeVideo(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		videoID int64
@@ -209,7 +209,7 @@ func TestSetUnlikeVideo(t *testing.T) {
 	}
 }
 
-func TestIsVideoLiked(t *testing.T) {
+func TestUserCache_IsVideoLiked(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		videoID int64
@@ -263,7 +263,7 @@ func TestIsVideoLiked(t *testing.T) {
 	}
 }
 
-func TestClearLikedVideos(t *testing.T) {
+func TestUserCache_ClearLikedVideos(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		mockErr error

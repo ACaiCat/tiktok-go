@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,15 +33,17 @@ func TestNewErrNo(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			err := NewErrNo(tc.code, tc.msg)
 			assert.Equal(t, tc.wantErr, err)
 		})
 	}
 }
 
-func TestErrNoError(t *testing.T) {
+func TestErrNo_Error(t *testing.T) {
 	type testCase struct {
 		err     ErrNo
 		wantMsg string
@@ -62,14 +64,16 @@ func TestErrNoError(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			assert.Equal(t, tc.wantMsg, tc.err.Error())
 		})
 	}
 }
 
-func TestErrNoWithMessage(t *testing.T) {
+func TestErrNo_WithMessage(t *testing.T) {
 	type testCase struct {
 		base    ErrNo
 		newMsg  string
@@ -89,8 +93,10 @@ func TestErrNoWithMessage(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			result := tc.base.WithMessage(tc.newMsg)
 			assert.Equal(t, tc.wantMsg, result.ErrMsg)
 			assert.Equal(t, tc.base.ErrCode, result.ErrCode)
@@ -98,7 +104,7 @@ func TestErrNoWithMessage(t *testing.T) {
 	}
 }
 
-func TestErrNoWithError(t *testing.T) {
+func TestErrNo_WithError(t *testing.T) {
 	type testCase struct {
 		base    ErrNo
 		err     error
@@ -118,8 +124,10 @@ func TestErrNoWithError(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			result := tc.base.WithError(tc.err)
 			assert.Equal(t, tc.wantMsg, result.ErrMsg)
 			assert.Equal(t, tc.base.ErrCode, result.ErrCode)
@@ -157,8 +165,10 @@ func TestConvertErr(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			result := ConvertErr(tc.err)
 			assert.Equal(t, tc.wantCode, result.ErrCode)
 			assert.Equal(t, tc.wantMsg, result.ErrMsg)

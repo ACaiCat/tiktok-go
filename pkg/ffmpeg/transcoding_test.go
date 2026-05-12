@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 	ffmpeggo "github.com/u2takey/ffmpeg-go"
 )
@@ -29,10 +29,12 @@ func TestTranscodeVideo(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
-			Mock((*ffmpeggo.Stream).Run).Return(tc.mockErr).Build()
-			Mock((*bytes.Buffer).Bytes).Return([]byte{}).Build()
+		mockey.PatchConvey(name, t, func() {
+			mockey.Mock((*ffmpeggo.Stream).Run).Return(tc.mockErr).Build()
+			mockey.Mock((*bytes.Buffer).Bytes).Return([]byte{}).Build()
 
 			result, err := TranscodeVideo(tc.filePath)
 			if tc.wantErr {

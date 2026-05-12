@@ -13,11 +13,11 @@ import (
 )
 
 var testVideos = []*model.Video{
-	{ID: 1, Title: "video1", VideoURL: "http://example.com/1"},
-	{ID: 2, Title: "video2", VideoURL: "http://example.com/2"},
+	{ID: 1, Title: "video1", VideoURL: "https://example.com/1"},
+	{ID: 2, Title: "video2", VideoURL: "https://example.com/2"},
 }
 
-func TestSetPopularVideos(t *testing.T) {
+func TestVideoCache_SetPopularVideos(t *testing.T) {
 	type testCase struct {
 		videos  []*model.Video
 		mockErr error
@@ -64,7 +64,7 @@ func TestSetPopularVideos(t *testing.T) {
 	}
 }
 
-func TestGetPopularVideos(t *testing.T) {
+func TestVideoCache_GetPopularVideos(t *testing.T) {
 	type testCase struct {
 		stored  []*model.Video
 		mockErr error

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
@@ -21,8 +21,10 @@ func TestCreateKey(t *testing.T) {
 		"empty account name": {"", true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
+		mockey.PatchConvey(name, t, func() {
 			key, err := CreateKey(tc.accountName)
 
 			if tc.wantErr {
@@ -81,10 +83,13 @@ func TestValidateCode(t *testing.T) {
 			wantErr:   true,
 		},
 	}
+
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			testTime := time.UnixMilli(tc.timestamp)
-			Mock(time.Now).Return(testTime).Build()
+			mockey.Mock(time.Now).Return(testTime).Build()
 
 			valid, err := ValidateCode(tc.secret, tc.code)
 			if tc.wantErr {

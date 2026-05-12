@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/config"
@@ -64,10 +64,12 @@ func TestCreateToken(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			testTime := time.UnixMilli(tc.timestamp)
-			Mock(time.Now).Return(testTime).Build()
+			mockey.Mock(time.Now).Return(testTime).Build()
 
 			token, err := CreateToken(tc.tokenType, tc.userID)
 			if tc.wantErr {
@@ -142,10 +144,12 @@ func TestVerifyToken(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			testTime := time.UnixMilli(tc.timestamp)
-			Mock(time.Now).Return(testTime).Build()
+			mockey.Mock(time.Now).Return(testTime).Build()
 
 			userID, err := ValidateToken(tc.token, tc.tokenType)
 

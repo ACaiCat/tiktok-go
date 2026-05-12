@@ -18,7 +18,7 @@ var testMessages = []*model.ChatMessage{
 	{ID: 2, SenderID: 10, ReceiverID: 20, Content: "world", CreatedAt: time.Now()},
 }
 
-func TestSetUnreadMessages(t *testing.T) {
+func TestChatCache_SetUnreadMessages(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		senderID int64
@@ -75,7 +75,7 @@ func TestSetUnreadMessages(t *testing.T) {
 	}
 }
 
-func TestGetUnreadMessages(t *testing.T) {
+func TestChatCache_GetUnreadMessages(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		senderID int64
@@ -124,7 +124,7 @@ func TestGetUnreadMessages(t *testing.T) {
 	}
 }
 
-func TestClearUnreadMessages(t *testing.T) {
+func TestChatCache_ClearUnreadMessages(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		senderID int64

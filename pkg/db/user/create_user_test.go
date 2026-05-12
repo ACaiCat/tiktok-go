@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateUser(t *testing.T) {
+func TestUserDao_CreateUser(t *testing.T) {
 	type testCase struct {
 		username string
 		password string
@@ -22,10 +22,12 @@ func TestCreateUser(t *testing.T) {
 		"db error returns error": {username: "alice", password: "hash", mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*UserDao).CreateUser).Return(tc.mockID, tc.mockErr).Build()
+			mockey.Mock((*UserDao).CreateUser).Return(tc.mockID, tc.mockErr).Build()
 
 			id, err := dao.CreateUser(context.Background(), tc.username, tc.password)
 			if tc.wantErr {

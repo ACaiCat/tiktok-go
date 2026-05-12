@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddMessage(t *testing.T) {
+func TestChatDao_AddMessage(t *testing.T) {
 	type testCase struct {
 		senderID   int64
 		receiverID int64
@@ -25,10 +25,12 @@ func TestAddMessage(t *testing.T) {
 		"db error returns error":  {senderID: 1, receiverID: 2, content: "fail", mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*ChatDao).AddMessage).Return(tc.mockErr).Build()
+			mockey.Mock((*ChatDao).AddMessage).Return(tc.mockErr).Build()
 
 			err := dao.AddMessage(context.Background(), tc.senderID, tc.receiverID, tc.content, tc.isRead, tc.isAi)
 			if tc.wantErr {

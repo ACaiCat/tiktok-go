@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIsExistFollow(t *testing.T) {
+func TestFollowerDao_IsExistFollow(t *testing.T) {
 	type testCase struct {
 		userID     int64
 		followerID int64
@@ -23,10 +23,12 @@ func TestIsExistFollow(t *testing.T) {
 		"db error":         {userID: 1, followerID: 2, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*FollowerDao).IsExistFollow).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*FollowerDao).IsExistFollow).Return(tc.mockRet, tc.mockErr).Build()
 
 			ok, err := dao.IsExistFollow(context.Background(), tc.userID, tc.followerID)
 			if tc.wantErr {
@@ -39,7 +41,7 @@ func TestIsExistFollow(t *testing.T) {
 	}
 }
 
-func TestIsExistFriend(t *testing.T) {
+func TestFollowerDao_IsExistFriend(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		friendID int64
@@ -54,10 +56,12 @@ func TestIsExistFriend(t *testing.T) {
 		"db error":         {userID: 1, friendID: 2, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*FollowerDao).IsExistFriend).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*FollowerDao).IsExistFriend).Return(tc.mockRet, tc.mockErr).Build()
 
 			ok, err := dao.IsExistFriend(context.Background(), tc.userID, tc.friendID)
 			if tc.wantErr {

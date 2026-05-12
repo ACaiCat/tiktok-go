@@ -21,6 +21,9 @@ ignore:
   - "biz/mw/**/*"
   - "idl/**/*"
 
+  - "pkg/db/model/**/*"
+  - "pkg/db/query/**/*"
+
   - "**/*.pb.go"
   - "**/*.pb.validate.go"
   - "**/*_gen.go"

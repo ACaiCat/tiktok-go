@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIncrLikeCount(t *testing.T) {
+func TestVideoDao_IncrLikeCount(t *testing.T) {
 	type testCase struct {
 		videoID int64
 		mockErr error
@@ -20,10 +20,12 @@ func TestIncrLikeCount(t *testing.T) {
 		"db error":                {videoID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).IncrLikeCount).Return(tc.mockErr).Build()
+			mockey.Mock((*VideoDao).IncrLikeCount).Return(tc.mockErr).Build()
 
 			err := dao.IncrLikeCount(context.Background(), tc.videoID)
 			if tc.wantErr {
@@ -35,7 +37,7 @@ func TestIncrLikeCount(t *testing.T) {
 	}
 }
 
-func TestDecrLikeCount(t *testing.T) {
+func TestVideoDao_DecrLikeCount(t *testing.T) {
 	type testCase struct {
 		videoID int64
 		mockErr error
@@ -47,10 +49,12 @@ func TestDecrLikeCount(t *testing.T) {
 		"db error":                {videoID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*VideoDao).DecrLikeCount).Return(tc.mockErr).Build()
+			mockey.Mock((*VideoDao).DecrLikeCount).Return(tc.mockErr).Build()
 
 			err := dao.DecrLikeCount(context.Background(), tc.videoID)
 			if tc.wantErr {

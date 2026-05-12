@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddVideoComment(t *testing.T) {
+func TestCommentDao_AddVideoComment(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		videoID int64
@@ -22,10 +22,12 @@ func TestAddVideoComment(t *testing.T) {
 		"db error returns error":    {userID: 1, videoID: 10, content: "x", mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*CommentDao).AddVideoComment).Return(tc.mockErr).Build()
+			mockey.Mock((*CommentDao).AddVideoComment).Return(tc.mockErr).Build()
 
 			err := dao.AddVideoComment(context.Background(), tc.userID, tc.videoID, tc.content)
 			if tc.wantErr {
@@ -37,7 +39,7 @@ func TestAddVideoComment(t *testing.T) {
 	}
 }
 
-func TestAddCommentReply(t *testing.T) {
+func TestCommentDao_AddCommentReply(t *testing.T) {
 	type testCase struct {
 		userID    int64
 		videoID   int64
@@ -52,10 +54,12 @@ func TestAddCommentReply(t *testing.T) {
 		"db error returns error":    {userID: 1, videoID: 10, commentID: 5, content: "x", mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*CommentDao).AddCommentReply).Return(tc.mockErr).Build()
+			mockey.Mock((*CommentDao).AddCommentReply).Return(tc.mockErr).Build()
 
 			err := dao.AddCommentReply(context.Background(), tc.userID, tc.videoID, tc.commentID, tc.content)
 			if tc.wantErr {

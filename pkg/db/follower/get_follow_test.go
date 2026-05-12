@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func TestGetFollower(t *testing.T) {
+func TestFollowerDao_GetFollower(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		pageSize int
@@ -29,10 +29,12 @@ func TestGetFollower(t *testing.T) {
 		"db error":              {userID: 1, pageSize: 10, pageNum: 0, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*FollowerDao).GetFollower).Return(tc.mockRet, tc.mockCnt, tc.mockErr).Build()
+			mockey.Mock((*FollowerDao).GetFollower).Return(tc.mockRet, tc.mockCnt, tc.mockErr).Build()
 
 			us, cnt, err := dao.GetFollower(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
@@ -46,7 +48,7 @@ func TestGetFollower(t *testing.T) {
 	}
 }
 
-func TestGetFollowing(t *testing.T) {
+func TestFollowerDao_GetFollowing(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		pageSize int
@@ -65,10 +67,12 @@ func TestGetFollowing(t *testing.T) {
 		"db error":              {userID: 1, pageSize: 10, pageNum: 0, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*FollowerDao).GetFollowing).Return(tc.mockRet, tc.mockCnt, tc.mockErr).Build()
+			mockey.Mock((*FollowerDao).GetFollowing).Return(tc.mockRet, tc.mockCnt, tc.mockErr).Build()
 
 			us, cnt, err := dao.GetFollowing(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
@@ -82,7 +86,7 @@ func TestGetFollowing(t *testing.T) {
 	}
 }
 
-func TestGetFriends(t *testing.T) {
+func TestFollowerDao_GetFriends(t *testing.T) {
 	type testCase struct {
 		userID   int64
 		pageSize int
@@ -101,10 +105,12 @@ func TestGetFriends(t *testing.T) {
 		"db error":            {userID: 1, pageSize: 10, pageNum: 0, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*FollowerDao).GetFriends).Return(tc.mockRet, tc.mockCnt, tc.mockErr).Build()
+			mockey.Mock((*FollowerDao).GetFriends).Return(tc.mockRet, tc.mockCnt, tc.mockErr).Build()
 
 			us, cnt, err := dao.GetFriends(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {

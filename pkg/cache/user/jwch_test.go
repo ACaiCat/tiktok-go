@@ -11,7 +11,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
 
-func TestSetJwchSession(t *testing.T) {
+func TestUserCache_SetJwchSession(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		jwchID  string
@@ -62,7 +62,7 @@ func TestSetJwchSession(t *testing.T) {
 	}
 }
 
-func TestGetJwchSession(t *testing.T) {
+func TestUserCache_GetJwchSession(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		jwchID  string
@@ -112,7 +112,7 @@ func TestGetJwchSession(t *testing.T) {
 	}
 }
 
-func TestCleanJwchSession(t *testing.T) {
+func TestUserCache_CleanJwchSession(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		mockErr error

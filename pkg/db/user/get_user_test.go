@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
 )
 
-func TestGetByID(t *testing.T) {
+func TestUserDao_GetByID(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		mockRet *model.User
@@ -24,10 +24,12 @@ func TestGetByID(t *testing.T) {
 		"db error returns error":     {userID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*UserDao).GetByID).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*UserDao).GetByID).Return(tc.mockRet, tc.mockErr).Build()
 
 			u, err := dao.GetByID(context.Background(), tc.userID)
 			if tc.wantErr {
@@ -40,7 +42,7 @@ func TestGetByID(t *testing.T) {
 	}
 }
 
-func TestGetByUsername(t *testing.T) {
+func TestUserDao_GetByUsername(t *testing.T) {
 	type testCase struct {
 		username string
 		mockRet  *model.User
@@ -54,10 +56,12 @@ func TestGetByUsername(t *testing.T) {
 		"db error returns error":       {username: "alice", mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*UserDao).GetByUsername).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*UserDao).GetByUsername).Return(tc.mockRet, tc.mockErr).Build()
 
 			u, err := dao.GetByUsername(context.Background(), tc.username)
 			if tc.wantErr {

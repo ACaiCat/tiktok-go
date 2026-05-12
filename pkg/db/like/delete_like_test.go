@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDeleteVideoLike(t *testing.T) {
+func TestLikeDao_DeleteVideoLike(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		videoID int64
@@ -21,10 +21,12 @@ func TestDeleteVideoLike(t *testing.T) {
 		"db error returns error":    {userID: 1, videoID: 10, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*LikeDao).DeleteVideoLike).Return(tc.mockErr).Build()
+			mockey.Mock((*LikeDao).DeleteVideoLike).Return(tc.mockErr).Build()
 
 			err := dao.DeleteVideoLike(context.Background(), tc.userID, tc.videoID)
 			if tc.wantErr {
@@ -36,7 +38,7 @@ func TestDeleteVideoLike(t *testing.T) {
 	}
 }
 
-func TestDeleteCommentLike(t *testing.T) {
+func TestLikeDao_DeleteCommentLike(t *testing.T) {
 	type testCase struct {
 		userID    int64
 		commentID int64
@@ -49,10 +51,12 @@ func TestDeleteCommentLike(t *testing.T) {
 		"db error returns error":      {userID: 1, commentID: 5, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*LikeDao).DeleteCommentLike).Return(tc.mockErr).Build()
+			mockey.Mock((*LikeDao).DeleteCommentLike).Return(tc.mockErr).Build()
 
 			err := dao.DeleteCommentLike(context.Background(), tc.userID, tc.commentID)
 			if tc.wantErr {

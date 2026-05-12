@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIsUserExists(t *testing.T) {
+func TestUserDao_IsUserExists(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		mockRet bool
@@ -22,10 +22,12 @@ func TestIsUserExists(t *testing.T) {
 		"db error returns error": {userID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*UserDao).IsUserExists).Return(tc.mockRet, tc.mockErr).Build()
+			mockey.Mock((*UserDao).IsUserExists).Return(tc.mockRet, tc.mockErr).Build()
 
 			ok, err := dao.IsUserExists(context.Background(), tc.userID)
 			if tc.wantErr {

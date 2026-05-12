@@ -5,7 +5,7 @@ import (
 	"io"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/minio/minio-go/v7"
 	"github.com/stretchr/testify/assert"
 
@@ -41,9 +41,11 @@ func TestUploadCover(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
-			Mock((*minio.Client).PutObject).To(func(_ context.Context, _ string, _ string, _ io.Reader, _ int64, _ minio.PutObjectOptions) (minio.UploadInfo, error) {
+		mockey.PatchConvey(name, t, func() {
+			mockey.Mock((*minio.Client).PutObject).To(func(_ context.Context, _ string, _ string, _ io.Reader, _ int64, _ minio.PutObjectOptions) (minio.UploadInfo, error) {
 				return minio.UploadInfo{}, tc.putErr
 			}).Build()
 
@@ -80,8 +82,10 @@ func TestGetCoverURL(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			setSSL(tc.useSSL)
 			url := GetCoverURL(tc.videoID)
 			assert.Contains(t, url, tc.wantPrefix)

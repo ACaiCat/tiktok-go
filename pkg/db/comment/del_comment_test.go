@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDeleteComment(t *testing.T) {
+func TestCommentDao_DeleteComment(t *testing.T) {
 	type testCase struct {
 		commentID int64
 		mockErr   error
@@ -20,10 +20,12 @@ func TestDeleteComment(t *testing.T) {
 		"db error returns error": {commentID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*CommentDao).DeleteComment).Return(tc.mockErr).Build()
+			mockey.Mock((*CommentDao).DeleteComment).Return(tc.mockErr).Build()
 
 			err := dao.DeleteComment(context.Background(), tc.commentID)
 			if tc.wantErr {
@@ -35,7 +37,7 @@ func TestDeleteComment(t *testing.T) {
 	}
 }
 
-func TestDeleteCommentReply(t *testing.T) {
+func TestCommentDao_DeleteCommentReply(t *testing.T) {
 	type testCase struct {
 		commentID int64
 		mockErr   error
@@ -47,10 +49,12 @@ func TestDeleteCommentReply(t *testing.T) {
 		"db error returns error":       {commentID: 5, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*CommentDao).DeleteCommentReply).Return(tc.mockErr).Build()
+			mockey.Mock((*CommentDao).DeleteCommentReply).Return(tc.mockErr).Build()
 
 			err := dao.DeleteCommentReply(context.Background(), tc.commentID)
 			if tc.wantErr {

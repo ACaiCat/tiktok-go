@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/bytedance/mockey"
+	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestIncrLikeCount(t *testing.T) {
+func TestCommentDao_IncrLikeCount(t *testing.T) {
 	type testCase struct {
 		commentID int64
 		mockErr   error
@@ -20,10 +20,12 @@ func TestIncrLikeCount(t *testing.T) {
 		"db error returns error":  {commentID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*CommentDao).IncrLikeCount).Return(tc.mockErr).Build()
+			mockey.Mock((*CommentDao).IncrLikeCount).Return(tc.mockErr).Build()
 
 			err := dao.IncrLikeCount(context.Background(), tc.commentID)
 			if tc.wantErr {
@@ -35,7 +37,7 @@ func TestIncrLikeCount(t *testing.T) {
 	}
 }
 
-func TestDecrLikeCount(t *testing.T) {
+func TestCommentDao_DecrLikeCount(t *testing.T) {
 	type testCase struct {
 		commentID int64
 		mockErr   error
@@ -47,10 +49,12 @@ func TestDecrLikeCount(t *testing.T) {
 		"db error returns error":  {commentID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
-		PatchConvey(name, t, func() {
+		mockey.PatchConvey(name, t, func() {
 			dao := newTestDao()
-			Mock((*CommentDao).DecrLikeCount).Return(tc.mockErr).Build()
+			mockey.Mock((*CommentDao).DecrLikeCount).Return(tc.mockErr).Build()
 
 			err := dao.DecrLikeCount(context.Background(), tc.commentID)
 			if tc.wantErr {
