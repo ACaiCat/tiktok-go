@@ -23,7 +23,7 @@ func (e ErrNo) WithMessage(msg string) ErrNo {
 }
 
 func (e ErrNo) WithError(err error) ErrNo {
-	e.ErrMsg = err.Error()
+	e.ErrMsg = e.ErrMsg + ": " + err.Error()
 	return e
 }
 

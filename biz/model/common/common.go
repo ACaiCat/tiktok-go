@@ -10,9 +10,9 @@ import (
 // 响应状态
 type Base struct {
 	// 返回消息
-	Msg string `thrift:"msg,1,required" form:"msg,required" json:"msg,required" query:"msg,required"`
+	Code int32 `thrift:"code,1,required" form:"code,required" json:"code,required" query:"code,required"`
 	// 状态码
-	Code int32 `thrift:"code,2,required" form:"code,required" json:"code,required" query:"code,required"`
+	Msg string `thrift:"msg,2,required" form:"msg,required" json:"msg,required" query:"msg,required"`
 }
 
 func NewBase() *Base {
@@ -22,25 +22,25 @@ func NewBase() *Base {
 func (p *Base) InitDefault() {
 }
 
-func (p *Base) GetMsg() (v string) {
-	return p.Msg
-}
-
 func (p *Base) GetCode() (v int32) {
 	return p.Code
 }
 
+func (p *Base) GetMsg() (v string) {
+	return p.Msg
+}
+
 var fieldIDToName_Base = map[int16]string{
-	1: "msg",
-	2: "code",
+	1: "code",
+	2: "msg",
 }
 
 func (p *Base) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetMsg bool = false
 	var issetCode bool = false
+	var issetMsg bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -57,20 +57,20 @@ func (p *Base) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetMsg = true
+				issetCode = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetCode = true
+				issetMsg = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -87,12 +87,12 @@ func (p *Base) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetMsg {
+	if !issetCode {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetCode {
+	if !issetMsg {
 		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
@@ -116,17 +116,6 @@ RequiredFieldNotSetError:
 
 func (p *Base) ReadField1(iprot thrift.TProtocol) error {
 
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Msg = _field
-	return nil
-}
-func (p *Base) ReadField2(iprot thrift.TProtocol) error {
-
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
@@ -134,6 +123,17 @@ func (p *Base) ReadField2(iprot thrift.TProtocol) error {
 		_field = v
 	}
 	p.Code = _field
+	return nil
+}
+func (p *Base) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Msg = _field
 	return nil
 }
 
@@ -170,10 +170,10 @@ WriteStructEndError:
 }
 
 func (p *Base) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("msg", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("code", thrift.I32, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Msg); err != nil {
+	if err := oprot.WriteI32(p.Code); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -187,10 +187,10 @@ WriteFieldEndError:
 }
 
 func (p *Base) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("code", thrift.I32, 2); err != nil {
+	if err = oprot.WriteFieldBegin("msg", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Code); err != nil {
+	if err := oprot.WriteString(p.Msg); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

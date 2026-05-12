@@ -109,12 +109,12 @@ func TestErrNoWithError(t *testing.T) {
 		"wrap external error": {
 			base:    ServiceErr,
 			err:     errors.New("db connection failed"),
-			wantMsg: "db connection failed",
+			wantMsg: "服务器内部错误: db connection failed",
 		},
 		"wrap param error": {
 			base:    ParamErr,
 			err:     errors.New("invalid field"),
-			wantMsg: "invalid field",
+			wantMsg: "参数错误: invalid field",
 		},
 	}
 
