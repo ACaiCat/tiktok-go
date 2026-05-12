@@ -13,25 +13,20 @@ coverage:
         threshold: 5%
 
 ignore:
-  - "cmd/**/*"
+  - "cmd"
+  - "config"
+  - "docs"
+  - "idl"
 
-  - "biz/router/**/*"
-  - "biz/model/**/*"
-  - "biz/pack/**/*"
-  - "biz/mw/**/*"
-  - "idl/**/*"
+  - "**/router/**"
+  - "**/pack/**"
+  - "**/model/**"
+  - "**/query/**"
 
-  - "pkg/db/model/**/*"
-  - "pkg/db/query/**/*"
-
-  - "**/*.pb.go"
-  - "**/*.pb.validate.go"
-  - "**/*_gen.go"
-  - "**/*_generated.go"
-
-  - "config/**/*"
-  - "docs/**/*"
-  - "**/*_test.go"
+  - "*.pb.go"
+  - "*.pb.validate.go"
+  - "*_gen.go"
+  - "*_generated.go"
 
 comment:
   layout: "diff, flags, files"
