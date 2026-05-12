@@ -17,6 +17,8 @@ ignore:
 
   - "biz/router/**/*"
   - "biz/model/**/*"
+  - "biz/pack/**/*"
+  - "biz/mw/**/*"
   - "idl/**/*"
 
   - "**/*.pb.go"
