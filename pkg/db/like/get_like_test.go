@@ -33,7 +33,7 @@ func TestLikeDao_GetLikeCounts(t *testing.T) {
 			dao := newTestDao()
 			dbtestutil.MockScan(func(dest interface{}) {
 				destValue := reflect.ValueOf(dest)
-				if destValue.Kind() != reflect.Ptr || destValue.Elem().Kind() != reflect.Slice {
+				if destValue.Kind() != reflect.Pointer || destValue.Elem().Kind() != reflect.Slice {
 					return
 				}
 				sliceValue := destValue.Elem()

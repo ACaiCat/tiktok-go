@@ -85,7 +85,7 @@ func MockScan(fill func(dest interface{}), err error) {
 
 func FillValue(dest interface{}, value interface{}) {
 	destValue := reflect.ValueOf(dest)
-	if destValue.Kind() != reflect.Ptr {
+	if destValue.Kind() != reflect.Pointer {
 		return
 	}
 	valueOfValue := reflect.ValueOf(value)
