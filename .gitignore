@@ -37,3 +37,4 @@ dumped_hertz_remote_config.json
 /config/config.yaml
 /logs
 /publish
+coverage.txt
