@@ -141,7 +141,6 @@ func TestLocalTool_CallTool(t *testing.T) {
 	defer mockey.UnPatchAll()
 
 	for name, tc := range testCases {
-
 		mockey.PatchConvey(name, t, func() {
 			tool := newAddTool(tc.authorize, tc.fn)
 			call := openai.ToolCall{

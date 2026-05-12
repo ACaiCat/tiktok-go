@@ -67,17 +67,20 @@ func TestChatService_getChatHistory(t *testing.T) {
 	defer mockey.UnPatchAll()
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
-			mockey.Mock((*chatCache.ChatCache).GetChatHistory).To(func(ctx context.Context, userID int64, otherUserID int64, pageSize int, pageNum int) ([]*modelDao.ChatMessage, error) {
+			mockey.Mock((*chatCache.ChatCache).GetChatHistory).To(func(ctx context.Context, userID int64,
+				otherUserID int64, pageSize int, pageNum int) ([]*modelDao.ChatMessage, error) {
 				return tc.mockCacheResult, tc.mockCacheErr
 			}).Build()
-			mockey.Mock((*chatDao.ChatDao).GetChatHistory).To(func(ctx context.Context, userID int64, otherUserID int64, pageSize int, pageNum int) ([]*modelDao.ChatMessage, error) {
+			mockey.Mock((*chatDao.ChatDao).GetChatHistory).To(func(ctx context.Context, userID int64, otherUserID int64,
+				pageSize int, pageNum int) ([]*modelDao.ChatMessage, error) {
 				return tc.mockDAOResult, tc.mockDAOErr
 			}).Build()
 			mockey.Mock((*chatCache.ChatCache).SetChatHistory).Return(nil).Build()
 			mockey.Mock(NewChatService).To(func(_ context.Context, manager *ws.OnlineUserManager) *ChatService {
 				return &ChatService{cache: &chatCache.ChatCache{}, chatDao: &chatDao.ChatDao{}}
 			}).Build()
-			result, err := NewChatService(t.Context(), ws.NewOnlineUserManager()).getChatHistory(1, 2, 10, 0)
+			result, err := NewChatService(t.Context(), ws.NewOnlineUserManager()).
+				getChatHistory(1, 2, 10, 0)
 			if tc.expectError != "" {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.expectError)

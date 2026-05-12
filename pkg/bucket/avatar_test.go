@@ -45,7 +45,8 @@ func TestUploadAvatar(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
-			mockey.Mock((*minio.Client).PutObject).To(func(_ context.Context, _ string, _ string, _ io.Reader, _ int64, _ minio.PutObjectOptions) (minio.UploadInfo, error) {
+			mockey.Mock((*minio.Client).PutObject).To(func(_ context.Context, _ string, _ string, _ io.Reader, _ int64,
+				_ minio.PutObjectOptions) (minio.UploadInfo, error) {
 				return minio.UploadInfo{}, tc.putErr
 			}).Build()
 

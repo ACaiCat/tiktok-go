@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/bytedance/mockey"
@@ -90,7 +91,7 @@ func TestChatService_getUnreadMessages(t *testing.T) {
 				return
 			}
 			assert.NoError(t, err)
-			if tc.mockCacheErr == redis.Nil {
+			if errors.Is(tc.mockCacheErr, redis.Nil) {
 				assert.Equal(t, tc.mockDAOResult, result)
 				return
 			}

@@ -197,13 +197,16 @@ func TestInteractionService_ListComment(t *testing.T) {
 			mockey.Mock((*videoDao.VideoDao).IsVideoExists).To(func(ctx context.Context, videoID int64) (bool, error) {
 				return tc.mockVideoExists, tc.mockErr
 			}).Build()
-			mockey.Mock((*commentDao.CommentDao).GetCommentsByVideoID).To(func(ctx context.Context, videoID int64, pageSize int, pageNum int) ([]*modelDao.Comment, error) {
+			mockey.Mock((*commentDao.CommentDao).GetCommentsByVideoID).To(func(ctx context.Context, videoID int64,
+				pageSize int, pageNum int) ([]*modelDao.Comment, error) {
 				return tc.mockResult, tc.mockErr
 			}).Build()
-			mockey.Mock((*commentDao.CommentDao).IsCommentExists).To(func(ctx context.Context, commentID int64) (bool, error) {
+			mockey.Mock((*commentDao.CommentDao).IsCommentExists).To(func(ctx context.Context,
+				commentID int64) (bool, error) {
 				return tc.mockCommentExist, tc.mockErr
 			}).Build()
-			mockey.Mock((*commentDao.CommentDao).GetCommentsByCommentID).To(func(ctx context.Context, commentID int64, pageSize int, pageNum int) ([]*modelDao.Comment, error) {
+			mockey.Mock((*commentDao.CommentDao).GetCommentsByCommentID).To(func(ctx context.Context, commentID int64,
+				pageSize int, pageNum int) ([]*modelDao.Comment, error) {
 				return tc.mockResult, tc.mockErr
 			}).Build()
 

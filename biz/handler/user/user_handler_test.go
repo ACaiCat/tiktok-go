@@ -6,7 +6,6 @@ import (
 	"mime/multipart"
 	"testing"
 
-	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/bytedance/mockey"
 	"github.com/cloudwego/hertz/pkg/common/config"
 	"github.com/cloudwego/hertz/pkg/common/ut"
@@ -15,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
+	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	userService "github.com/ACaiCat/tiktok-go/biz/service/user"
 )
 

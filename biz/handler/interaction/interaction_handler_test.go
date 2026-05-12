@@ -5,7 +5,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/bytedance/mockey"
 	"github.com/cloudwego/hertz/pkg/common/config"
 	"github.com/cloudwego/hertz/pkg/common/ut"
@@ -13,6 +12,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/route"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	interactionService "github.com/ACaiCat/tiktok-go/biz/service/interaction"
 	videoService "github.com/ACaiCat/tiktok-go/biz/service/video"

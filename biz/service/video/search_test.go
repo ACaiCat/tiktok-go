@@ -50,7 +50,8 @@ func TestVideoService_SearchVideo(t *testing.T) {
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
 			mockey.Mock((*videoDao.VideoDao).SearchVideo).To(
-				func(_ *videoDao.VideoDao, ctx context.Context, keywords []string, pageSize int, pageNum int, fromDate time.Time, toDate time.Time, username string) ([]*modelDao.Video, error) {
+				func(_ *videoDao.VideoDao, ctx context.Context, keywords []string, pageSize int, pageNum int,
+					fromDate time.Time, toDate time.Time, username string) ([]*modelDao.Video, error) {
 					return tc.mockVideos, tc.mockErr
 				}).Build()
 

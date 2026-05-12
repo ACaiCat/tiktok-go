@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/ws"
 	chatService "github.com/ACaiCat/tiktok-go/biz/service/chat"
+	"github.com/ACaiCat/tiktok-go/pkg/errno"
 )
 
 func encodeMessage(msgType int, body interface{}) string {

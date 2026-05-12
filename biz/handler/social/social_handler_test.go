@@ -5,7 +5,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ACaiCat/tiktok-go/biz/model/social"
 	"github.com/bytedance/mockey"
 	"github.com/cloudwego/hertz/pkg/common/config"
 	"github.com/cloudwego/hertz/pkg/common/ut"
@@ -14,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
+	"github.com/ACaiCat/tiktok-go/biz/model/social"
 	socialService "github.com/ACaiCat/tiktok-go/biz/service/social"
 )
 

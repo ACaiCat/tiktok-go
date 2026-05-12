@@ -5,11 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bytedance/mockey"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	videoDao "github.com/ACaiCat/tiktok-go/pkg/db/video"
-	"github.com/bytedance/mockey"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestVideoService_GetFeed(t *testing.T) {
