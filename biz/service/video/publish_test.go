@@ -67,7 +67,7 @@ func TestVideoService_PublishVideo(t *testing.T) {
 			}).Build()
 
 			fh := &multipart.FileHeader{Filename: "test.mp4"}
-			err := NewVideoService(t.Context()).PublishVideo(1, "title", "desc", fh)
+			err := NewVideoService(context.Background()).PublishVideo(1, "title", "desc", fh)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

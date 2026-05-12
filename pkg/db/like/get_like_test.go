@@ -2,10 +2,13 @@ package likedao
 
 import (
 	"context"
+	"reflect"
 	"testing"
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestLikeDao_GetLikeCounts(t *testing.T) {
@@ -26,12 +29,28 @@ func TestLikeDao_GetLikeCounts(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockLikeQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*LikeDao).GetLikeCounts).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockScan(func(dest interface{}) {
+				destValue := reflect.ValueOf(dest)
+				if destValue.Kind() != reflect.Ptr || destValue.Elem().Kind() != reflect.Slice {
+					return
+				}
+				sliceValue := destValue.Elem()
+				elemType := sliceValue.Type().Elem()
+				for videoID, count := range tc.mockRet {
+					item := reflect.New(elemType).Elem()
+					item.FieldByName("VideoID").SetInt(videoID)
+					item.FieldByName("Count").SetInt(count)
+					sliceValue = reflect.Append(sliceValue, item)
+				}
+				destValue.Elem().Set(sliceValue)
+			}, tc.mockErr)
 
 			m, err := dao.GetLikeCounts(context.Background(), tc.videoIDs)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetLikeCount failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, m)
@@ -58,12 +77,16 @@ func TestLikeDao_GetUserLikes(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockLikeQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*LikeDao).GetUserLikes).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockScan(func(dest interface{}) {
+				dbtestutil.FillValue(dest, tc.mockRet)
+			}, tc.mockErr)
 
 			ids, err := dao.GetUserLikes(context.Background(), tc.userID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetUserLikes failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, ids)

@@ -6,6 +6,8 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestCommentDao_IncrLikeCount(t *testing.T) {
@@ -24,12 +26,14 @@ func TestCommentDao_IncrLikeCount(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).IncrLikeCount).Return(tc.mockErr).Build()
+			dbtestutil.MockUpdateColumn(tc.mockErr)
 
 			err := dao.IncrLikeCount(context.Background(), tc.commentID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "IncrLikeCount failed")
 			} else {
 				assert.NoError(t, err)
 			}
@@ -53,12 +57,14 @@ func TestCommentDao_DecrLikeCount(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).DecrLikeCount).Return(tc.mockErr).Build()
+			dbtestutil.MockUpdateColumn(tc.mockErr)
 
 			err := dao.DecrLikeCount(context.Background(), tc.commentID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "DecrLikeCount failed")
 			} else {
 				assert.NoError(t, err)
 			}

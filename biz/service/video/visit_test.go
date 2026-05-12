@@ -46,7 +46,7 @@ func TestVideoService_VisitVideo(t *testing.T) {
 				return &VideoService{}
 			}).Build()
 
-			err := NewVideoService(t.Context()).VisitVideo(tc.req)
+			err := NewVideoService(context.Background()).VisitVideo(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

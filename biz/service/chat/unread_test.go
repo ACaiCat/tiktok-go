@@ -45,7 +45,7 @@ func TestChatService_HandleUnreadMessage(t *testing.T) {
 			}).Build()
 			mockey.Mock((*ChatService).clearUnreadMessagesCache).To(func(userID int64, senderID int64) {}).Build()
 			mockey.Mock(NewChatService).To(func(_ context.Context, manager *ws.OnlineUserManager) *ChatService { return &ChatService{} }).Build()
-			err := NewChatService(t.Context(), ws.NewOnlineUserManager()).HandleUnreadMessage(1, &ws.UnreadRequest{Sender: 2})
+			err := NewChatService(context.Background(), ws.NewOnlineUserManager()).HandleUnreadMessage(1, &ws.UnreadRequest{Sender: 2})
 			if tc.expectError != "" {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.expectError)
@@ -84,7 +84,7 @@ func TestChatService_getUnreadMessages(t *testing.T) {
 			mockey.Mock(NewChatService).To(func(_ context.Context, manager *ws.OnlineUserManager) *ChatService {
 				return &ChatService{cache: &chatCache.ChatCache{}, chatDao: &chatDao.ChatDao{}}
 			}).Build()
-			result, err := NewChatService(t.Context(), ws.NewOnlineUserManager()).getUnreadMessages(1, 2)
+			result, err := NewChatService(context.Background(), ws.NewOnlineUserManager()).getUnreadMessages(1, 2)
 			if tc.expectError != "" {
 				assert.Error(t, err)
 				assert.ErrorContains(t, err, tc.expectError)

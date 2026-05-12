@@ -49,7 +49,7 @@ func TestInteractionService_LikeVideo(t *testing.T) {
 				return &InteractionService{}
 			}).Build()
 
-			err := NewInteractionService(t.Context()).LikeVideo(tc.req, 1)
+			err := NewInteractionService(context.Background()).LikeVideo(tc.req, 1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

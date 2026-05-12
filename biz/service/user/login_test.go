@@ -74,7 +74,7 @@ func TestUserService_UserLogin(t *testing.T) {
 				return &UserService{}
 			}).Build()
 
-			_, _, _, err := NewUserService(t.Context()).UserLogin(tc.req)
+			_, _, _, err := NewUserService(context.Background()).UserLogin(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

@@ -6,6 +6,8 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestCommentDao_DeleteComment(t *testing.T) {
@@ -24,12 +26,14 @@ func TestCommentDao_DeleteComment(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).DeleteComment).Return(tc.mockErr).Build()
+			dbtestutil.MockDelete(tc.mockErr)
 
 			err := dao.DeleteComment(context.Background(), tc.commentID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "DeleteComment failed")
 			} else {
 				assert.NoError(t, err)
 			}
@@ -53,12 +57,14 @@ func TestCommentDao_DeleteCommentReply(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockCommentQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*CommentDao).DeleteCommentReply).Return(tc.mockErr).Build()
+			dbtestutil.MockDelete(tc.mockErr)
 
 			err := dao.DeleteCommentReply(context.Background(), tc.commentID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "DeleteCommentReply failed")
 			} else {
 				assert.NoError(t, err)
 			}

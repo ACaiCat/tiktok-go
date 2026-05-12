@@ -6,6 +6,8 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestLikeDao_AddVideoLike(t *testing.T) {
@@ -25,12 +27,14 @@ func TestLikeDao_AddVideoLike(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockLikeQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*LikeDao).AddVideoLike).Return(tc.mockErr).Build()
+			dbtestutil.MockCreate(tc.mockErr)
 
 			err := dao.AddVideoLike(context.Background(), tc.userID, tc.videoID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "AddVideoLike failed")
 			} else {
 				assert.NoError(t, err)
 			}
@@ -55,12 +59,14 @@ func TestLikeDao_AddCommentLike(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockLikeQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*LikeDao).AddCommentLike).Return(tc.mockErr).Build()
+			dbtestutil.MockCreate(tc.mockErr)
 
 			err := dao.AddCommentLike(context.Background(), tc.userID, tc.commentID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "AddCommentLike failed")
 			} else {
 				assert.NoError(t, err)
 			}

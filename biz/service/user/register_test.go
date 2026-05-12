@@ -67,7 +67,7 @@ func TestUserService_UserRegister(t *testing.T) {
 				return &UserService{}
 			}).Build()
 
-			err := NewUserService(t.Context()).UserRegister(tc.req)
+			err := NewUserService(context.Background()).UserRegister(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

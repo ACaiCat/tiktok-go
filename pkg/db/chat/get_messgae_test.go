@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestChatDao_GetUnreadMessages(t *testing.T) {
@@ -31,12 +32,14 @@ func TestChatDao_GetUnreadMessages(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockChatQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*ChatDao).GetUnreadMessages).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			got, err := dao.GetUnreadMessages(context.Background(), tc.userID, tc.senderID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetUnreadMessages failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, got)
@@ -62,12 +65,14 @@ func TestChatDao_MarkMessagesAsRead(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockChatQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*ChatDao).MarkMessagesAsRead).Return(tc.mockErr).Build()
+			dbtestutil.MockUpdate(tc.mockErr)
 
 			err := dao.MarkMessagesAsRead(context.Background(), tc.userID, tc.senderID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "MarkMessagesAsRead failed")
 			} else {
 				assert.NoError(t, err)
 			}
@@ -98,16 +103,30 @@ func TestChatDao_GetChatHistory(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockChatQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*ChatDao).GetChatHistory).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			got, err := dao.GetChatHistory(context.Background(), tc.userID, tc.otherUserID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetChatHistory failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, got)
 			}
 		})
 	}
+}
+
+func TestChatDao_GetChatHistory_ExcludesMissingRecord(t *testing.T) {
+	mockey.PatchConvey("history handles empty result", t, func() {
+		mockChatQueryChain()
+		dao := newTestDao()
+		dbtestutil.MockFind([]*model.ChatMessage{}, nil)
+
+		got, err := dao.GetChatHistory(context.Background(), 1, 2, 10, 0)
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
 }

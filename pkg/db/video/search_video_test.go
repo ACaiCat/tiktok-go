@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestVideoDao_SearchVideo(t *testing.T) {
@@ -37,12 +38,14 @@ func TestVideoDao_SearchVideo(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*VideoDao).SearchVideo).Return(tc.mockRet, tc.mockErr).Build()
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			vs, err := dao.SearchVideo(context.Background(), tc.keywords, tc.pageSize, tc.pageNum, tc.fromDate, tc.toDate, tc.username)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "SearchVideo failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, vs)

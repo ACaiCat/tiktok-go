@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
+	dbtestutil "github.com/ACaiCat/tiktok-go/pkg/db/testutil"
 )
 
 func TestFollowerDao_GetFollower(t *testing.T) {
@@ -33,12 +34,22 @@ func TestFollowerDao_GetFollower(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockFollowerQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*FollowerDao).GetFollower).Return(tc.mockRet, tc.mockCnt, tc.mockErr).Build()
+			dbtestutil.MockTransaction(nil)
+			dbtestutil.MockScan(func(dest interface{}) {
+				ids := make([]int64, 0, tc.mockCnt)
+				for _, user := range tc.mockRet {
+					ids = append(ids, user.ID)
+				}
+				dbtestutil.FillValue(dest, ids)
+			}, tc.mockErr)
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			us, cnt, err := dao.GetFollower(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetFollower failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, us)
@@ -71,12 +82,22 @@ func TestFollowerDao_GetFollowing(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockFollowerQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*FollowerDao).GetFollowing).Return(tc.mockRet, tc.mockCnt, tc.mockErr).Build()
+			dbtestutil.MockTransaction(nil)
+			dbtestutil.MockScan(func(dest interface{}) {
+				ids := make([]int64, 0, tc.mockCnt)
+				for _, user := range tc.mockRet {
+					ids = append(ids, user.ID)
+				}
+				dbtestutil.FillValue(dest, ids)
+			}, tc.mockErr)
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			us, cnt, err := dao.GetFollowing(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetFollowing failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, us)
@@ -109,12 +130,28 @@ func TestFollowerDao_GetFriends(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockFollowerQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*FollowerDao).GetFriends).Return(tc.mockRet, tc.mockCnt, tc.mockErr).Build()
+			dbtestutil.MockTransaction(nil)
+			scanCall := 0
+			dbtestutil.MockScan(func(dest interface{}) {
+				scanCall++
+				ids := make([]int64, 0, tc.mockCnt)
+				for _, user := range tc.mockRet {
+					ids = append(ids, user.ID)
+				}
+				if scanCall == 1 {
+					dbtestutil.FillValue(dest, ids)
+					return
+				}
+				dbtestutil.FillValue(dest, ids)
+			}, tc.mockErr)
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
 
 			us, cnt, err := dao.GetFriends(context.Background(), tc.userID, tc.pageSize, tc.pageNum)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetFriend failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, us)

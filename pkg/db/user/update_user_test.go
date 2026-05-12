@@ -6,6 +6,7 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gen"
 )
 
 func TestUserDao_UpdateUserMFA(t *testing.T) {
@@ -21,16 +22,17 @@ func TestUserDao_UpdateUserMFA(t *testing.T) {
 		"db error returns error": {userID: 1, secret: "x", mockErr: assert.AnError, wantErr: true},
 	}
 
-	defer mockey.UnPatchAll()
-
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockUserQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*UserDao).UpdateUserMFA).Return(tc.mockErr).Build()
+
+			mockey.Mock((*gen.DO).Update).Return(gen.ResultInfo{}, tc.mockErr).Build()
 
 			err := dao.UpdateUserMFA(context.Background(), tc.userID, tc.secret)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "UpdateUserMFA failed")
 			} else {
 				assert.NoError(t, err)
 			}
@@ -51,16 +53,17 @@ func TestUserDao_UpdateUserAvatarURL(t *testing.T) {
 		"db error returns error":    {userID: 1, avatarURL: "x", mockErr: assert.AnError, wantErr: true},
 	}
 
-	defer mockey.UnPatchAll()
-
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockUserQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*UserDao).UpdateUserAvatarURL).Return(tc.mockErr).Build()
+
+			mockey.Mock((*gen.DO).Update).Return(gen.ResultInfo{}, tc.mockErr).Build()
 
 			err := dao.UpdateUserAvatarURL(context.Background(), tc.userID, tc.avatarURL)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "UpdateUserAvatarURL failed")
 			} else {
 				assert.NoError(t, err)
 			}
@@ -82,16 +85,17 @@ func TestUserDao_UpdateUserJwch(t *testing.T) {
 		"db error returns error": {userID: 1, jwchID: "x", jwchPassword: "y", mockErr: assert.AnError, wantErr: true},
 	}
 
-	defer mockey.UnPatchAll()
-
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockUserQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*UserDao).UpdateUserJwch).Return(tc.mockErr).Build()
+
+			mockey.Mock((*gen.DO).Updates).Return(gen.ResultInfo{}, tc.mockErr).Build()
 
 			err := dao.UpdateUserJwch(context.Background(), tc.userID, tc.jwchID, tc.jwchPassword)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "UpdateUserJwch failed")
 			} else {
 				assert.NoError(t, err)
 			}

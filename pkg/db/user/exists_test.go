@@ -6,6 +6,7 @@ import (
 
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gen"
 )
 
 func TestUserDao_IsUserExists(t *testing.T) {
@@ -22,16 +23,22 @@ func TestUserDao_IsUserExists(t *testing.T) {
 		"db error returns error": {userID: 1, mockErr: assert.AnError, wantErr: true},
 	}
 
-	defer mockey.UnPatchAll()
-
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
+			mockUserQueryChain()
 			dao := newTestDao()
-			mockey.Mock((*UserDao).IsUserExists).Return(tc.mockRet, tc.mockErr).Build()
+
+			mockey.Mock((*gen.DO).Count).To(func(_ *gen.DO) (int64, error) {
+				if tc.mockRet {
+					return 1, tc.mockErr
+				}
+				return 0, tc.mockErr
+			}).Build()
 
 			ok, err := dao.IsUserExists(context.Background(), tc.userID)
 			if tc.wantErr {
 				assert.Error(t, err)
+				assert.ErrorContains(t, err, "IsUserExists failed")
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, ok)

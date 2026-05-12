@@ -46,7 +46,7 @@ func TestUserService_GetUserInfo(t *testing.T) {
 				return &UserService{}
 			}).Build()
 
-			result, err := NewUserService(t.Context()).GetUserInfo(1)
+			result, err := NewUserService(context.Background()).GetUserInfo(1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)

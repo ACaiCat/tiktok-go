@@ -79,7 +79,7 @@ func TestInteractionService_CommentAction(t *testing.T) {
 				return &InteractionService{}
 			}).Build()
 
-			err := NewInteractionService(t.Context()).CommentAction(tc.req, 1)
+			err := NewInteractionService(context.Background()).CommentAction(tc.req, 1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)
@@ -140,7 +140,7 @@ func TestInteractionService_DeleteComment(t *testing.T) {
 				return &InteractionService{}
 			}).Build()
 
-			err := NewInteractionService(t.Context()).DeleteComment(tc.req, 1)
+			err := NewInteractionService(context.Background()).DeleteComment(tc.req, 1)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)
@@ -214,7 +214,7 @@ func TestInteractionService_ListComment(t *testing.T) {
 				return &InteractionService{}
 			}).Build()
 
-			result, err := NewInteractionService(t.Context()).ListComment(tc.req)
+			result, err := NewInteractionService(context.Background()).ListComment(tc.req)
 
 			if tc.expectError != "" {
 				assert.Error(t, err)
