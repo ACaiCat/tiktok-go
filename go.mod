@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/alibaba/sentinel-golang v1.0.4
-	github.com/apache/thrift v0.13.0
+	github.com/apache/thrift v0.23.0
 	github.com/bytedance/mockey v1.4.6
 	github.com/cloudwego/hertz v0.10.4
 	github.com/go-redis/redismock/v9 v9.2.0
@@ -125,4 +125,4 @@ require (
 	gorm.io/hints v1.1.2 // indirect
 )
 
-replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
+replace github.com/apache/thrift => github.com/apache/thrift v0.23.0
