@@ -15,7 +15,7 @@ require (
 	github.com/hertz-contrib/opensergo v0.0.1
 	github.com/invopop/jsonschema v0.14.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/mark3labs/mcp-go v0.52.0
+	github.com/mark3labs/mcp-go v0.54.0
 	github.com/minio/minio-go/v7 v7.0.100
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.5.0
