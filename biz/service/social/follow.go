@@ -1,9 +1,13 @@
 package service
 
 import (
+	"context"
+	"slices"
 	"strconv"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
@@ -16,12 +20,12 @@ import (
 )
 
 func (s *SocialService) FollowAction(req *social.FollowReq, followerID int64) error {
-	userID, err := strconv.ParseInt(req.ToUserID, 10, 64)
+	followingID, err := strconv.ParseInt(req.ToUserID, 10, 64)
 	if err != nil {
 		return errno.ParamErr.WithError(err)
 	}
 
-	if userID == followerID {
+	if followingID == followerID {
 		return errno.FollowSelfErr
 	}
 
@@ -29,19 +33,34 @@ func (s *SocialService) FollowAction(req *social.FollowReq, followerID int64) er
 		return errno.NotSupportActionErr
 	}
 
-	exists, err := s.userDao.IsUserExists(s.ctx, userID)
+	exists, err := s.userDao.IsUserExists(s.ctx, followingID)
 	if err != nil {
-		return errors.WithMessagef(err, "service.FollowAction: check user exists failed, userID=%d", userID)
+		return errors.WithMessagef(err, "service.FollowAction: check user exists failed, userID=%d", followingID)
 	}
 	if !exists {
 		return errno.UserIsNotExistErr
 	}
 
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
-		followed, err := s.followerDao.WithTx(tx).IsExistFollow(s.ctx, userID, followerID)
-
+		followed, err := s.userCache.IsFollowed(s.ctx, followerID, followingID)
 		if err != nil {
-			return errors.WithMessagef(err, "service.FollowAction: check follow exists failed, userID=%d, followerID=%d", userID, followerID)
+			if !errors.Is(err, redis.Nil) {
+				hlog.CtxErrorf(s.ctx, "service.FollowAction: IsFollowed failed, userID=%d, followingID=%d, err=%v", followingID, followerID, err)
+			}
+
+			followingIDs, err := s.followerDao.WithTx(tx).GetFollowingIDs(context.Background(), followerID)
+			if err != nil {
+				return errors.WithMessagef(err, "service.FollowAction: GetFollowingIDs failed, userID=%d", followingID)
+			}
+
+			followed = slices.Contains(followingIDs, followingID)
+
+			go func() {
+				err := s.userCache.SetFollowings(context.Background(), followerID, followingIDs)
+				if err != nil {
+					hlog.Errorf("service.FollowAction: SetFollowings failed, userID=%d, err=%v", followingID, err)
+				}
+			}()
 		}
 
 		if req.ActionType == social.FollowActionType_FOLLOW {
@@ -49,23 +68,38 @@ func (s *SocialService) FollowAction(req *social.FollowReq, followerID int64) er
 				return errno.FollowAlreadyExistErr
 			}
 
-			if err := s.followerDao.WithTx(tx).AddFollow(s.ctx, userID, followerID); err != nil {
-				return errors.WithMessagef(err, "service.FollowAction: db.AddFollow failed, userID=%d, followerID=%d", userID, followerID)
+			if err := s.followerDao.WithTx(tx).AddFollow(s.ctx, followingID, followerID); err != nil {
+				return errors.WithMessagef(err, "service.FollowAction: db.AddFollow failed, userID=%d, followerID=%d", followingID, followerID)
 			}
+
+			go func() {
+				err := s.userCache.SetFollow(context.Background(), followerID, followingID)
+				if err != nil {
+					hlog.Errorf("service.FollowAction: SetFollow failed, userID=%d, err=%v", followingID, err)
+				}
+			}()
 		} else {
 			if !followed {
 				return errno.FollowNotExistErr
 			}
 
-			if err := s.followerDao.WithTx(tx).DeleteFollow(s.ctx, userID, followerID); err != nil {
-				return errors.WithMessagef(err, "service.FollowAction: db.DeleteFollow failed, userID=%d, followerID=%d", userID, followerID)
+			if err := s.followerDao.WithTx(tx).DeleteFollow(s.ctx, followingID, followerID); err != nil {
+				return errors.WithMessagef(err, "service.FollowAction: db.DeleteFollow failed, userID=%d, followerID=%d", followingID, followerID)
 			}
+
+			go func() {
+				err := s.userCache.SetUnfollow(context.Background(), followerID, followingID)
+				if err != nil {
+					hlog.Errorf("service.FollowAction: SetUnfollow failed, userID=%d, err=%v", followingID, err)
+				}
+			}()
+
 		}
 		return nil
 	})
 
 	if err != nil {
-		return errors.WithMessagef(err, "service.FollowAction: tx failed, userID=%d, followerID=%d", userID, followerID)
+		return errors.WithMessagef(err, "service.FollowAction: tx failed, userID=%d, followerID=%d", followingID, followerID)
 	}
 
 	return nil

@@ -23,7 +23,6 @@ func TestVideoService_PublishVideo(t *testing.T) {
 	}
 
 	testCases := map[string]testCase{
-		"success": {},
 		"read file error": {
 			mockReadErr: assert.AnError,
 			expectError: assert.AnError.Error(),

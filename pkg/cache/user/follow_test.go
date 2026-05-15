@@ -10,30 +10,28 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
 
-func TestUserCache_SetLikeVideos(t *testing.T) {
+func TestUserCache_SetFollowings(t *testing.T) {
 	type testCase struct {
-		userID   int64
-		videoIDs []int64
-		mockErr  error
-		wantErr  bool
+		userID       int64
+		followingIDs []int64
+		mockErr      error
+		wantErr      bool
 	}
 
 	testCases := map[string]testCase{
-		"set liked videos success": {
-			userID:   1,
-			videoIDs: []int64{10, 20, 30},
-			wantErr:  false,
+		"set followings success": {
+			userID:       1,
+			followingIDs: []int64{2, 3, 4},
+		},
+		"empty followings success": {
+			userID:       1,
+			followingIDs: []int64{},
 		},
 		"pipeline error returns error": {
-			userID:   1,
-			videoIDs: []int64{10},
-			mockErr:  assert.AnError,
-			wantErr:  true,
-		},
-		"empty video list success": {
-			userID:   1,
-			videoIDs: []int64{},
-			wantErr:  false,
+			userID:       1,
+			followingIDs: []int64{2},
+			mockErr:      assert.AnError,
+			wantErr:      true,
 		},
 	}
 
@@ -42,19 +40,19 @@ func TestUserCache_SetLikeVideos(t *testing.T) {
 			db, mock := redismock.NewClientMock()
 			cache := NewUserCache(db)
 
-			key := getLikedVideosKey(tc.userID)
-			args := make([]interface{}, len(tc.videoIDs))
-			for i, v := range tc.videoIDs {
+			key := getFollowingKey(tc.userID)
+			args := make([]interface{}, len(tc.followingIDs))
+			for i, v := range tc.followingIDs {
 				args[i] = v
 			}
 			if tc.mockErr != nil {
 				mock.ExpectSAdd(key, args...).SetErr(tc.mockErr)
 			} else {
-				mock.ExpectSAdd(key, args...).SetVal(int64(len(tc.videoIDs)))
+				mock.ExpectSAdd(key, args...).SetVal(int64(len(tc.followingIDs)))
 				mock.ExpectExpire(key, constants.LikeCacheExpiration).SetVal(true)
 			}
 
-			err := cache.SetLikeVideos(context.Background(), tc.userID, tc.videoIDs)
+			err := cache.SetFollowings(context.Background(), tc.userID, tc.followingIDs)
 			if tc.wantErr {
 				assert.Error(t, err)
 				return
@@ -65,32 +63,38 @@ func TestUserCache_SetLikeVideos(t *testing.T) {
 	}
 }
 
-func TestUserCache_GetLikedVideos(t *testing.T) {
+func TestUserCache_GetFollowing(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		stored  []string
 		mockErr error
-		wantLen int
+		want    []int64
 		wantErr bool
 	}
 
 	testCases := map[string]testCase{
-		"get liked videos success": {
-			userID:  1,
-			stored:  []string{"10", "20", "30"},
-			wantLen: 3,
-			wantErr: false,
+		"get following success": {
+			userID: 1,
+			stored: []string{
+				"2",
+				"3",
+			},
+			want: []int64{2, 3},
+		},
+		"empty set returns empty slice": {
+			userID: 1,
+			stored: []string{},
+			want:   []int64{},
 		},
 		"redis error returns error": {
 			userID:  1,
 			mockErr: assert.AnError,
 			wantErr: true,
 		},
-		"empty set returns empty slice": {
+		"parse error returns error": {
 			userID:  1,
-			stored:  []string{},
-			wantLen: 0,
-			wantErr: false,
+			stored:  []string{"bad"},
+			wantErr: true,
 		},
 	}
 
@@ -99,44 +103,43 @@ func TestUserCache_GetLikedVideos(t *testing.T) {
 			db, mock := redismock.NewClientMock()
 			cache := NewUserCache(db)
 
-			key := getLikedVideosKey(tc.userID)
+			key := getFollowingKey(tc.userID)
 			if tc.mockErr != nil {
 				mock.ExpectSMembers(key).SetErr(tc.mockErr)
 			} else {
 				mock.ExpectSMembers(key).SetVal(tc.stored)
 			}
 
-			ids, err := cache.GetLikedVideos(context.Background(), tc.userID)
+			ids, err := cache.GetFollowing(context.Background(), tc.userID)
 			if tc.wantErr {
 				assert.Error(t, err)
 				return
 			}
 			assert.NoError(t, err)
-			assert.Len(t, ids, tc.wantLen)
+			assert.ElementsMatch(t, tc.want, ids)
 			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
 }
 
-func TestUserCache_SetLikeVideo(t *testing.T) {
+func TestUserCache_SetFollow(t *testing.T) {
 	type testCase struct {
-		userID  int64
-		videoID int64
-		mockErr error
-		wantErr bool
+		userID      int64
+		followingID int64
+		mockErr     error
+		wantErr     bool
 	}
 
 	testCases := map[string]testCase{
-		"set single like success": {
-			userID:  1,
-			videoID: 10,
-			wantErr: false,
+		"set follow success": {
+			userID:      1,
+			followingID: 2,
 		},
 		"pipeline error returns error": {
-			userID:  1,
-			videoID: 10,
-			mockErr: assert.AnError,
-			wantErr: true,
+			userID:      1,
+			followingID: 2,
+			mockErr:     assert.AnError,
+			wantErr:     true,
 		},
 	}
 
@@ -145,15 +148,15 @@ func TestUserCache_SetLikeVideo(t *testing.T) {
 			db, mock := redismock.NewClientMock()
 			cache := NewUserCache(db)
 
-			key := getLikedVideosKey(tc.userID)
+			key := getFollowingKey(tc.userID)
 			if tc.mockErr != nil {
-				mock.ExpectSAdd(key, tc.videoID).SetErr(tc.mockErr)
+				mock.ExpectSAdd(key, tc.followingID).SetErr(tc.mockErr)
 			} else {
-				mock.ExpectSAdd(key, tc.videoID).SetVal(1)
+				mock.ExpectSAdd(key, tc.followingID).SetVal(1)
 				mock.ExpectExpire(key, constants.LikeCacheExpiration).SetVal(true)
 			}
 
-			err := cache.SetLikeVideo(context.Background(), tc.userID, tc.videoID)
+			err := cache.SetFollow(context.Background(), tc.userID, tc.followingID)
 			if tc.wantErr {
 				assert.Error(t, err)
 				return
@@ -164,25 +167,24 @@ func TestUserCache_SetLikeVideo(t *testing.T) {
 	}
 }
 
-func TestUserCache_SetUnlikeVideo(t *testing.T) {
+func TestUserCache_SetUnfollow(t *testing.T) {
 	type testCase struct {
-		userID  int64
-		videoID int64
-		mockErr error
-		wantErr bool
+		userID      int64
+		followingID int64
+		mockErr     error
+		wantErr     bool
 	}
 
 	testCases := map[string]testCase{
-		"unlike video success": {
-			userID:  1,
-			videoID: 10,
-			wantErr: false,
+		"set unfollow success": {
+			userID:      1,
+			followingID: 2,
 		},
 		"redis error returns error": {
-			userID:  1,
-			videoID: 10,
-			mockErr: assert.AnError,
-			wantErr: true,
+			userID:      1,
+			followingID: 2,
+			mockErr:     assert.AnError,
+			wantErr:     true,
 		},
 	}
 
@@ -191,14 +193,14 @@ func TestUserCache_SetUnlikeVideo(t *testing.T) {
 			db, mock := redismock.NewClientMock()
 			cache := NewUserCache(db)
 
-			key := getLikedVideosKey(tc.userID)
+			key := getFollowingKey(tc.userID)
 			if tc.mockErr != nil {
-				mock.ExpectSRem(key, tc.videoID).SetErr(tc.mockErr)
+				mock.ExpectSRem(key, tc.followingID).SetErr(tc.mockErr)
 			} else {
-				mock.ExpectSRem(key, tc.videoID).SetVal(1)
+				mock.ExpectSRem(key, tc.followingID).SetVal(1)
 			}
 
-			err := cache.SetUnlikeVideo(context.Background(), tc.userID, tc.videoID)
+			err := cache.SetUnfollow(context.Background(), tc.userID, tc.followingID)
 			if tc.wantErr {
 				assert.Error(t, err)
 				return
@@ -209,33 +211,31 @@ func TestUserCache_SetUnlikeVideo(t *testing.T) {
 	}
 }
 
-func TestUserCache_IsVideoLiked(t *testing.T) {
+func TestUserCache_IsFollowed(t *testing.T) {
 	type testCase struct {
-		userID  int64
-		videoID int64
-		result  bool
-		mockErr error
-		wantErr bool
+		userID      int64
+		followingID int64
+		result      bool
+		mockErr     error
+		wantErr     bool
 	}
 
 	testCases := map[string]testCase{
-		"video is liked": {
-			userID:  1,
-			videoID: 10,
-			result:  true,
-			wantErr: false,
+		"user is followed": {
+			userID:      1,
+			followingID: 2,
+			result:      true,
 		},
-		"video is not liked": {
-			userID:  1,
-			videoID: 99,
-			result:  false,
-			wantErr: false,
+		"user is not followed": {
+			userID:      1,
+			followingID: 3,
+			result:      false,
 		},
 		"redis error returns error": {
-			userID:  1,
-			videoID: 10,
-			mockErr: assert.AnError,
-			wantErr: true,
+			userID:      1,
+			followingID: 2,
+			mockErr:     assert.AnError,
+			wantErr:     true,
 		},
 	}
 
@@ -244,27 +244,27 @@ func TestUserCache_IsVideoLiked(t *testing.T) {
 			db, mock := redismock.NewClientMock()
 			cache := NewUserCache(db)
 
-			key := getLikedVideosKey(tc.userID)
-			mock.ExpectExists(getFollowingKey(tc.userID)).SetVal(1)
+			key := getFollowingKey(tc.userID)
+			mock.ExpectExists(key).SetVal(1)
 			if tc.mockErr != nil {
-				mock.ExpectSIsMember(key, tc.videoID).SetErr(tc.mockErr)
+				mock.ExpectSIsMember(key, tc.followingID).SetErr(tc.mockErr)
 			} else {
-				mock.ExpectSIsMember(key, tc.videoID).SetVal(tc.result)
+				mock.ExpectSIsMember(key, tc.followingID).SetVal(tc.result)
 			}
 
-			liked, err := cache.IsVideoLiked(context.Background(), tc.userID, tc.videoID)
+			followed, err := cache.IsFollowed(context.Background(), tc.userID, tc.followingID)
 			if tc.wantErr {
 				assert.Error(t, err)
 				return
 			}
 			assert.NoError(t, err)
-			assert.Equal(t, tc.result, liked)
+			assert.Equal(t, tc.result, followed)
 			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
 }
 
-func TestUserCache_ClearLikedVideos(t *testing.T) {
+func TestUserCache_ClearFollowing(t *testing.T) {
 	type testCase struct {
 		userID  int64
 		mockErr error
@@ -272,9 +272,8 @@ func TestUserCache_ClearLikedVideos(t *testing.T) {
 	}
 
 	testCases := map[string]testCase{
-		"clear liked videos success": {
-			userID:  1,
-			wantErr: false,
+		"clear following success": {
+			userID: 1,
 		},
 		"redis error returns error": {
 			userID:  1,
@@ -288,14 +287,14 @@ func TestUserCache_ClearLikedVideos(t *testing.T) {
 			db, mock := redismock.NewClientMock()
 			cache := NewUserCache(db)
 
-			key := getLikedVideosKey(tc.userID)
+			key := getFollowingKey(tc.userID)
 			if tc.mockErr != nil {
 				mock.ExpectDel(key).SetErr(tc.mockErr)
 			} else {
 				mock.ExpectDel(key).SetVal(1)
 			}
 
-			err := cache.ClearLikedVideos(context.Background(), tc.userID)
+			err := cache.ClearFollowing(context.Background(), tc.userID)
 			if tc.wantErr {
 				assert.Error(t, err)
 				return

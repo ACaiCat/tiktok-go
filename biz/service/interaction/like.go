@@ -7,6 +7,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
@@ -59,9 +60,13 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
 		isLiked, err := s.userCache.IsVideoLiked(s.ctx, userID, videoID)
 		if err != nil {
+			if !errors.Is(err, redis.Nil) {
+				hlog.CtxErrorf(s.ctx, "service.likeVideoByID: IsVideoLiked failed, userID=%d, videoID=%d, err=%v", userID, videoID, err)
+			}
+
 			likedVideos, err := s.likeDao.WithTx(tx).GetUserLikes(s.ctx, userID)
 			if err != nil {
-				return errors.WithMessagef(err, "service.likeVideoByID: db.GetUserLikes failed, userID=%d", userID)
+				return errors.WithMessagef(err, "service.likeVideoByID: db.GetUserLikes failed, userID=%d, userID=%d", userID, userID)
 			}
 			isLiked = slices.Contains(likedVideos, videoID)
 

@@ -107,6 +107,43 @@ func TestFollowerDao_GetFollowing(t *testing.T) {
 	}
 }
 
+func TestFollowerDao_GetFollowingIDs(t *testing.T) {
+	type testCase struct {
+		userID  int64
+		mockIDs []int64
+		mockErr error
+		wantErr bool
+	}
+
+	testCases := map[string]testCase{
+		"get following ids success": {userID: 1, mockIDs: []int64{2, 3}},
+		"no following ids":          {userID: 1, mockIDs: []int64{}},
+		"db error":                  {userID: 1, mockErr: assert.AnError, wantErr: true},
+	}
+
+	defer mockey.UnPatchAll()
+
+	for name, tc := range testCases {
+		mockey.PatchConvey(name, t, func() {
+			mockFollowerQueryChain()
+			dao := newTestDao()
+			dbtestutil.MockScan(func(dest interface{}) {
+				dbtestutil.FillValue(dest, tc.mockIDs)
+			}, tc.mockErr)
+
+			ids, err := dao.GetFollowingIDs(context.Background(), tc.userID)
+			if tc.wantErr {
+				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetFollowingIDs failed")
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.Equal(t, tc.mockIDs, ids)
+		})
+	}
+}
+
 func TestFollowerDao_GetFriends(t *testing.T) {
 	type testCase struct {
 		userID   int64

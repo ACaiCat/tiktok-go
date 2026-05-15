@@ -41,7 +41,7 @@ func (l *LikeDao) GetUserLikes(ctx context.Context, userID int64) ([]int64, erro
 
 	err = l.q.Like.WithContext(ctx).
 		Select(l.q.Like.VideoID).
-		Where(l.q.Like.UserID.Eq(userID)).
+		Where(l.q.Like.UserID.Eq(userID), l.q.Like.CommentID.IsNull()).
 		Scan(&videoIDs)
 
 	if err != nil {

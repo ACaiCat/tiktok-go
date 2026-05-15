@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
@@ -25,7 +26,7 @@ func (c *UserCache) SetLikeVideos(ctx context.Context, userID int64, videoIDs []
 	_, err := pipe.Exec(ctx)
 
 	if err != nil {
-		return errors.Wrapf(err, "SetLikeVideosFailed, userID=%d", userID)
+		return errors.Wrapf(err, "SetLikeVideos failed, userID=%d", userID)
 	}
 
 	return nil
@@ -34,7 +35,7 @@ func (c *UserCache) SetLikeVideos(ctx context.Context, userID int64, videoIDs []
 func (c *UserCache) GetLikedVideos(ctx context.Context, userID int64) ([]int64, error) {
 	videoIDsStr, err := c.c.SMembers(ctx, getLikedVideosKey(userID)).Result()
 	if err != nil {
-		return nil, errors.Wrapf(err, "get liked videos failed, userID=%d", userID)
+		return nil, errors.Wrapf(err, "GetLikedVideos failed, userID=%d", userID)
 	}
 
 	videoIDs := make([]int64, len(videoIDsStr))
@@ -42,7 +43,7 @@ func (c *UserCache) GetLikedVideos(ctx context.Context, userID int64) ([]int64, 
 		var id int64
 		_, err := fmt.Sscanf(v, "%d", &id)
 		if err != nil {
-			return nil, errors.Wrapf(err, "GetLikedVideosById failed, userID=%d", userID)
+			return nil, errors.Wrapf(err, "GetLikedVideos failed, userID=%d", userID)
 		}
 		videoIDs[i] = id
 	}
@@ -57,7 +58,7 @@ func (c *UserCache) SetLikeVideo(ctx context.Context, userID int64, videoID int6
 	_, err := pipe.Exec(ctx)
 
 	if err != nil {
-		return errors.Wrapf(err, "SetLikedVideosById failed, userID=%d", userID)
+		return errors.Wrapf(err, "SetLikeVideo failed, userID=%d", userID)
 	}
 
 	return nil
@@ -65,15 +66,23 @@ func (c *UserCache) SetLikeVideo(ctx context.Context, userID int64, videoID int6
 
 func (c *UserCache) SetUnlikeVideo(ctx context.Context, userID int64, videoID int64) error {
 	if err := c.c.SRem(ctx, getLikedVideosKey(userID), videoID).Err(); err != nil {
-		return errors.Wrapf(err, "CleanLikedVideosById failed, userID=%d", userID)
+		return errors.Wrapf(err, "SetUnlikeVideo failed, userID=%d", userID)
 	}
 	return nil
 }
 
 func (c *UserCache) IsVideoLiked(ctx context.Context, userID int64, videoID int64) (bool, error) {
+	exist, err := c.c.Exists(ctx, getFollowingKey(userID)).Result()
+	if err != nil {
+		return false, errors.Wrapf(err, "IsVideoLiked failed, userID=%d", userID)
+	}
+	if exist == 0 {
+		return false, redis.Nil
+	}
+
 	result, err := c.c.SIsMember(ctx, getLikedVideosKey(userID), videoID).Result()
 	if err != nil {
-		return false, errors.Wrapf(err, "IsLikedVideosById failed, userID=%d", userID)
+		return false, errors.Wrapf(err, "IsVideoLiked failed, userID=%d", userID)
 	}
 
 	return result, nil
@@ -81,7 +90,7 @@ func (c *UserCache) IsVideoLiked(ctx context.Context, userID int64, videoID int6
 
 func (c *UserCache) ClearLikedVideos(ctx context.Context, userID int64) error {
 	if err := c.c.Del(ctx, getLikedVideosKey(userID)).Err(); err != nil {
-		return errors.Wrapf(err, "CleanLikedVideosById failed, userID=%d", userID)
+		return errors.Wrapf(err, "ClearLikedVideos failed, userID=%d", userID)
 	}
 	return nil
 }

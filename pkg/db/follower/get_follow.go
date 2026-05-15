@@ -80,6 +80,23 @@ func (f *FollowerDao) GetFollowing(ctx context.Context, userID int64, pageSize i
 	return users, len(userIDs), nil
 }
 
+func (f *FollowerDao) GetFollowingIDs(ctx context.Context, userID int64) ([]int64, error) {
+	var err error
+
+	var userIDs []int64
+
+	err = f.q.Follower.WithContext(ctx).
+		Select(f.q.Follower.UserID).
+		Where(f.q.Follower.FollowerID.Eq(userID)).
+		Scan(&userIDs)
+
+	if err != nil {
+		return nil, errors.Wrapf(err, "GetFollowingIDs failed, userID: %d", userID)
+	}
+
+	return userIDs, nil
+}
+
 func (f *FollowerDao) GetFriends(ctx context.Context, userID int64, pageSize int, pageNum int) ([]*model.User, int, error) {
 	var err error
 
