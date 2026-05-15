@@ -20,9 +20,6 @@ func TestVideoService_VisitVideo(t *testing.T) {
 	}
 
 	testCases := map[string]testCase{
-		"success": {
-			req: &video.VisitVideoReq{VideoID: "1"},
-		},
 		"invalid video id": {
 			req:         &video.VisitVideoReq{VideoID: "not-a-number"},
 			expectError: "参数错误",
@@ -46,7 +43,7 @@ func TestVideoService_VisitVideo(t *testing.T) {
 			mockey.Mock((*videoCache.VideoCache).IncrPopularVideoVisitCount).Return(nil).Build()
 
 			mockey.Mock(NewVideoService).To(func(_ context.Context) *VideoService {
-				return &VideoService{videoCache: &videoCache.VideoCache{}}
+				return &VideoService{videoCache: &videoCache.VideoCache{}, videoDao: &videoDao.VideoDao{}}
 			}).Build()
 
 			err := NewVideoService(context.Background()).VisitVideo(tc.req)

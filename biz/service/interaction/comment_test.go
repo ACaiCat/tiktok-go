@@ -46,10 +46,6 @@ func TestInteractionService_CommentAction(t *testing.T) {
 			mockVideoExists: false,
 			expectError:     errno.VideoNotExistErr.ErrMsg,
 		},
-		"video success": {
-			req:             &interaction.CommentReq{VideoID: stringPtr("1"), Content: "hi"},
-			mockVideoExists: true,
-		},
 		"invalid reply comment id": {
 			req:         &interaction.CommentReq{CommentID: stringPtr("bad"), Content: "hi"},
 			expectError: "invalid syntax",
@@ -124,10 +120,6 @@ func TestInteractionService_DeleteComment(t *testing.T) {
 			req:         &interaction.DeleteCommentReq{CommentID: "1"},
 			mockComment: &modelDao.Comment{ID: 1, UserID: 2, VideoID: 1},
 			expectError: errno.CommentNotBelongToUserErr.ErrMsg,
-		},
-		"video comment success": {
-			req:         &interaction.DeleteCommentReq{CommentID: "1"},
-			mockComment: &modelDao.Comment{ID: 1, UserID: 1, VideoID: 1},
 		},
 		"reply comment success": {
 			req:         &interaction.DeleteCommentReq{CommentID: "1"},

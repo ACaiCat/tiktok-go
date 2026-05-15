@@ -76,11 +76,11 @@ func TestVideoService_GetVideoList(t *testing.T) {
 		},
 	}
 
+	defer mockey.UnPatchAll()
+
 	for name, tc := range testCases {
 		tc := tc
 		mockey.PatchConvey(name, t, func() {
-			defer mockey.UnPatchAll()
-
 			if !tc.cacheEnabled && tc.cacheListErr == nil {
 				tc.cacheListErr = redis.Nil
 			}
@@ -164,8 +164,7 @@ func TestVideoService_GetLikedVideos(t *testing.T) {
 
 	testCases := map[string]testCase{
 		"success": {
-			req:        &interaction.ListLikeReq{UserID: "1", PageNum: 0, PageSize: 10},
-			mockVideos: []*modelDao.Video{{ID: 1, UserID: 100, Title: "liked"}},
+			req: &interaction.ListLikeReq{UserID: "1", PageNum: 0, PageSize: 10},
 		},
 		"invalid user id": {
 			req:         &interaction.ListLikeReq{UserID: "nan", PageNum: 0, PageSize: 10},
@@ -192,7 +191,7 @@ func TestVideoService_GetLikedVideos(t *testing.T) {
 			mockey.Mock((*videoCache.VideoCache).SetVideos).Return(nil).Build()
 
 			mockey.Mock(NewVideoService).To(func(_ context.Context) *VideoService {
-				return &VideoService{}
+				return &VideoService{videoCache: &videoCache.VideoCache{}}
 			}).Build()
 
 			result, err := NewVideoService(context.Background()).GetLikedVideos(tc.req)

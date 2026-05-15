@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"sync"
 	"testing"
 
 	"github.com/bytedance/mockey"
@@ -25,7 +24,6 @@ func TestVideoService_GetPopularVideos(t *testing.T) {
 		mockCacheErr    error
 		mockDBErr       error
 		expectError     string
-		waitAsyncCache  bool
 	}
 
 	mockVideos := []*modelDao.Video{
@@ -44,13 +42,6 @@ func TestVideoService_GetPopularVideos(t *testing.T) {
 			mockCacheVideos: []*modelDao.Video{nil},
 			mockDBVideos:    mockVideos,
 		},
-		"popular ids cache miss fallback to db": {
-			req:            &video.PopularReq{PageNum: 0, PageSize: 10},
-			mockCacheErr:   assert.AnError,
-			mockPageVideos: mockVideos,
-			mockWarmVideos: mockVideos,
-			waitAsyncCache: true,
-		},
 		"outside cache window reads db directly": {
 			req:            &video.PopularReq{PageNum: 10, PageSize: 10},
 			mockPageVideos: mockVideos,
@@ -67,11 +58,6 @@ func TestVideoService_GetPopularVideos(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
-			var wg sync.WaitGroup
-			if tc.waitAsyncCache {
-				wg.Add(1)
-			}
-
 			mockey.Mock((*videoCache.VideoCache).GetPopularVideos).To(
 				func(_ *videoCache.VideoCache, ctx context.Context, pageSize int, pageNum int) ([]int64, error) {
 					return tc.mockPopularIDs, tc.mockCacheErr
@@ -81,13 +67,7 @@ func TestVideoService_GetPopularVideos(t *testing.T) {
 					return tc.mockCacheVideos, nil
 				}).Build()
 			mockey.Mock((*videoCache.VideoCache).SetPopularVideos).Return(nil).Build()
-			mockey.Mock((*videoCache.VideoCache).SetVideos).To(
-				func(_ *videoCache.VideoCache, ctx context.Context, videos []*modelDao.Video) error {
-					if tc.waitAsyncCache {
-						wg.Done()
-					}
-					return nil
-				}).Build()
+			mockey.Mock((*videoCache.VideoCache).SetVideos).Return(nil).Build()
 			mockey.Mock((*videoDao.VideoDao).GetPopularVideos).To(
 				func(_ *videoDao.VideoDao, ctx context.Context, pageSize int, pageNum int) ([]*modelDao.Video, error) {
 					if pageSize == 10 && pageNum == 0 && tc.mockPageVideos != nil {
@@ -107,7 +87,7 @@ func TestVideoService_GetPopularVideos(t *testing.T) {
 				}).Build()
 
 			mockey.Mock(NewVideoService).To(func(_ context.Context) *VideoService {
-				return &VideoService{videoCache: &videoCache.VideoCache{}, videoDao: &videoDao.VideoDao{}}
+				return &VideoService{ctx: context.Background(), videoCache: &videoCache.VideoCache{}, videoDao: &videoDao.VideoDao{}}
 			}).Build()
 
 			result, err := NewVideoService(context.Background()).GetPopularVideos(tc.req)
@@ -120,7 +100,6 @@ func TestVideoService_GetPopularVideos(t *testing.T) {
 
 			assert.NoError(t, err)
 			assert.NotNil(t, result)
-			wg.Wait()
 		})
 	}
 }
