@@ -8,6 +8,7 @@ import (
 
 	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
+	"github.com/ACaiCat/tiktok-go/pkg/crypt"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/totp"
 )
@@ -52,7 +53,12 @@ func (s *UserService) BindMFA(req *user.BindMFAReq, userID int64) error {
 		return errno.MFACodeInvalidErr
 	}
 
-	err = s.dao.UpdateUserMFA(s.ctx, userID, req.Secret)
+	secret, err := crypt.Encrypt(req.Secret)
+	if err != nil {
+		return errors.Wrapf(err, "service.BindMFA: crypt.Encrypt failed, userID=%d", userID)
+	}
+
+	err = s.dao.UpdateUserMFA(s.ctx, userID, secret)
 	if err != nil {
 		return errors.WithMessagef(err, "service.BindMFA: db.UpdateUserMFA failed, userID=%d", userID)
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/user"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
+	"github.com/ACaiCat/tiktok-go/pkg/crypt"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
 	"github.com/ACaiCat/tiktok-go/pkg/jwt"
 	totp "github.com/ACaiCat/tiktok-go/pkg/totp"
@@ -38,7 +39,12 @@ func (s *UserService) UserLogin(req *user.LoginReq) (*model.User, string, string
 			return nil, "", "", errno.MFAMissingErr
 		}
 
-		ok, err := totp.ValidateCode(*usr.TotpSecret, *req.Code)
+		secret, err := crypt.Decrypt(*usr.TotpSecret)
+		if err != nil {
+			return nil, "", "", errors.Wrapf(err, "service.UserLogin: crypt.Decrypt failed, userID=%d", usr.ID)
+		}
+
+		ok, err := totp.ValidateCode(secret, *req.Code)
 
 		if err != nil {
 			return nil, "", "", errors.WithMessagef(err, "service.UserLogin: totp.ValidateCode failed, userID=%d", usr.ID)

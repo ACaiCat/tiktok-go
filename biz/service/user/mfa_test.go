@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/user"
+	"github.com/ACaiCat/tiktok-go/config"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	userDao "github.com/ACaiCat/tiktok-go/pkg/db/user"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
@@ -124,6 +125,8 @@ func TestUserService_BindMFA(t *testing.T) {
 			expectError:   assert.AnError.Error(),
 		},
 	}
+
+	config.AppConfig.Security.Key = "FnUqo4Qeoiwxv3L8f04is8OhmhTbSvUifSWN6BujF+c="
 
 	defer mockey.UnPatchAll()
 
