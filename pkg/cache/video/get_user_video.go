@@ -35,7 +35,7 @@ func (p *VideoCache) GetUserVideoList(ctx context.Context, userID int64, pageSiz
 func (p *VideoCache) getUserVideoListVersion(ctx context.Context, userID int64) (int64, error) {
 	versionStr, err := p.c.Get(ctx, getUserVideoListVersionKey(userID)).Result()
 	if err != nil {
-		return 0, nil
+		return 0, errors.Wrapf(err, "GetUserVideoListVersion failed, userID=%d", userID)
 	}
 
 	version, err := strconv.ParseInt(versionStr, 10, 64)

@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"testing"
 
-	userCache "github.com/ACaiCat/tiktok-go/pkg/cache/user"
 	"github.com/bytedance/mockey"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
+	userCache "github.com/ACaiCat/tiktok-go/pkg/cache/user"
 	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	userDao "github.com/ACaiCat/tiktok-go/pkg/db/user"
@@ -79,7 +79,6 @@ func TestVideoService_GetVideoList(t *testing.T) {
 	defer mockey.UnPatchAll()
 
 	for name, tc := range testCases {
-		tc := tc
 		mockey.PatchConvey(name, t, func() {
 			if !tc.cacheEnabled && tc.cacheListErr == nil {
 				tc.cacheListErr = redis.Nil

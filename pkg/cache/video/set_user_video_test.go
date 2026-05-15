@@ -88,9 +88,9 @@ func TestVideoCache_SetUserVideoList(t *testing.T) {
 				key := getUserVideoListKey(tc.userID, version, tc.pageSize, tc.pageNum)
 				data := expectedUserVideoListJSON(tc.videos, tc.total)
 				if tc.setErr != nil {
-					mock.ExpectSet(key, data, constants.VideoCacheExpiration).SetErr(tc.setErr)
+					mock.ExpectSet(key, data, constants.UserVideoCacheExpiration).SetErr(tc.setErr)
 				} else {
-					mock.ExpectSet(key, data, constants.VideoCacheExpiration).SetVal("OK")
+					mock.ExpectSet(key, data, constants.UserVideoCacheExpiration).SetVal("OK")
 				}
 			}
 

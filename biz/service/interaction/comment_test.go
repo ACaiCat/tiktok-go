@@ -5,13 +5,13 @@ import (
 	"database/sql"
 	"testing"
 
-	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
+	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	commentDao "github.com/ACaiCat/tiktok-go/pkg/db/comment"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	videoDao "github.com/ACaiCat/tiktok-go/pkg/db/video"

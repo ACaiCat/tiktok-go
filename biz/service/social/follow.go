@@ -93,7 +93,6 @@ func (s *SocialService) FollowAction(req *social.FollowReq, followerID int64) er
 					hlog.Errorf("service.FollowAction: SetUnfollow failed, userID=%d, err=%v", followingID, err)
 				}
 			}()
-
 		}
 		return nil
 	})

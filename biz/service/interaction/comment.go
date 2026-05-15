@@ -134,7 +134,6 @@ func (s *InteractionService) DeleteComment(req *interaction.DeleteCommentReq, us
 					hlog.Errorf("service.DeleteComment: cache.IncrVideoCommentCount failed, videoID=%d, err=%v", comment.VideoID, err)
 				}
 			}()
-
 		}
 
 		err = s.commentDao.WithTx(tx).DeleteComment(s.ctx, commentID)

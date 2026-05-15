@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/db/model"
@@ -12,7 +13,7 @@ import (
 
 func (p *VideoCache) SetUserVideoList(ctx context.Context, userID int64, pageSize int, pageNum int, total int64, videos []*model.Video) error {
 	version, err := p.getUserVideoListVersion(ctx, userID)
-	if err != nil {
+	if err != nil && !errors.Is(err, redis.Nil) {
 		return err
 	}
 

@@ -35,14 +35,13 @@ func TestVideoCache_GetUserVideoList(t *testing.T) {
 			wantIDs:   []int64{2, 1},
 			wantTotal: 9,
 		},
-		"missing version uses zero version": {
-			userID:     10,
-			pageSize:   20,
-			pageNum:    0,
-			versionErr: redis.Nil,
-			stored:     `{"video_ids":[1],"total":1}`,
-			wantIDs:    []int64{1},
-			wantTotal:  1,
+		"missing version returns error": {
+			userID:        10,
+			pageSize:      20,
+			pageNum:       0,
+			versionErr:    redis.Nil,
+			wantErr:       true,
+			wantErrString: "GetUserVideoListVersion failed",
 		},
 		"list cache miss returns error": {
 			userID:        10,
@@ -84,7 +83,7 @@ func TestVideoCache_GetUserVideoList(t *testing.T) {
 				mock.ExpectGet(versionKey).SetVal(tc.version)
 			}
 
-			if tc.wantErrString != "getUserVideoListVersion parse failed" {
+			if tc.versionErr == nil && tc.wantErrString != "getUserVideoListVersion parse failed" {
 				version := int64(0)
 				if tc.version == "3" {
 					version = 3

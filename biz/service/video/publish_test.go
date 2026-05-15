@@ -5,10 +5,10 @@ import (
 	"mime/multipart"
 	"testing"
 
-	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
+	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	videoDao "github.com/ACaiCat/tiktok-go/pkg/db/video"
 	"github.com/ACaiCat/tiktok-go/pkg/ffmpeg"
 	"github.com/ACaiCat/tiktok-go/pkg/utils"
