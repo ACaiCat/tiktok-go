@@ -28,6 +28,34 @@ func (v *VideoDao) GetVideoByID(ctx context.Context, videoID int64) (*model.Vide
 	return video, nil
 }
 
+func (v *VideoDao) GetVideosByIDs(ctx context.Context, videoIDs []int64) ([]*model.Video, error) {
+	if len(videoIDs) == 0 {
+		return []*model.Video{}, nil
+	}
+
+	videos, err := v.q.Video.WithContext(ctx).
+		Where(v.q.Video.ID.In(videoIDs...)).
+		Find()
+
+	if err != nil {
+		return nil, errors.Wrapf(err, "GetVideosByIDs failed, videoIDs: %v", videoIDs)
+	}
+
+	videoByID := make(map[int64]*model.Video, len(videos))
+	for _, video := range videos {
+		videoByID[video.ID] = video
+	}
+
+	orderedVideos := make([]*model.Video, 0, len(videos))
+	for _, videoID := range videoIDs {
+		if video, ok := videoByID[videoID]; ok {
+			orderedVideos = append(orderedVideos, video)
+		}
+	}
+
+	return orderedVideos, nil
+}
+
 func (v *VideoDao) GetFeedByLatestTime(ctx context.Context, latestTime time.Time, limit int) ([]*model.Video, error) {
 	var err error
 

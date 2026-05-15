@@ -64,7 +64,7 @@ func (c *UserCache) SetLikeVideo(ctx context.Context, userID int64, videoID int6
 }
 
 func (c *UserCache) SetUnlikeVideo(ctx context.Context, userID int64, videoID int64) error {
-	if err := c.c.Del(ctx, getLikedVideosKey(userID)).Err(); err != nil {
+	if err := c.c.SRem(ctx, getLikedVideosKey(userID), videoID).Err(); err != nil {
 		return errors.Wrapf(err, "CleanLikedVideosById failed, userID=%d", userID)
 	}
 	return nil

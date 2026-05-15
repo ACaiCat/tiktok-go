@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"github.com/ACaiCat/tiktok-go/pkg/cache"
+	userCache "github.com/ACaiCat/tiktok-go/pkg/cache/user"
 	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	commentDao "github.com/ACaiCat/tiktok-go/pkg/db/comment"
 	likeDao "github.com/ACaiCat/tiktok-go/pkg/db/like"
+	userDao "github.com/ACaiCat/tiktok-go/pkg/db/user"
 	videoDao "github.com/ACaiCat/tiktok-go/pkg/db/video"
 )
 
@@ -15,7 +17,9 @@ type VideoService struct {
 	videoDao   *videoDao.VideoDao
 	commentDao *commentDao.CommentDao
 	likeDao    *likeDao.LikeDao
-	cache      *videoCache.VideoCache
+	userDao    *userDao.UserDao
+	videoCache *videoCache.VideoCache
+	userCache  *userCache.UserCache
 	ctx        context.Context
 }
 
@@ -24,7 +28,9 @@ func NewVideoService(ctx context.Context) *VideoService {
 		videoDao:   videoDao.NewVideoDao(db.DB),
 		commentDao: commentDao.NewCommentDao(db.DB),
 		likeDao:    likeDao.NewLikeDao(db.DB),
-		cache:      videoCache.NewVideoCache(cache.Cache),
+		userDao:    userDao.NewUserDao(db.DB),
+		videoCache: videoCache.NewVideoCache(cache.Cache),
+		userCache:  userCache.NewUserCache(cache.Cache),
 		ctx:        ctx,
 	}
 }

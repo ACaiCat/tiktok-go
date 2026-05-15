@@ -58,5 +58,11 @@ func (s *VideoService) PublishVideo(userID int64, title string, description stri
 	if err != nil {
 		return errors.WithMessagef(err, "service.PublishVideo: db.PublishVideo failed, userID=%d, title=%q", userID, title)
 	}
+	go func() {
+		if err := s.videoCache.ClearUserVideoList(s.ctx, userID); err != nil {
+			hlog.Errorf("service.PublishVideo: cache.ClearUserVideoList failed, userID=%d, err=%v", userID, err)
+		}
+	}()
+
 	return nil
 }

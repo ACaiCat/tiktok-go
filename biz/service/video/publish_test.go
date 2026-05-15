@@ -5,6 +5,7 @@ import (
 	"mime/multipart"
 	"testing"
 
+	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
@@ -61,6 +62,8 @@ func TestVideoService_PublishVideo(t *testing.T) {
 				) error {
 					return tc.mockPublishErr
 				}).Build()
+
+			mockey.Mock((*videoCache.VideoCache).ClearUserVideoList).Return(nil).Build()
 
 			mockey.Mock(NewVideoService).To(func(_ context.Context) *VideoService {
 				return &VideoService{}

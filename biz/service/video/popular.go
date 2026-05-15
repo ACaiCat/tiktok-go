@@ -10,61 +10,50 @@ import (
 	"github.com/ACaiCat/tiktok-go/biz/model/model"
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
-	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
+	"github.com/ACaiCat/tiktok-go/pkg/utils"
 )
 
 func (s *VideoService) GetPopularVideos(req *video.PopularReq) ([]*model.Video, error) {
-	var err error
+	pageSize, pageNum := utils.NormalizePage(req.PageSize, req.PageNum, constants.DefaultVideoPageSize, constants.MaxVideoPageSize)
 
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = constants.DefaultVideoPageSize
-	}
-
-	pageNum := req.PageNum
-	if pageNum < 0 {
-		pageNum = 1
-	}
-
-	if pageSize > constants.MaxVideoPageSize {
-		pageSize = constants.MaxVideoPageSize
-	}
-
-	popularVideos, err := s.cache.GetPopularVideos(s.ctx)
-	if err != nil {
-		if !errors.Is(err, redis.Nil) {
-			hlog.CtxErrorf(s.ctx, "service.GetPopularVideos cache read failed: %v", err)
-		}
-
-		popularVideos, err = s.videoDao.GetPopularVideos(s.ctx, constants.PopularVideoCacheCount, 0)
-		if err != nil {
-			return nil, errors.WithMessage(err, "service.GetPopularVideos: db.GetPopularVideos failed")
-		}
-
-		go func() {
-			err = s.cache.SetPopularVideos(context.Background(), popularVideos)
-			if err != nil {
-				hlog.Errorf("service.GetPopularVideos cache write failed: %v", err)
-			}
-		}()
-	}
-
-	if pageSize*pageNum > constants.PopularVideoCacheCount {
-		videosDao, err := s.videoDao.GetPopularVideos(s.ctx, int(pageSize), int(pageNum))
+	start := pageSize * pageNum
+	if start+pageSize > constants.PopularVideoCacheCount {
+		videosDao, err := s.videoDao.GetPopularVideos(s.ctx, pageSize, pageNum)
 		if err != nil {
 			return nil, errors.WithMessagef(err, "service.GetPopularVideos: db.GetPopularVideos failed, page=%d, pageSize=%d", pageNum, pageSize)
 		}
-		videos := VideosDaoToDto(videosDao)
-		return videos, nil
+		return VideosDaoToDto(videosDao), nil
 	}
 
-	targetVideos := make([]*modelDao.Video, 0)
-
-	for i := int(pageSize) * int(pageNum); i < int(pageSize)*(int(pageNum)+1) && i < len(popularVideos); i++ {
-		targetVideos = append(targetVideos, popularVideos[i])
+	popularVideoIDs, err := s.videoCache.GetPopularVideos(s.ctx, pageSize, pageNum)
+	if err == nil {
+		targetVideos, err := s.getVideosByIDs(popularVideoIDs)
+		if err != nil {
+			return nil, err
+		}
+		return VideosDaoToDto(targetVideos), nil
 	}
 
-	videos := VideosDaoToDto(targetVideos)
+	if !errors.Is(err, redis.Nil) {
+		hlog.CtxErrorf(s.ctx, "service.GetPopularVideos cache read failed: %v", err)
+	}
 
-	return videos, nil
+	videosDao, err := s.videoDao.GetPopularVideos(s.ctx, pageSize, pageNum)
+	if err != nil {
+		return nil, errors.WithMessagef(err, "service.GetPopularVideos: db.GetPopularVideos failed, page=%d, pageSize=%d", pageNum, pageSize)
+	}
+
+	go func() {
+		popularVideos, err := s.videoDao.GetPopularVideos(context.Background(), constants.PopularVideoCacheCount, 0)
+		if err != nil {
+			hlog.Errorf("service.GetPopularVideos refresh cache db failed: %v", err)
+		} else if err := s.videoCache.SetPopularVideos(context.Background(), popularVideos); err != nil {
+			hlog.Errorf("service.GetPopularVideos cache write failed: %v", err)
+		}
+		if err := s.videoCache.SetVideos(context.Background(), videosDao); err != nil {
+			hlog.Errorf("service.GetPopularVideos cache detail write failed: %v", err)
+		}
+	}()
+
+	return VideosDaoToDto(videosDao), nil
 }

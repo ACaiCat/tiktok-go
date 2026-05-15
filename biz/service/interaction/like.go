@@ -27,6 +27,8 @@ func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) e
 		if err := s.likeVideoByID(*req.VideoID, userID, req.ActionType); err != nil {
 			return errors.WithMessagef(err, "service.LikeVideo: likeVideoByID failed, videoID=%q, userID=%d", *req.VideoID, userID)
 		}
+
+		return nil
 	}
 
 	if err := s.likeCommentByID(*req.CommentID, userID, req.ActionType); err != nil {
@@ -107,6 +109,13 @@ func (s *InteractionService) addVideoLikeTx(tx *gorm.DB, userID, videoID int64, 
 		hlog.CtxErrorf(s.ctx, "service.addVideoLikeTx cache update failed: %v", err)
 	}
 
+	go func() {
+		err := s.videoCache.IncrVideoLikeCount(context.Background(), videoID, 1)
+		if err != nil {
+			hlog.Errorf("service.addVideoLikeTx: cache.IncrVideoLikeCount failed, videoID=%d, err=%v", videoID, err)
+		}
+	}()
+
 	return nil
 }
 
@@ -123,9 +132,16 @@ func (s *InteractionService) cancelVideoLikeTx(tx *gorm.DB, userID, videoID int6
 		return errors.WithMessagef(err, "service.cancelVideoLikeTx: db.DecrLikeCount failed, videoID=%d", videoID)
 	}
 
-	if err := s.userCache.SetUnlikeVideo(s.ctx, userID, videoID); err != nil {
-		hlog.CtxErrorf(s.ctx, "service.cancelVideoLikeTx cache update failed: %v", err)
-	}
+	go func() {
+		if err := s.userCache.SetUnlikeVideo(s.ctx, userID, videoID); err != nil {
+			hlog.Errorf("service.cancelVideoLikeTx: cache.SetUnlikeVideo failed, videoID=%d, err=%v", videoID, err)
+		}
+
+		err := s.videoCache.IncrVideoLikeCount(context.Background(), videoID, -1)
+		if err != nil {
+			hlog.Errorf("service.cancelVideoLikeTx: cache.IncrVideoLikeCount failed, videoID=%d, err=%v", videoID, err)
+		}
+	}()
 
 	return nil
 }

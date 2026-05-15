@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"testing"
 
+	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
@@ -33,24 +34,32 @@ func TestInteractionService_CommentAction(t *testing.T) {
 			expectError: "视频ID或评论ID不能为空",
 		},
 		"both targets": {
-			req:         &interaction.CommentReq{VideoID: new("1"), CommentID: new("2"), Content: "hi"},
+			req:         &interaction.CommentReq{VideoID: stringPtr("1"), CommentID: stringPtr("2"), Content: "hi"},
 			expectError: "视频ID和评论ID不能同时存在",
 		},
+		"invalid video id": {
+			req:         &interaction.CommentReq{VideoID: stringPtr("bad"), Content: "hi"},
+			expectError: "invalid syntax",
+		},
 		"video not exist": {
-			req:             &interaction.CommentReq{VideoID: new("1"), Content: "hi"},
+			req:             &interaction.CommentReq{VideoID: stringPtr("1"), Content: "hi"},
 			mockVideoExists: false,
 			expectError:     errno.VideoNotExistErr.ErrMsg,
 		},
 		"video success": {
-			req:             &interaction.CommentReq{VideoID: new("1"), Content: "hi"},
+			req:             &interaction.CommentReq{VideoID: stringPtr("1"), Content: "hi"},
 			mockVideoExists: true,
 		},
+		"invalid reply comment id": {
+			req:         &interaction.CommentReq{CommentID: stringPtr("bad"), Content: "hi"},
+			expectError: "invalid syntax",
+		},
 		"reply success": {
-			req:         &interaction.CommentReq{CommentID: new("2"), Content: "hi"},
+			req:         &interaction.CommentReq{CommentID: stringPtr("2"), Content: "hi"},
 			mockComment: &modelDao.Comment{ID: 2, VideoID: 1},
 		},
 		"reply comment not exist": {
-			req:         &interaction.CommentReq{CommentID: new("2"), Content: "hi"},
+			req:         &interaction.CommentReq{CommentID: stringPtr("2"), Content: "hi"},
 			expectError: errno.CommentNotExistErr.ErrMsg,
 		},
 	}
@@ -74,6 +83,8 @@ func TestInteractionService_CommentAction(t *testing.T) {
 			}).Build()
 			mockey.Mock((*commentDao.CommentDao).AddCommentReply).Return(nil).Build()
 			mockey.Mock((*commentDao.CommentDao).IncrCommentCount).Return(nil).Build()
+			mockey.Mock((*videoCache.VideoCache).SetVideo).Return(nil).Build()
+			mockey.Mock((*videoCache.VideoCache).IncrVideoCommentCount).Return(nil).Build()
 
 			mockey.Mock(NewInteractionService).To(func(_ context.Context) *InteractionService {
 				return &InteractionService{}
@@ -114,9 +125,13 @@ func TestInteractionService_DeleteComment(t *testing.T) {
 			mockComment: &modelDao.Comment{ID: 1, UserID: 2, VideoID: 1},
 			expectError: errno.CommentNotBelongToUserErr.ErrMsg,
 		},
-		"success": {
+		"video comment success": {
 			req:         &interaction.DeleteCommentReq{CommentID: "1"},
 			mockComment: &modelDao.Comment{ID: 1, UserID: 1, VideoID: 1},
+		},
+		"reply comment success": {
+			req:         &interaction.DeleteCommentReq{CommentID: "1"},
+			mockComment: &modelDao.Comment{ID: 1, UserID: 1, VideoID: 1, ParentID: int64Ptr(2)},
 		},
 	}
 
@@ -135,6 +150,7 @@ func TestInteractionService_DeleteComment(t *testing.T) {
 			mockey.Mock((*videoDao.VideoDao).DecrCommentCount).Return(nil).Build()
 			mockey.Mock((*commentDao.CommentDao).DecrCommentCount).Return(nil).Build()
 			mockey.Mock((*commentDao.CommentDao).DeleteComment).Return(nil).Build()
+			mockey.Mock((*videoCache.VideoCache).IncrVideoCommentCount).Return(nil).Build()
 
 			mockey.Mock(NewInteractionService).To(func(_ context.Context) *InteractionService {
 				return &InteractionService{}
@@ -169,22 +185,34 @@ func TestInteractionService_ListComment(t *testing.T) {
 			expectError: "视频ID或评论ID不能为空",
 		},
 		"video success": {
-			req:             &interaction.ListCommentReq{VideoID: new("1")},
+			req:             &interaction.ListCommentReq{VideoID: stringPtr("1")},
 			mockVideoExists: true,
 			mockResult:      []*modelDao.Comment{},
 		},
+		"both targets": {
+			req:         &interaction.ListCommentReq{VideoID: stringPtr("1"), CommentID: stringPtr("2")},
+			expectError: "视频ID和评论ID不能同时存在",
+		},
+		"invalid video id": {
+			req:         &interaction.ListCommentReq{VideoID: stringPtr("bad")},
+			expectError: "invalid syntax",
+		},
 		"video not exist": {
-			req:             &interaction.ListCommentReq{VideoID: new("1")},
+			req:             &interaction.ListCommentReq{VideoID: stringPtr("1")},
 			mockVideoExists: false,
 			expectError:     errno.VideoNotExistErr.ErrMsg,
 		},
 		"comment success": {
-			req:              &interaction.ListCommentReq{CommentID: new("2")},
+			req:              &interaction.ListCommentReq{CommentID: stringPtr("2")},
 			mockCommentExist: true,
 			mockResult:       []*modelDao.Comment{},
 		},
+		"invalid comment id": {
+			req:         &interaction.ListCommentReq{CommentID: stringPtr("bad")},
+			expectError: "invalid syntax",
+		},
 		"comment not exist": {
-			req:              &interaction.ListCommentReq{CommentID: new("2")},
+			req:              &interaction.ListCommentReq{CommentID: stringPtr("2")},
 			mockCommentExist: false,
 			expectError:      errno.CommentNotExistErr.ErrMsg,
 		},
@@ -228,4 +256,8 @@ func TestInteractionService_ListComment(t *testing.T) {
 	}
 
 	_ = model.Comment{}
+}
+
+func int64Ptr(v int64) *int64 {
+	return &v
 }

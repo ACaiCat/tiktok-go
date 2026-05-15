@@ -193,9 +193,9 @@ func TestUserCache_SetUnlikeVideo(t *testing.T) {
 
 			key := getLikedVideosKey(tc.userID)
 			if tc.mockErr != nil {
-				mock.ExpectDel(key).SetErr(tc.mockErr)
+				mock.ExpectSRem(key, tc.videoID).SetErr(tc.mockErr)
 			} else {
-				mock.ExpectDel(key).SetVal(1)
+				mock.ExpectSRem(key, tc.videoID).SetVal(1)
 			}
 
 			err := cache.SetUnlikeVideo(context.Background(), tc.userID, tc.videoID)

@@ -11,6 +11,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"github.com/ACaiCat/tiktok-go/pkg/utils"
 )
 
 func (s *VideoService) SearchVideo(req *video.SearchReq) ([]*model.Video, error) {
@@ -24,19 +25,7 @@ func (s *VideoService) SearchVideo(req *video.SearchReq) ([]*model.Video, error)
 		}
 	}
 
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = constants.DefaultVideoPageSize
-	}
-
-	pageNum := req.PageNum
-	if pageNum < 0 {
-		pageNum = 1
-	}
-
-	if pageSize > constants.MaxVideoPageSize {
-		pageSize = constants.MaxVideoPageSize
-	}
+	pageSize, pageNum := utils.NormalizePage(req.PageSize, req.PageNum, constants.DefaultVideoPageSize, constants.MaxVideoPageSize)
 
 	var toDate time.Time
 	var fromDate time.Time
@@ -62,7 +51,7 @@ func (s *VideoService) SearchVideo(req *video.SearchReq) ([]*model.Video, error)
 		username = *req.Username
 	}
 
-	videosDao, err := s.videoDao.SearchVideo(s.ctx, keywords, int(pageSize), int(pageNum), fromDate, toDate, username)
+	videosDao, err := s.videoDao.SearchVideo(s.ctx, keywords, pageSize, pageNum, fromDate, toDate, username)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "service.SearchVideo: db.SearchVideo failed, keywords=%q", keywords)
 	}

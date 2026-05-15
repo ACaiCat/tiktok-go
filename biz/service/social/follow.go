@@ -12,6 +12,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"github.com/ACaiCat/tiktok-go/pkg/utils"
 )
 
 func (s *SocialService) FollowAction(req *social.FollowReq, followerID int64) error {
@@ -76,19 +77,7 @@ func (s *SocialService) ListFollowing(req *social.ListFollowingReq) ([]*model.So
 		return nil, 0, errno.ParamErr.WithError(err)
 	}
 
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = constants.DefaultSocialUserPageSize
-	}
-
-	pageNum := req.PageNum
-	if pageNum < 0 {
-		pageNum = 0
-	}
-
-	if pageSize > constants.MaxSocialUserPageSize {
-		pageSize = constants.MaxSocialUserPageSize
-	}
+	pageSize, pageNum := utils.NormalizePage(req.PageSize, req.PageNum, constants.DefaultSocialUserPageSize, constants.MaxSocialUserPageSize)
 
 	var users []*modelDao.User
 	var total int
@@ -102,7 +91,7 @@ func (s *SocialService) ListFollowing(req *social.ListFollowingReq) ([]*model.So
 			return errno.UserIsNotExistErr
 		}
 
-		users, total, err = s.followerDao.WithTx(tx).GetFollowing(s.ctx, userID, int(pageSize), int(pageNum))
+		users, total, err = s.followerDao.WithTx(tx).GetFollowing(s.ctx, userID, pageSize, pageNum)
 		if err != nil {
 			return errors.WithMessagef(err, "service.ListFollowing: db.GetFollowing failed, userID=%d", userID)
 		}
@@ -123,19 +112,7 @@ func (s *SocialService) ListFollower(req *social.ListFollowerReq) ([]*model.Soci
 		return nil, 0, errno.ParamErr.WithError(err)
 	}
 
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = constants.DefaultSocialUserPageSize
-	}
-
-	pageNum := req.PageNum
-	if pageNum < 0 {
-		pageNum = 0
-	}
-
-	if pageSize > constants.MaxSocialUserPageSize {
-		pageSize = constants.MaxSocialUserPageSize
-	}
+	pageSize, pageNum := utils.NormalizePage(req.PageSize, req.PageNum, constants.DefaultSocialUserPageSize, constants.MaxSocialUserPageSize)
 
 	var users []*modelDao.User
 	var total int
@@ -150,7 +127,7 @@ func (s *SocialService) ListFollower(req *social.ListFollowerReq) ([]*model.Soci
 			return errno.UserIsNotExistErr
 		}
 
-		users, total, err = s.followerDao.WithTx(tx).GetFollower(s.ctx, userID, int(pageSize), int(pageNum))
+		users, total, err = s.followerDao.WithTx(tx).GetFollower(s.ctx, userID, pageSize, pageNum)
 		if err != nil {
 			return errors.WithMessagef(err, "service.ListFollower: db.GetFollower failed, userID=%d", userID)
 		}
@@ -166,19 +143,7 @@ func (s *SocialService) ListFollower(req *social.ListFollowerReq) ([]*model.Soci
 }
 
 func (s *SocialService) ListFriend(req *social.ListFriendReq, userID int64) ([]*model.SocialUser, int, error) {
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = constants.DefaultSocialUserPageSize
-	}
-
-	pageNum := req.PageNum
-	if pageNum < 0 {
-		pageNum = 0
-	}
-
-	if pageSize > constants.MaxSocialUserPageSize {
-		pageSize = constants.MaxSocialUserPageSize
-	}
+	pageSize, pageNum := utils.NormalizePage(req.PageSize, req.PageNum, constants.DefaultSocialUserPageSize, constants.MaxSocialUserPageSize)
 
 	var users []*modelDao.User
 	var total int
@@ -193,7 +158,7 @@ func (s *SocialService) ListFriend(req *social.ListFriendReq, userID int64) ([]*
 			return errno.UserIsNotExistErr
 		}
 
-		users, total, err = s.followerDao.WithTx(tx).GetFriends(s.ctx, userID, int(pageSize), int(pageNum))
+		users, total, err = s.followerDao.WithTx(tx).GetFriends(s.ctx, userID, pageSize, pageNum)
 		if err != nil {
 			return errors.WithMessagef(err, "service.ListFriend: db.GetFriends failed, userID=%d", userID)
 		}
