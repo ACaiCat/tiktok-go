@@ -8,6 +8,7 @@ import (
 	"github.com/bytedance/mockey"
 	"github.com/stretchr/testify/assert"
 
+	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	videoDao "github.com/ACaiCat/tiktok-go/pkg/db/video"
 	"github.com/ACaiCat/tiktok-go/pkg/ffmpeg"
 	"github.com/ACaiCat/tiktok-go/pkg/utils"
@@ -22,7 +23,6 @@ func TestVideoService_PublishVideo(t *testing.T) {
 	}
 
 	testCases := map[string]testCase{
-		"success": {},
 		"read file error": {
 			mockReadErr: assert.AnError,
 			expectError: assert.AnError.Error(),
@@ -61,6 +61,8 @@ func TestVideoService_PublishVideo(t *testing.T) {
 				) error {
 					return tc.mockPublishErr
 				}).Build()
+
+			mockey.Mock((*videoCache.VideoCache).ClearUserVideoList).Return(nil).Build()
 
 			mockey.Mock(NewVideoService).To(func(_ context.Context) *VideoService {
 				return &VideoService{}

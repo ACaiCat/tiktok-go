@@ -47,6 +47,54 @@ func TestVideoDao_GetVideoByID(t *testing.T) {
 	}
 }
 
+func TestVideoDao_GetVideosByIDs(t *testing.T) {
+	type testCase struct {
+		videoIDs []int64
+		mockRet  []*model.Video
+		mockErr  error
+		wantRet  []*model.Video
+		wantErr  bool
+	}
+
+	videos := []*model.Video{{ID: 2}, {ID: 1}}
+
+	testCases := map[string]testCase{
+		"get videos success keeps input order": {
+			videoIDs: []int64{1, 2},
+			mockRet:  videos,
+			wantRet:  []*model.Video{{ID: 1}, {ID: 2}},
+		},
+		"empty ids": {
+			videoIDs: []int64{},
+			wantRet:  []*model.Video{},
+		},
+		"db error returns error": {
+			videoIDs: []int64{1},
+			mockErr:  assert.AnError,
+			wantErr:  true,
+		},
+	}
+
+	defer mockey.UnPatchAll()
+
+	for name, tc := range testCases {
+		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
+			dao := newTestDao()
+			dbtestutil.MockFind(tc.mockRet, tc.mockErr)
+
+			vs, err := dao.GetVideosByIDs(context.Background(), tc.videoIDs)
+			if tc.wantErr {
+				assert.Error(t, err)
+				assert.ErrorContains(t, err, "GetVideosByIDs failed")
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.wantRet, vs)
+			}
+		})
+	}
+}
+
 func TestVideoDao_GetFeedByLatestTime(t *testing.T) {
 	type testCase struct {
 		latestTime time.Time
@@ -238,6 +286,44 @@ func TestVideoDao_GetUserLikeList(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.mockRet, vs)
+			}
+		})
+	}
+}
+
+func TestVideoDao_IsVideoExists(t *testing.T) {
+	type testCase struct {
+		videoID int64
+		mockRet bool
+		mockErr error
+		wantErr bool
+	}
+
+	testCases := map[string]testCase{
+		"video exists":    {videoID: 1, mockRet: true},
+		"video not exist": {videoID: 99, mockRet: false},
+		"db error":        {videoID: 1, mockErr: assert.AnError, wantErr: true},
+	}
+
+	defer mockey.UnPatchAll()
+
+	for name, tc := range testCases {
+		mockey.PatchConvey(name, t, func() {
+			mockVideoQueryChain()
+			dao := newTestDao()
+			count := int64(0)
+			if tc.mockRet {
+				count = 1
+			}
+			dbtestutil.MockCount(count, tc.mockErr)
+
+			ok, err := dao.IsVideoExists(context.Background(), tc.videoID)
+			if tc.wantErr {
+				assert.Error(t, err)
+				assert.ErrorContains(t, err, "IsVideoExists failed")
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.mockRet, ok)
 			}
 		})
 	}

@@ -1,8 +1,10 @@
 package service
 
 import (
+	"context"
 	"strconv"
 
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"github.com/ACaiCat/tiktok-go/pkg/errno"
+	"github.com/ACaiCat/tiktok-go/pkg/utils"
 )
 
 func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID int64) error {
@@ -51,6 +54,13 @@ func (s *InteractionService) CommentAction(req *interaction.CommentReq, userID i
 		if err != nil {
 			return errors.WithMessagef(err, "service.CommentAction: add video comment tx failed, videoID=%d, userID=%d", videoID, userID)
 		}
+
+		go func() {
+			err := s.videoCache.IncrVideoCommentCount(context.Background(), videoID, 1)
+			if err != nil {
+				hlog.Errorf("service.CommentAction: cache.IncrVideoCommentCount failed, videoID=%d, err=%v", videoID, err)
+			}
+		}()
 
 		return nil
 	}
@@ -117,6 +127,13 @@ func (s *InteractionService) DeleteComment(req *interaction.DeleteCommentReq, us
 			if err := s.videoDao.WithTx(tx).DecrCommentCount(s.ctx, comment.VideoID); err != nil {
 				return errors.WithMessagef(err, "service.DeleteComment: decr video comment count failed, videoID=%d", comment.VideoID)
 			}
+
+			go func() {
+				err := s.videoCache.IncrVideoCommentCount(context.Background(), comment.VideoID, -1)
+				if err != nil {
+					hlog.Errorf("service.DeleteComment: cache.IncrVideoCommentCount failed, videoID=%d, err=%v", comment.VideoID, err)
+				}
+			}()
 		}
 
 		err = s.commentDao.WithTx(tx).DeleteComment(s.ctx, commentID)
@@ -136,19 +153,7 @@ func (s *InteractionService) DeleteComment(req *interaction.DeleteCommentReq, us
 func (s *InteractionService) ListComment(req *interaction.ListCommentReq) ([]*model.Comment, error) {
 	var err error
 
-	pageSize := req.PageSize
-	if pageSize <= 0 {
-		pageSize = constants.DefaultCommentPageSize
-	}
-
-	pageNum := req.PageNum
-	if pageNum < 0 {
-		pageNum = 0
-	}
-
-	if pageSize > constants.MaxCommentPageSize {
-		pageSize = constants.MaxCommentPageSize
-	}
+	pageSize, pageNum := utils.NormalizePage(req.PageSize, req.PageNum, constants.DefaultCommentPageSize, constants.MaxCommentPageSize)
 
 	if req.VideoID == nil && req.CommentID == nil {
 		return nil, errno.ParamErr.WithMessage("视频ID或评论ID不能为空")
@@ -174,7 +179,7 @@ func (s *InteractionService) ListComment(req *interaction.ListCommentReq) ([]*mo
 			return nil, errno.VideoNotExistErr
 		}
 
-		comments, err := s.commentDao.GetCommentsByVideoID(s.ctx, videoID, int(pageSize), int(pageNum))
+		comments, err := s.commentDao.GetCommentsByVideoID(s.ctx, videoID, pageSize, pageNum)
 		if err != nil {
 			return nil, errors.WithMessagef(err, "service.ListComment: db.GetCommentsByVideoID failed, videoID=%d", videoID)
 		}
@@ -197,7 +202,7 @@ func (s *InteractionService) ListComment(req *interaction.ListCommentReq) ([]*mo
 		return nil, errno.CommentNotExistErr
 	}
 
-	comments, err := s.commentDao.GetCommentsByCommentID(s.ctx, commentID, int(pageSize), int(pageNum))
+	comments, err := s.commentDao.GetCommentsByCommentID(s.ctx, commentID, pageSize, pageNum)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "service.ListComment: db.GetCommentsByCommentID failed, commentID=%d", commentID)
 	}

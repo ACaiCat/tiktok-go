@@ -3,5 +3,5 @@ package constants
 import "time"
 
 const (
-	LikeCacheExpiration = time.Hour * 1
+	LikeCacheExpiration = time.Minute * 5
 )

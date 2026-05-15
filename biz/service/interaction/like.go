@@ -7,6 +7,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/interaction"
@@ -24,19 +25,21 @@ func (s *InteractionService) LikeVideo(req *interaction.LikeReq, userID int64) e
 	}
 
 	if req.VideoID != nil {
-		if err := s.likeVideoByID(*req.VideoID, userID, req.ActionType); err != nil {
+		if err := s.likeVideo(*req.VideoID, userID, req.ActionType); err != nil {
 			return errors.WithMessagef(err, "service.LikeVideo: likeVideoByID failed, videoID=%q, userID=%d", *req.VideoID, userID)
 		}
+
+		return nil
 	}
 
-	if err := s.likeCommentByID(*req.CommentID, userID, req.ActionType); err != nil {
+	if err := s.likeComment(*req.CommentID, userID, req.ActionType); err != nil {
 		return errors.WithMessagef(err, "service.LikeVideo: likeCommentByID failed, commentID=%q, userID=%d", *req.CommentID, userID)
 	}
 
 	return nil
 }
 
-func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, actionType interaction.LikeActionType) error {
+func (s *InteractionService) likeVideo(videoIDStr string, userID int64, actionType interaction.LikeActionType) error {
 	videoID, err := strconv.ParseInt(videoIDStr, 10, 64)
 	if err != nil {
 		return errno.ParamErr.WithError(err)
@@ -48,7 +51,7 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 
 	videoExists, err := s.videoDao.IsVideoExists(s.ctx, videoID)
 	if err != nil {
-		return errors.WithMessagef(err, "service.likeVideoByID: check video exists failed, videoID=%d, userID=%d", videoID, userID)
+		return errors.WithMessagef(err, "service.likeVideo: check video exists failed, videoID=%d, userID=%d", videoID, userID)
 	}
 	if !videoExists {
 		return errno.VideoNotExistErr
@@ -57,15 +60,19 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 	err = db.DB.Transaction(func(tx *gorm.DB) error {
 		isLiked, err := s.userCache.IsVideoLiked(s.ctx, userID, videoID)
 		if err != nil {
+			if !errors.Is(err, redis.Nil) {
+				hlog.CtxErrorf(s.ctx, "service.likeVideo: IsVideoLiked failed, userID=%d, videoID=%d, err=%v", userID, videoID, err)
+			}
+
 			likedVideos, err := s.likeDao.WithTx(tx).GetUserLikes(s.ctx, userID)
 			if err != nil {
-				return errors.WithMessagef(err, "service.likeVideoByID: db.GetUserLikes failed, userID=%d", userID)
+				return errors.WithMessagef(err, "service.likeVideo: db.GetUserLikes failed, userID=%d, userID=%d", userID, userID)
 			}
 			isLiked = slices.Contains(likedVideos, videoID)
 
 			go func() {
 				if err := s.userCache.SetLikeVideos(context.Background(), userID, likedVideos); err != nil {
-					hlog.Errorf("service.likeVideoByID.SetLikeVideos failed: %v", err)
+					hlog.Errorf("service.likeVideo: cache.SetLikeVideos failed: %v", err)
 				}
 			}()
 		}
@@ -85,7 +92,7 @@ func (s *InteractionService) likeVideoByID(videoIDStr string, userID int64, acti
 	})
 
 	if err != nil {
-		return errors.WithMessagef(err, "service.likeVideoByID: tx failed, videoID=%d, userID=%d", videoID, userID)
+		return err
 	}
 
 	return nil
@@ -103,9 +110,15 @@ func (s *InteractionService) addVideoLikeTx(tx *gorm.DB, userID, videoID int64, 
 		return errors.WithMessagef(err, "service.addVideoLikeTx: db.IncrLikeCount failed, videoID=%d", videoID)
 	}
 
-	if err := s.userCache.SetLikeVideo(s.ctx, userID, videoID); err != nil {
-		hlog.CtxErrorf(s.ctx, "service.addVideoLikeTx cache update failed: %v", err)
-	}
+	go func() {
+		if err := s.userCache.SetLikeVideo(s.ctx, userID, videoID); err != nil {
+			hlog.CtxErrorf(s.ctx, "service.addVideoLikeTx cache update failed: %v", err)
+		}
+		err := s.videoCache.IncrVideoLikeCount(context.Background(), videoID, 1)
+		if err != nil {
+			hlog.Errorf("service.addVideoLikeTx: cache.IncrVideoLikeCount failed, videoID=%d, err=%v", videoID, err)
+		}
+	}()
 
 	return nil
 }
@@ -123,14 +136,21 @@ func (s *InteractionService) cancelVideoLikeTx(tx *gorm.DB, userID, videoID int6
 		return errors.WithMessagef(err, "service.cancelVideoLikeTx: db.DecrLikeCount failed, videoID=%d", videoID)
 	}
 
-	if err := s.userCache.SetUnlikeVideo(s.ctx, userID, videoID); err != nil {
-		hlog.CtxErrorf(s.ctx, "service.cancelVideoLikeTx cache update failed: %v", err)
-	}
+	go func() {
+		if err := s.userCache.SetUnlikeVideo(s.ctx, userID, videoID); err != nil {
+			hlog.Errorf("service.cancelVideoLikeTx: cache.SetUnlikeVideo failed, videoID=%d, err=%v", videoID, err)
+		}
+
+		err := s.videoCache.IncrVideoLikeCount(context.Background(), videoID, -1)
+		if err != nil {
+			hlog.Errorf("service.cancelVideoLikeTx: cache.IncrVideoLikeCount failed, videoID=%d, err=%v", videoID, err)
+		}
+	}()
 
 	return nil
 }
 
-func (s *InteractionService) likeCommentByID(commentIDStr string, userID int64, actionType interaction.LikeActionType) error {
+func (s *InteractionService) likeComment(commentIDStr string, userID int64, actionType interaction.LikeActionType) error {
 	commentID, err := strconv.ParseInt(commentIDStr, 10, 64)
 	if err != nil {
 		return errno.ParamErr.WithError(err)

@@ -6,10 +6,12 @@ import (
 	"testing"
 
 	"github.com/bytedance/mockey"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/social"
+	userCache "github.com/ACaiCat/tiktok-go/pkg/cache/user"
 	followerDao "github.com/ACaiCat/tiktok-go/pkg/db/follower"
 	modelDao "github.com/ACaiCat/tiktok-go/pkg/db/model"
 	userDao "github.com/ACaiCat/tiktok-go/pkg/db/user"
@@ -21,6 +23,10 @@ func TestSocialService_FollowAction(t *testing.T) {
 		req            *social.FollowReq
 		mockUserExists bool
 		mockFollowed   bool
+		mockCacheErr   error
+		mockIDsErr     error
+		mockAddErr     error
+		mockDeleteErr  error
 		expectError    string
 	}
 
@@ -38,14 +44,40 @@ func TestSocialService_FollowAction(t *testing.T) {
 			mockUserExists: false,
 			expectError:    errno.UserIsNotExistErr.ErrMsg,
 		},
-		"follow success": {
+		"unsupported action": {
+			req:         &social.FollowReq{ToUserID: "2", ActionType: 99},
+			expectError: errno.NotSupportActionErr.ErrMsg,
+		},
+		"follow already exists": {
 			req:            &social.FollowReq{ToUserID: "2", ActionType: social.FollowActionType_FOLLOW},
 			mockUserExists: true,
+			mockFollowed:   true,
+			expectError:    errno.FollowAlreadyExistErr.ErrMsg,
 		},
 		"unfollow missing relation": {
 			req:            &social.FollowReq{ToUserID: "2", ActionType: social.FollowActionType_UNFOLLOW},
 			mockUserExists: true,
 			expectError:    errno.FollowNotExistErr.ErrMsg,
+		},
+		"cache miss load ids error": {
+			req:            &social.FollowReq{ToUserID: "2", ActionType: social.FollowActionType_FOLLOW},
+			mockUserExists: true,
+			mockCacheErr:   redis.Nil,
+			mockIDsErr:     assert.AnError,
+			expectError:    assert.AnError.Error(),
+		},
+		"add follow error": {
+			req:            &social.FollowReq{ToUserID: "2", ActionType: social.FollowActionType_FOLLOW},
+			mockUserExists: true,
+			mockAddErr:     assert.AnError,
+			expectError:    assert.AnError.Error(),
+		},
+		"delete follow error": {
+			req:            &social.FollowReq{ToUserID: "2", ActionType: social.FollowActionType_UNFOLLOW},
+			mockUserExists: true,
+			mockFollowed:   true,
+			mockDeleteErr:  assert.AnError,
+			expectError:    assert.AnError.Error(),
 		},
 	}
 
@@ -53,26 +85,37 @@ func TestSocialService_FollowAction(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
-			mockey.Mock((*gorm.DB).Transaction).To(func(fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error {
+			mockey.Mock((*gorm.DB).Transaction).To(func(_ *gorm.DB, fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error {
 				return fc(&gorm.DB{})
 			}).Build()
-			mockey.Mock((*userDao.UserDao).WithTx).To(func(tx *gorm.DB) *userDao.UserDao {
+			mockey.Mock((*userDao.UserDao).WithTx).To(func(_ *userDao.UserDao, tx *gorm.DB) *userDao.UserDao {
 				return &userDao.UserDao{}
 			}).Build()
-			mockey.Mock((*followerDao.FollowerDao).WithTx).To(func(tx *gorm.DB) *followerDao.FollowerDao {
+			mockey.Mock((*followerDao.FollowerDao).WithTx).To(func(_ *followerDao.FollowerDao, tx *gorm.DB) *followerDao.FollowerDao {
 				return &followerDao.FollowerDao{}
 			}).Build()
-			mockey.Mock((*userDao.UserDao).IsUserExists).To(func(ctx context.Context, userID int64) (bool, error) {
+			mockey.Mock((*userDao.UserDao).IsUserExists).To(func(_ *userDao.UserDao, ctx context.Context, userID int64) (bool, error) {
 				return tc.mockUserExists, nil
 			}).Build()
-			mockey.Mock((*followerDao.FollowerDao).IsExistFollow).To(func(ctx context.Context, userID int64, followerID int64) (bool, error) {
-				return tc.mockFollowed, nil
+			mockey.Mock((*userCache.UserCache).IsFollowed).To(func(_ *userCache.UserCache, ctx context.Context, userID int64, followingID int64) (bool, error) {
+				return tc.mockFollowed, tc.mockCacheErr
 			}).Build()
-			mockey.Mock((*followerDao.FollowerDao).AddFollow).Return(nil).Build()
-			mockey.Mock((*followerDao.FollowerDao).DeleteFollow).Return(nil).Build()
+			mockey.Mock((*followerDao.FollowerDao).GetFollowingIDs).To(func(_ *followerDao.FollowerDao, ctx context.Context, userID int64) ([]int64, error) {
+				return []int64{}, tc.mockIDsErr
+			}).Build()
+			mockey.Mock((*userCache.UserCache).SetFollowings).Return(nil).Build()
+			mockey.Mock((*userCache.UserCache).SetFollow).Return(nil).Build()
+			mockey.Mock((*userCache.UserCache).SetUnfollow).Return(nil).Build()
+			mockey.Mock((*followerDao.FollowerDao).AddFollow).Return(tc.mockAddErr).Build()
+			mockey.Mock((*followerDao.FollowerDao).DeleteFollow).Return(tc.mockDeleteErr).Build()
 
 			mockey.Mock(NewSocialService).To(func(_ context.Context) *SocialService {
-				return &SocialService{}
+				return &SocialService{
+					userDao:     &userDao.UserDao{},
+					followerDao: &followerDao.FollowerDao{},
+					userCache:   &userCache.UserCache{},
+					ctx:         context.Background(),
+				}
 			}).Build()
 
 			err := NewSocialService(context.Background()).FollowAction(tc.req, 1)

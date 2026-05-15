@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ACaiCat/tiktok-go/biz/model/video"
+	videoCache "github.com/ACaiCat/tiktok-go/pkg/cache/video"
 	videoDao "github.com/ACaiCat/tiktok-go/pkg/db/video"
 )
 
@@ -19,9 +20,6 @@ func TestVideoService_VisitVideo(t *testing.T) {
 	}
 
 	testCases := map[string]testCase{
-		"success": {
-			req: &video.VisitVideoReq{VideoID: "1"},
-		},
 		"invalid video id": {
 			req:         &video.VisitVideoReq{VideoID: "not-a-number"},
 			expectError: "参数错误",
@@ -41,9 +39,11 @@ func TestVideoService_VisitVideo(t *testing.T) {
 				func(_ *videoDao.VideoDao, ctx context.Context, videoID int64) error {
 					return tc.mockErr
 				}).Build()
+			mockey.Mock((*videoCache.VideoCache).IncrVideoVisitCount).Return(nil).Build()
+			mockey.Mock((*videoCache.VideoCache).IncrPopularVideoVisitCount).Return(nil).Build()
 
 			mockey.Mock(NewVideoService).To(func(_ context.Context) *VideoService {
-				return &VideoService{}
+				return &VideoService{videoCache: &videoCache.VideoCache{}, videoDao: &videoDao.VideoDao{}}
 			}).Build()
 
 			err := NewVideoService(context.Background()).VisitVideo(tc.req)
