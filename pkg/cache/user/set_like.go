@@ -2,17 +2,11 @@ package usercache
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
 
 	"github.com/ACaiCat/tiktok-go/pkg/constants"
 )
-
-func getLikedVideosKey(userID int64) string {
-	return fmt.Sprintf("user:%d:liked_videos", userID)
-}
 
 func (c *UserCache) SetLikeVideos(ctx context.Context, userID int64, videoIDs []int64) error {
 	args := make([]any, len(videoIDs))
@@ -30,25 +24,6 @@ func (c *UserCache) SetLikeVideos(ctx context.Context, userID int64, videoIDs []
 	}
 
 	return nil
-}
-
-func (c *UserCache) GetLikedVideos(ctx context.Context, userID int64) ([]int64, error) {
-	videoIDsStr, err := c.c.SMembers(ctx, getLikedVideosKey(userID)).Result()
-	if err != nil {
-		return nil, errors.Wrapf(err, "GetLikedVideos failed, userID=%d", userID)
-	}
-
-	videoIDs := make([]int64, len(videoIDsStr))
-	for i, v := range videoIDsStr {
-		var id int64
-		_, err := fmt.Sscanf(v, "%d", &id)
-		if err != nil {
-			return nil, errors.Wrapf(err, "GetLikedVideos failed, userID=%d", userID)
-		}
-		videoIDs[i] = id
-	}
-
-	return videoIDs, nil
 }
 
 func (c *UserCache) SetLikeVideo(ctx context.Context, userID int64, videoID int64) error {
@@ -69,23 +44,6 @@ func (c *UserCache) SetUnlikeVideo(ctx context.Context, userID int64, videoID in
 		return errors.Wrapf(err, "SetUnlikeVideo failed, userID=%d", userID)
 	}
 	return nil
-}
-
-func (c *UserCache) IsVideoLiked(ctx context.Context, userID int64, videoID int64) (bool, error) {
-	exist, err := c.c.Exists(ctx, getFollowingKey(userID)).Result()
-	if err != nil {
-		return false, errors.Wrapf(err, "IsVideoLiked failed, userID=%d", userID)
-	}
-	if exist == 0 {
-		return false, redis.Nil
-	}
-
-	result, err := c.c.SIsMember(ctx, getLikedVideosKey(userID), videoID).Result()
-	if err != nil {
-		return false, errors.Wrapf(err, "IsVideoLiked failed, userID=%d", userID)
-	}
-
-	return result, nil
 }
 
 func (c *UserCache) ClearLikedVideos(ctx context.Context, userID int64) error {

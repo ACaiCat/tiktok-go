@@ -49,14 +49,14 @@ func TestInteractionService_LikeVideo(t *testing.T) {
 
 	for name, tc := range testCases {
 		mockey.PatchConvey(name, t, func() {
-			mockey.Mock((*InteractionService).likeVideoByID).To(
+			mockey.Mock((*InteractionService).likeVideo).To(
 				func(_ *InteractionService, videoIDStr string, userID int64, actionType interaction.LikeActionType) error {
 					assert.Equal(t, tc.req.GetVideoID(), videoIDStr)
 					assert.Equal(t, int64(1), userID)
 					assert.Equal(t, tc.req.GetActionType(), actionType)
 					return tc.mockVideoErr
 				}).Build()
-			mockey.Mock((*InteractionService).likeCommentByID).To(
+			mockey.Mock((*InteractionService).likeComment).To(
 				func(_ *InteractionService, commentIDStr string, userID int64, actionType interaction.LikeActionType) error {
 					assert.Equal(t, tc.req.GetCommentID(), commentIDStr)
 					assert.Equal(t, int64(1), userID)

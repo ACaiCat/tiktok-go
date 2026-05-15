@@ -27,7 +27,7 @@ func (p *VideoCache) SetUserVideoList(ctx context.Context, userID int64, pageSiz
 	}
 
 	key := getUserVideoListKey(userID, version, pageSize, pageNum)
-	if err := p.c.Set(ctx, key, data, constants.VideoCacheExpiration).Err(); err != nil {
+	if err := p.c.Set(ctx, key, data, constants.UserVideoCacheExpiration).Err(); err != nil {
 		return errors.Wrapf(err, "SetUserVideoList failed, userID=%d", userID)
 	}
 

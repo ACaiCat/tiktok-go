@@ -154,3 +154,19 @@ func (v *VideoDao) GetUserLikeList(ctx context.Context, userID int64, pageSize i
 
 	return videos, nil
 }
+
+func (v *VideoDao) IsVideoExists(ctx context.Context, videoID int64) (bool, error) {
+	var err error
+
+	count, err := v.q.Video.WithContext(ctx).
+		Select(v.q.Video.ID).
+		Where(v.q.Video.ID.Eq(videoID)).
+		Limit(1).
+		Count()
+
+	if err != nil {
+		return false, errors.Wrapf(err, "IsVideoExists failed, videoID: %d", videoID)
+	}
+
+	return count > 0, nil
+}
