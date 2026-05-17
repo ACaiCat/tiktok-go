@@ -17,7 +17,7 @@ import (
 	"github.com/ACaiCat/tiktok-go/pkg/db"
 	"github.com/ACaiCat/tiktok-go/pkg/logger"
 	"github.com/cloudwego/hertz/pkg/app/server"
-	hertzWebsocket "github.com/cloudwego/hertz/pkg/common/adaptor"
+	"github.com/cloudwego/hertz/pkg/common/adaptor"
 )
 
 func init() {
@@ -38,7 +38,7 @@ func main() {
 	h.Use(logMw.AccessLog())
 	h.Use(sentinelMw.Sentinel())
 
-	h.GET("/ws", hertzWebsocket.HertzHandler(http.HandlerFunc(chat.Chat)))
+	h.GET("/ws", adaptor.HertzHandler(http.HandlerFunc(chat.Chat)))
 	register(h)
 
 	h.Spin()

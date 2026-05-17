@@ -9,7 +9,7 @@
 - 数据库：PostgreSQL (GORM Gen)
 - 缓存：Redis
 - 认证：JWT (双Token)
-- 存储: Minio
+- 存储：Minio
 - 配置：Viper
 
 ## 项目结构
@@ -35,7 +35,7 @@ tiktok-go/
 │   ├── router/                    # 路由
 │   ├── model/                     # 请求和响应数据模型
 │   ├── pack/                      # 响应数据打包方法
-│   └── mw/                        # 中间件、
+│   └── mw/                        # 中间件
 │       ├── log/                   # 日志中间件
 │       ├── sentinel/              # Sentinel中间件
 │       └── auth/                  # JWT认证中间件
@@ -57,28 +57,23 @@ tiktok-go/
     │
     ├── ai/                        # AI聊天
     ├── jwt/                       # JWT工具包
+    ├── crypt/                     # 对称加密
     ├── ffmpeg/                    # 媒体处理
     ├── img/                       # 图片处理
     ├── errno/                     # 错误码定义
     ├── constants/                 # 全局常量
     ├── totp/                      # TOTP多因素认证
-    └── utils/                     # 工具函数          
+    └── utils/                     # 工具函数     
 ```
+## 文档
 
-## API文档
+### [API文档](docs/API.md)
 
-[文档](docs/API.md)
 > ApiFox生成的，Chat是自己搓的
 
-## 报告
+### [报告](docs/Report.md)
 
-[报告](docs/Report.md)
-> Work4的，Work5的还没写
-
-## 设计
-
-[设计](docs/Design.md)
-> 石山随笔
+> 飞书: <https://west2-online.feishu.cn/wiki/T91YwlVjfiamLAkwUhycxYY7nFc>
 
 ## 快速开始
 
