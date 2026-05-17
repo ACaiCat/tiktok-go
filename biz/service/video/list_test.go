@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"testing"
+	"time"
 
 	"github.com/bytedance/mockey"
 	"github.com/redis/go-redis/v9"
@@ -123,9 +124,10 @@ func TestVideoService_GetVideoList(t *testing.T) {
 			mockey.Mock((*videoCache.VideoCache).SetVideos).Return(nil).Build()
 
 			svc := &VideoService{
-				videoDao: &videoDao.VideoDao{},
-				userDao:  &userDao.UserDao{},
-				ctx:      context.Background(),
+				videoDao:  &videoDao.VideoDao{},
+				userDao:   &userDao.UserDao{},
+				userCache: &userCache.UserCache{},
+				ctx:       context.Background(),
 			}
 			if tc.cacheEnabled {
 				svc.videoCache = &videoCache.VideoCache{}
@@ -151,6 +153,8 @@ func TestVideoService_GetVideoList(t *testing.T) {
 			assert.Equal(t, tc.expectDBCalled, dbCalled)
 		})
 	}
+
+	time.Sleep(1 * time.Second) // 等待所有mock调用完成，避免测试结束后调用未完成的mock导致panic
 }
 
 func TestVideoService_GetLikedVideos(t *testing.T) {
