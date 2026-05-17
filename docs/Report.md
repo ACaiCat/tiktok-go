@@ -1,105 +1,527 @@
 # 报告
 
-前前后后写了差不多一个星期，然后踩了一堆坑...
+## 项目结构
 
-## 吐槽
+```
+tiktok-go/
+├── cmd/
+│   ├── api/                       # APP入口点
+│   ├── chat/                      # 聊天客户端 (100 %AI)
+│   └── gorm-gen/                  # GORM Gen
+│
+├── config/                        # 配置模块
+├── idl/                           # 接口定义
+├── biz/                           # 业务逻辑层
+│   ├── handler/                   # HTTP处理器
+│   ├── service/                   # 业务服务层
+│   │   ├── user/                  # 用户
+│   │   ├── video/                 # 视频
+│   │   ├── interaction/           # 互动
+│   │   ├── social/                # 社交
+│   │   └── chat/                  # 聊天
+│   │
+│   ├── router/                    # 路由
+│   ├── model/                     # 请求和响应数据模型
+│   ├── pack/                      # 响应数据打包方法
+│   └── mw/                        # 中间件
+│       ├── log/                   # 日志中间件
+│       ├── sentinel/              # Sentinel中间件
+│       └── auth/                  # JWT认证中间件
+│   
+└── pkg/                           # 通用工具包
+    ├── db/                        # 数据库访问
+    │   ├── postgres.go            # 数据库连接初始化
+    │   ├── model/                 # 数据库模型
+    │   ├── query/                 # Gen查询
+    │   └── ...
+    │
+    ├── cache/                     # 缓存
+    │   ├── redis.go               # Redis连接初始化
+    │   └── ...
+    │
+    ├── bucket/                    # 对象存储
+    │   ├── minio.go               # MinIO客户端初始化
+    │   └── ...
+    │
+    ├── ai/                        # AI聊天
+    ├── jwt/                       # JWT工具包
+    ├── crypt/                     # 对称加密
+    ├── ffmpeg/                    # 媒体处理
+    ├── img/                       # 图片处理
+    ├── errno/                     # 错误码定义
+    ├── constants/                 # 全局常量
+    ├── totp/                      # TOTP多因素认证
+    └── utils/                     # 工具函数          
+```
 
-### 构式Proto
+## 上次Review
 
-感觉Hertz框架对`Proto IDL`的支持基本上是半残，主要遇到的问题：
+### 冗余字段
 
-1. proto3的`required`参数校验失效，我试过自定义`tag`、在字段`tag`后面加`required`各种办法都法实现这个功能，因为proto3没用
-   `required`关键字，所有的字段都是`optional`，所以我尝试改用proto2
+在需要统计评论数和点赞数的表对象中加入`like_count`、`comment_count`冗余字段，提高查询性能，避免用子查询或者`Left Join`来计算评论数和点赞数
 
-2. proto2的`required`是正常的，但是生成出来的模型所有字段都是指针，无敌了，跑路了直接，构式proto支持
+> 避免子查询N+1，而且Gen不好实现子查询 (*麻烦)
 
-3. 无法正常生成`oneof`的结构，因为业务数据要套一层`data`，所以就想直接写在`oneof`里，然后生成了一下发现直接成棍母了，石
-
-4. 示例项目篡改生成的代码，最恶心的事情。当时参考了`hertz-examples`的一些例子，头像上传接口的文件要塞在`FileHeader`
-   里，我就找了一下发现他[有个例子](https://github.com/cloudwego/hertz-examples/blob/dcee47a445dfc739825fa3df8115ed7e2887d7b3/bizdemo/tiktok_demo/idl/publish.proto#L12)
-   用`bytes`
-   定义文件字段，生成[模型](https://github.com/cloudwego/hertz-examples/blob/dcee47a445dfc739825fa3df8115ed7e2887d7b3/bizdemo/tiktok_demo/biz/model/basic/publish/publish.pb.go#L34)
-   有`multipart.FileHeader`字段，但是我自己写的时候他生成的是`[]byte`
-   ，想了半天到底何意味，然后在Hertz仓库的issues里面搜了一下，发现有个[issue](https://github.com/cloudwego/hertz/issues/1425)
-   里说这玩意压根不支持生成`multipart.FileHeader`，然后示例文档里那个生成的模型显然是人为改的，什么叫"DO NOT EDIT"，何意味。
-
-以上的问题`Thrift IDL`都没有，甚至人家还支持设置默认值
-
-### 构式Gen
-
-Gen的优点是可以根据数据库的表结构来生成对应的数据库模型和查询接口，但是这个查询接口非常垃圾，只能做一些非常简单的查询，稍微复杂点就是各种类型不匹配，例如子查询他支持就是依托构式，然后就只能写一堆
-`LeftJoin`去关联表去计数或者把查询分开
-
-总结：不要用Gen生成查询，因为他真的也只能搓点CRUD了，复杂一点还是直接用Gorm吧，不然难受死... [[某Issue]](https://github.com/go-gorm/gen/issues/1218)
-
-## 碎碎念
-
-### 缓存
-
-项目结构是改了好几次，一直不知道要不要加`repo`层整合一下`dao`和`cache`，然后查了点资料，发现其实缓存不一定要塞`repo`里去整合，由
-`service`层去处理也可以，考虑到我才几个接口要实现缓存，所以就不写`repo`了，写个`dao`够用了，然后`cache`单独一个包，然后塞给
-`service`层去处理
-
-### 模型转换
-
-一开始不知道dao转dto模型的方法应该塞哪里`pkg`? `service`? `dao`? 我觉得这层转换应该是交给`service`的，因为`service`作为
-`dto`和`dao`的中间层，所以应该由`service`层去处理这个模型转换
-
-### FFmpeg
-
-项目用FFmpeg去提取视频封面，还有给视频统一转码成`H264 fmp4`方便存储和视频分发。FFmpeg是一个命令行工具，所以传数据不是很方便，一开始是直接用两个
-`pipe`输入输出视频流，然后有一些视频是需要时不时回来`Peek`一下头的，然后`pipe`输入就爆了，所以后面直接调用系统的API去创建一个临时文件，然后把视频塞那里再转码，
-`pipe`是可以正常输出`fmp4`的，所以输出就正常`pipe`可以少些一些代码，而且`fmp4`也更适合视频网站
+```sql
+comments
+(
+id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+user_id       BIGINT      NOT NULL,
+video_id      BIGINT      NOT NULL,
+parent_id     BIGINT,
+content       TEXT        NOT NULL,
+like_count    BIGINT      NOT NULL DEFAULT 0,
+comment_count BIGINT      NOT NULL DEFAULT 0,
+created_at    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+```
 
 ### 事务
 
-我这里Dao有写方法需要多次查询，多次查询应该用事务来保证原子性，但是我偷懒没写
+在需要多次SQL操作的服务里使用事务，保证数据一致性
+```go
+err = db.DB.Transaction(func(tx *gorm.DB) error {
+comment, err := s.commentDao.WithTx(tx).GetCommentByID(s.ctx, commentID)
+...
+}
+```
+
+```mermaid
+flowchart TD
+    A([开始事务])
+    B[写入评论记录]
+    D[视频评论数 +1]
+    E[父评论回复数 +1]
+    F([提交事务])
+    G([回滚事务])
+    
+    subgraph TX[事务内操作]
+        direction TB
+        B -->|评论视频| D
+        B -->|回复评论| E
+    end
+    
+    A --> TX
+    TX -->|成功| F
+    TX -->|失败| G
+```
 
 ### 约束
 
-我表一个约束和关系也没设计，所以很多时候都要多判断一个存在性，比如点赞的视频是否存在，多一个查询就直接变成N+1了...，也许下次可以赛一个外键约束然后这样创建点赞之类的炸了只要判断一下错误就行了，不需要去额外查询视频是否存在
+给所有表加检查约束和外键约束，防止脏数据意外落库
 
-### 上传视频
+```sql
+likes
+(
+    ...
 
-我上传视频用Minio做对象存储，然后键正好要用视频ID，但是视频要插入之后才有ID。所以我一开始是先创建视频得到视频ID，然后再上传视频，最后更新视频的链接，这有一个问题，就是上传视频到对象存储有可能失败，失败之后那个视频会变成脏数据，需要给他清掉，也就是需要rollback，所以直接用了事务，炸了直接回滚不会有脏数据。不过我现在想了想其实可以直接生成一串UUID来作为视频和封面的键，然后视频上传成功了再在数据库里创建视频，这样就不需要更新视频和封面链接了。不过我好像没处理视频脏数据...，如果发生回滚，那对象存储的视频没删掉
+    CONSTRAINT fk_likes_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_likes_video_id FOREIGN KEY (video_id) REFERENCES videos (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_likes_comment_id FOREIGN KEY (comment_id) REFERENCES comments (id) ON DELETE CASCADE,
+    CONSTRAINT chk_likes_target_exactly_one CHECK (
+        (video_id IS NOT NULL AND comment_id IS NULL)
+            OR
+        (video_id IS NULL AND comment_id IS NOT NULL)
+        )
+);
+```
 
-### 热门视频排行榜缓存
+### 错误传递
+见下文[错误处理](#错误处理)
 
-这个接口要分页，所以一开始想要不把视频+分页+页码作为键，但是这样就会一点抽象，因为页码和分页组合会有很多，最后的办法是缓存固定的数量，比如缓存前100个视频数据，然后缓存命中就在
-`service`里找到用户请求的那部分并且返回，没命中再查数据库。不过我设计的貌似是有点问题的，比如引入缓存后如果如果排行榜突然变化很大，那么就会更新不及时，没有机制来清除缓存，但是10分钟缓存，我觉得对热门排行榜来说问题不大
+## 接口
 
-### 点赞操作缓存
+### 聊天
 
-一开始是想缓存一个视频所有点赞用户的ID集合，然后感觉视频动辄几万点赞，感觉存这个redis要爆内存，所以改成存用户点赞过的视频
+#### 请求
+使用`adaptor.HertzHandler`自定义一个`ChatHandler`，在校验请求头携带的`access_token`后将HTTP请求升级为Websocket连接
 
-### Docker编译
+#### 连接管理
 
-docker镜像构建时的环境变量和宿主机是独立的，所以要单独设`GO_PROXY`，不然慢死
+使用`OnlineUserManager`来管理在线用户，内部通过 `map[int64]OnlineUser`维护用户ID与WebSocket连接的映射关系，使用`sync.RWMutex`来保证操作原子性
 
-### Docker依赖
+#### 消息结构
 
-因为镜像是精简过的，所以可能会缺时区数据，要用装一个`tzdata`。而且要用到`ffmpeg`，所以也要用提前装好，还有`ca-certificates`
-，虽然目前没遇到炸CA证书的，但是保险起见装一下
+将传输数据统一封装为`Message`结构，包含`type`和`body`两部分。`Message`再派生出不同的消息类型
 
-不装`tzdata`加时区环境，变量数据库初始化直接炸`panic`，大坑
+- `ChatMessage`: 普通聊天消息
+- `HistoryRequest / HistoryMessage`: 历史消息拉取与返回
+- `UnreadRequest / UnreadMessage`: 未读消息拉取与返回
+- `ErrorMessage`: 错误消息
 
-### Context
+#### 聊天处理
 
-`context`按理说应该注入到service然后逐层传递来做超时控制，我偷懒全塞`Background()`了，超级技术债Be Like
+对于在线用户直接从Websocket发送消息，然后将消息标记已读时间并入库，离线则将已读时间标记为`null`并入库
 
-### 响应打包
+### 评论
 
-发现很多API的响应是一样的，也许可以做几个公共方法，来减少重复代码
+树状评论，不是很好计数，后续可以考虑改为类似B站的二级评论结构，回复二级评论变成`@xxx(特殊占位符) 评论内容`，目前评论计数只包含下一级评论的评论数
 
-### 视频访问量统计
 
-我没看懂Apifox里那个视频要如何增加访问量，我不觉得直接从下载视频的URL里面计数是好主意，因为这些视频最后肯定要给CDN缓存的，要计数只能
-`no-cache`，这绝对要给服务器打炸，所以我单独设计了个`visit`接口来增加访问量
+```mermaid
+flowchart TD
+    A["评论1<br/>2条子评论"]
 
-### 刷新Token接口
+    B["评论1.1<br/>3条子评论"]
+    C["评论1.2"]
 
-Apifox的示例里好像每次都会携带Access和Refresh两个Token，我觉得是不太好的，两个一起带安全性也不够，所以我请求只带了AccessToken，然后加了个接口来用RefreshToken刷新
+    D["评论1.1.1"]
+    E["评论1.1.2"]
+    F["评论1.1.3"]
 
-### `Slices.Contains`
+    A --> B
+    A --> C
 
-才发现Go的切片原来有`Contains`...
+    B --> D
+    B --> E
+    B --> F
+```
+
+### MFA
+
+接口在上一次作业中完成，本次做了安全性改进。使用`AES GCM`加密`totp_secret`后存入数据库，使用时再解密，提高安全性
+
+### 教务处绑定
+
+使用jwch库校验传入的学号和密码，并且使用`AES GCM`加密`jwch_password`后存入数据库
+
+## AI聊天
+
+目前基于私聊实现
+
+### 工具
+
+#### MCP
+
+每次拉起会话会直接新建一个MCP客户端，然后从福uu的MCP服务器获取工具列表并将工具塞进上下文里。
+
+> 考虑到福uu的MCP使用了CDN，无法长时间连接需要重连机制，而且保持连接有点浪费资源。
+
+#### 本地Tool
+
+本地Tool只有一个教务处的，然后做了亿点点封装。把教务处登录的函数输入和输出封装成结构体，注册到本地工具里，LLM初始化对话的时候塞进上下文，需要调用的时候优先从本地Tool找工具
+
+```mermaid
+flowchart TD
+    A((模型))
+    
+    B{{本地工具<br/>Registry}}
+    
+    subgraph LOCAL[本地工具]
+        direction LR
+        C[教务处登录方法]
+    end
+    
+    D[JSON反序列化]
+    E[JSON序列化]
+    F[(模型上下文)]
+    
+    A --> B
+    B -->|原始JSON字符串| D
+    D -->|结构化参数| C
+    C -->|结构化输出| E
+    E -->|JSON字符串输出| F 
+
+```
+
+#### 调用流程
+
+```mermaid
+flowchart TD
+    A((模型))
+    J[(模型上下文)]
+
+    subgraph TX[工具集]
+        direction LR
+        B{{本地工具<br/>Registry}}
+        C{{福uu MCP<br/>客户端}}
+    end
+
+    subgraph MCP[MCP服务]
+        direction TB
+        G[福uu MCP服务器]
+    end
+
+    subgraph LOCAL[本地工具]
+        direction LR
+        D[教务处登录方法]
+    end
+    
+
+    A --> TX
+
+    B --> D
+    D --> J
+
+    C --> G
+    G --> J
+```
+
+### Agent循环
+
+好像没什么好说的，其实就是个for循环，每轮检查工具调用数，不为0则调用工具并继续，为0则结束，以最后一个回答为最终结果
+
+```mermaid
+flowchart TD
+    C[(模型上下文)]
+    A((模型))
+    B{调用工具数}
+    E[调用工具]
+    D([结束])
+
+    C --> A
+    A --> B
+    A --> |模型输出写入上下文| C
+    B -->|> 0| E
+    E -->|调用结果写入上下文| C
+
+    B -->|= 0| D
+```
+
+### 安全机制
+
+通过工具的`Authorize`方法传入`ToolCallContext`来限制模型只能访问私聊两个人的教务处账号
+
+### 聊天处理
+
+每当用户发送消息时，AI会自己判断是否需要回复， AI的聊天会以消息字段`is_ai: true`入库，会有两条`receiver_id`和`sender_id`相反的记录，方便未读消息拉取 (然后历史消息变难写了，难绷)
+
+## 项目管理
+
+### 源代码管理
+PR + 窝瓜合并 (Squash)
+
+- 优点: 线性历史，没有很杂的提交记录
+- 缺点: PR稍微大点一个commit就成百上千行
+
+### 项目配置
+
+- .dockerignore: Docker构建忽略配置
+- .editorconfig: 代码风格配置
+- .gitignore: Git忽略文件追踪配置
+- .gitattributes: Git文件配置
+- .golangci.yml: 静态代码分析配置
+- codecov.yml: Codecov Bot配置文件，覆盖率检查
+- renovate.json: Renovate Bot配置文件，自动PR依赖更新
+
+### 工作流
+
+- ci: 二进制编译 (Windows + Linux矩阵)
+- ci-docker: Docker镜像打包
+- codeql: 漏洞扫描
+- lint: 代码规范
+- test: 单元测试和测试覆盖
+- release: 发版相关
+
+## 细节优化
+
+### 错误处理
+
+参考[Go 项目分层下的最佳 error 处理方式](https://juejin.cn/post/7246777406387306553)的错误处理方式，使用`errors.Wrap`包裹`err`，然后逐层包裹`errors.WithMessage`，最后在`pack.RespError`中将非预期的内部错误通过hlog处理
+```mermaid
+flowchart TD
+    A[发生err]
+    B[errors.Wrap包裹原始错误]
+    C[errors.WithMessage逐层追加上下文]
+    D{预期业务错误}
+    E[pack.RespError返回业务错误]
+    F[hlog记录内部错误]
+    G[pack.RespError返回通用错误]
+
+    A --> B
+    B --> C
+    C --> D
+    D -->|是| E
+    D -->|否| F
+    F --> G
+```
+
+### 参数校验
+
+在idl中使用`api.vd`参数定义，表达式是字节跳动的[go-tagexpr](https://github.com/bytedance/go-tagexpr/tree/master) (已经似了)，其实在`handler`和`service`已经校验了绝大部分参数，这里象征性写几个分页校验
+
+```thrift
+// 发布列表请求
+struct ListReq {
+    // 用户ID
+    1: required string user_id (api.query = 'user_id');
+    // 页码
+    2: required i32 page_num (api.query = 'page_num', api.vd="$ >= 0");
+    // 单页尺寸
+    3: required i32 page_size (api.query = 'page_size', api.vd="$ >= 1 && $ <= 100");
+}
+```
+
+### 流量治理
+
+使用`Sentinel`中间件对API进行限流，`Sentinel`中间件放入mw模块统一进行初始化
+
+### 代码复用
+
+大部分可复用的代码都在pkg里
+
+本轮将`service`层大量的分页fallback移动到了`pkg/utils/page`中`NormalizePage`方法里
+
+## 单元测试
+
+### 子测试
+使用子测试进行多样例测试
+```go
+func TestXXX(t *testing.T) {
+	type testCase struct {
+		parm xxx
+		wantResult     xxx
+	}
+
+	testCases := map[string]testCase{
+		"xxx": ...,
+		"xxx": ...,
+	}
+
+	defer mockey.UnPatchAll()
+
+	for name, tc := range testCases {
+		...
+	}
+}
+```
+
+### Mockey
+
+使用`mockey`库打桩，空置无关函数，将测试样例注入相关函数
+```go
+
+defer mockey.UnPatchAll()
+mockey.PatchConvey(name, t, func() {
+    mockey.Mock(xxx).Return(xxx).Build()
+    xxx, err := XXX(...)
+    ...
+    assert.XXX(...)
+})
+```
+
+
+## 性能优化
+
+### 缓存
+
+#### 教务处会话缓存
+
+福uu MCP需要传入`identifier + cookies`，教务处接口每次都重新登录成本略高，所以这里把教务处的`identifier + cookies`缓存到Redis里，优先复用短期有效会话，减少登录。
+
+```mermaid
+flowchart TD
+    A[请求教务处能力]
+    B[读取Redis中的identifier和cookies]
+    C{缓存命中}
+    E{验证会话}
+    F[直接复用缓存会话]
+    G[从数据库读取绑定信息]
+    I[重新登录教务处]
+
+    K[异步写回Redis缓存]
+    L[返回新会话]
+    M[绑定新账号后清理旧缓存]
+
+    A --> B --> C
+    C -->|是| E
+    E -->|有效| F
+    E -->|过期| G
+    C -->|否| G
+    G -->  I  --> K --> L
+    M -.-> B
+```
+
+#### 点赞操作缓存
+
+上一轮要求的，使用集合缓存用户点赞的所有视频ID，缓存命中时直接使用，缓存miss时降级走数据库然后回填缓存。这里异步修改缓存可能会有一致性问题，所以TTL设为`5min`以减少不一致
+
+```mermaid
+flowchart TD
+    A[点赞/取消点赞请求]
+    C[开启事务]
+    D[查询Redis点赞集合]
+    E{缓存命中}
+    F[直接得到isLiked]
+    G[查询数据库中的用户点赞列表]
+    I[异步回填点赞集合缓存]
+    J{动作类型}
+    K[新增点赞记录]
+    L[视频like_count +1]
+    M[删除点赞记录]
+    N[视频like_count -1]
+    O[提交事务]
+    P[异步SAdd或SRem点赞集合]
+    Q[异步增减视频详情缓存like_count]
+
+    A -->  C --> D --> E
+    E -->|是| F --> J
+    E -->|否| G --> I --> J
+    J -->|点赞| K --> L --> O
+    J -->|取消点赞| M --> N --> O
+    O --> P --> Q
+```
+
+#### 关注操作缓存
+
+和点赞操作缓存基本一致，异步删改缓存可能有一致性问题，所以TTL设为`5min`以减少不一致
+
+```mermaid
+flowchart TD
+    A[关注/取关请求]
+    C[开启事务]
+    D[查询Redis关注集合]
+    E{缓存命中}
+    F[直接得到followed]
+    G[查询数据库中的全部关注ID]
+    I[异步回填关注集合缓存]
+    J{动作类型}
+    K[写入关注关系]
+    L[删除关注关系]
+    M[提交事务]
+    N[异步SAdd或SRem关注集合]
+
+
+    A  --> C --> D --> E
+    E -->|是| F --> J
+    E -->|否| G  --> I --> J
+    J -->|关注| K --> M
+    J -->|取关| L --> M
+    M --> N
+```
+
+#### 用户视频列表
+
+这里采用`版本+分页`缓存视频的ID列表 (从知乎看的)，获取ID列表后再从缓存和数据库获取视频对象 (缓存没有自动降级到数据库)
+
+这里分页了缓存不是很好清理，所以过期的缓存通过TTL自动清理 (已在chat吸取教训)，用`version`来读取最新的缓存
+
+```mermaid
+flowchart TD
+    A[请求用户视频列表]
+    B[读取该用户的视频列表version]
+    C[按userID/version/page读取分页缓存]
+    D{列表缓存命中}
+    E[拿到videoIDs和total]
+    F[批量读取视频详情缓存]
+    G{详情是否有缺失}
+    H[只回源缺失的视频详情]
+    I[回填视频详情缓存]
+    J[组装并返回列表]
+    K[数据库查询用户视频分页和总数]
+    L[异步写入分页缓存]
+    M[异步写入视频详情缓存]
+    N[发布视频]
+    O[version +1]
+
+    A --> B --> C --> D
+    D -->|是| E --> F --> G
+    G -->|否| J
+    G -->|是| H --> I --> J
+    D -->|否| K --> L --> M --> J
+    N --> O
+    O -.-> B
+```
+
+### 异步
+
+部分接口缓存更新已经异步了，数据库更新依旧还是同步的。后续打算给点赞和评论接一个MQ
