@@ -29,7 +29,7 @@ require (
 	github.com/west2-online/jwch v0.4.23
 	golang.org/x/crypto v0.50.0
 	gorm.io/driver/postgres v1.6.0
-	gorm.io/gen v0.3.27
+	gorm.io/gen v0.3.29
 	gorm.io/gorm v1.31.1
 	gorm.io/plugin/dbresolver v1.6.2
 )
@@ -111,6 +111,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.2 // indirect
 	golang.org/x/arch v0.11.0 // indirect
+	golang.org/x/exp v0.0.0-20240112132812-db7319d0e0e3 // indirect
 	golang.org/x/mod v0.34.0 // indirect
 	golang.org/x/net v0.52.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
